@@ -12,4 +12,5 @@ interface IVaultManager {
   error TooManyVaults();
   error VaultAlreadyAdded();
   error NotDNftVault();
+  error InvalidNft();
 }

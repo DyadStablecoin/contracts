@@ -21,6 +21,16 @@ contract VaultManager is IVaultManager {
   mapping (uint => address[])                 public vaults; 
   mapping (uint => mapping (address => bool)) public isDNftVault;
 
+  modifier isDNftOwner(uint id) {
+    if (dNft.ownerOf(id) != msg.sender) revert NotOwner(); _;
+  }
+  modifier isValidDNft(uint id) {
+    if (id >= dNft.totalSupply()) revert InvalidNft(); _;
+  }
+  modifier isLicensed(address vault) {
+    if (!licenser.isLicensed(vault)) revert NotLicensed(); _;
+  }
+
   constructor(
     DNft     _dNft,
     Dyad     _dyad,
@@ -56,6 +66,15 @@ contract VaultManager is IVaultManager {
       vaults[id].pop();
       isDNftVault[id][vault] = false;
       emit Removed(id, vault);
+  }
+
+  function deposit(uint id, address vault, uint amount) 
+  external 
+  payable
+    isValidDNft(id) 
+    isLicensed(vault)
+  {
+    Vault(vault).deposit(id, amount);
   }
 
   function collatRatio(uint id)
