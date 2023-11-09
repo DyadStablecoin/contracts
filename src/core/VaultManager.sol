@@ -1,16 +1,21 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
-import {DNft} from "./DNft.sol";
-import {Licenser} from "./Licenser.sol";
-import {Vault} from "./Vault.sol";
+import {DNft}          from "./DNft.sol";
+import {Dyad}          from "./Dyad.sol";
+import {Licenser}      from "./Licenser.sol";
+import {Vault}         from "./Vault.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 
+import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
+
 contract VaultManager is IVaultManager {
+  using FixedPointMathLib for uint;
 
   uint public constant MAX_VAULTS = 5;
 
   DNft     public immutable dNft;
+  Dyad     public immutable dyad;
   Licenser public immutable licenser;
 
   mapping (uint => address[])                 public vaults; 
@@ -18,9 +23,11 @@ contract VaultManager is IVaultManager {
 
   constructor(
     DNft     _dNft,
+    Dyad     _dyad,
     Licenser _licenser
   ) {
     dNft     = _dNft;
+    dyad     = _dyad;
     licenser = _licenser;
   }
 
@@ -53,13 +60,13 @@ contract VaultManager is IVaultManager {
 
   function collatRatio(uint id)
   public 
+  view
   returns (uint) {
-    // uint totalUsdValue = getVaultsUsdValue(id);
-    // uint _dyad = dyad.mintedDyad(address(this), id); // save gas
-    // if (_dyad == 0) return type(uint).max;
-    // return totalUsdValue.divWadDown(_dyad);
+    uint totalUsdValue = getTotalUsdValue(id);
+    uint _dyad = dyad.mintedDyad(address(this), id);
+    if (_dyad == 0) return type(uint).max;
+    return totalUsdValue.divWadDown(_dyad);
   }
-
 
   function getTotalUsdValue(uint id) 
   public 
