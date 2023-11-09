@@ -13,6 +13,7 @@ contract VaultManager is IVaultManager {
   using FixedPointMathLib for uint;
 
   uint public constant MAX_VAULTS = 5;
+  uint public constant MIN_COLLATERIZATION_RATIO = 15e17; // 150%
 
   DNft     public immutable dNft;
   Dyad     public immutable dyad;
@@ -75,6 +76,14 @@ contract VaultManager is IVaultManager {
     isLicensed(vault)
   {
     Vault(vault).deposit(id, amount);
+  }
+
+  function withdraw(uint id, address vault, address to, uint amount) 
+  external 
+    isDNftOwner(id)
+  {
+    Vault(vault).withdraw(id, to, amount);
+    if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
   }
 
   function collatRatio(uint id)

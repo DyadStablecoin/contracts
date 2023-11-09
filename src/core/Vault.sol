@@ -57,7 +57,7 @@ contract Vault is Owned, IVault {
       onlyVaultManager
     {
       id2asset[id] -= amount;
-      asset.safeTransfer(to, amount);
+      asset.transfer(to, amount); 
       emit Withdraw(id, to, amount);
   }
 
