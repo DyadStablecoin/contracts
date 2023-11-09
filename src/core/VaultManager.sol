@@ -111,6 +111,21 @@ contract VaultManager is IVaultManager {
     return asset;
   }
 
+  function liquidate(uint id, uint to) 
+  external 
+    isValidDNft(id)
+    isValidDNft(to)
+  payable {
+    if (collatRatio(id) >= MIN_COLLATERIZATION_RATIO) revert CrTooHigh(); 
+    uint mintedDyad = dyad.mintedDyad(address(this), id);
+    dyad.burn(id, msg.sender, mintedDyad);
+
+    uint numberOfVaults = vaults[id].length;
+    for (uint i = 0; i < numberOfVaults; i++) {
+      Vault(vaults[id][i]).move(id, to);
+    }
+  }
+
   function collatRatio(uint id)
   public 
   view

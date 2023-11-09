@@ -14,4 +14,5 @@ interface IVaultManager {
   error NotDNftVault();
   error InvalidNft();
   error CrTooLow();
+  error CrTooHigh();
 }

@@ -55,10 +55,19 @@ contract Vault is Owned, IVault {
   function withdraw(uint id, address to, uint amount) 
     external 
       onlyVaultManager
-    {
-      id2asset[id] -= amount;
-      asset.transfer(to, amount); 
-      emit Withdraw(id, to, amount);
+  {
+    id2asset[id] -= amount;
+    asset.transfer(to, amount); 
+    emit Withdraw(id, to, amount);
+  }
+
+  function move(uint from, uint to)
+    external
+      onlyVaultManager
+  {
+    uint amount = id2asset[from];
+    id2asset[from] = 0;
+    id2asset[to]  += amount;
   }
 
   function assetPrice() 
