@@ -1,108 +1,68 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
+import {VaultManager} from "./VaultManager.sol";
+import {IDNft} from "../interfaces/IDNft.sol";
+import {IVault} from "../interfaces/IVault.sol";
+import {IAggregatorV3} from "../interfaces/AggregatorV3Interface.sol";
+
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {Owned} from "@solmate/src/auth/Owned.sol";
-
-import {IDNft} from "../interfaces/IDNft.sol";
-import {IVault} from "../interfaces/IVault.sol";
-import {IAggregatorV3} from "../interfaces/AggregatorV3Interface.sol";
-import {Dyad} from "./Dyad.sol";
+import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract Vault is Owned, IVault {
-  using SafeTransferLib   for address;
+  using SafeTransferLib   for ERC20;
   using SafeCast          for int;
   using FixedPointMathLib for uint;
 
-  uint public constant MIN_COLLATERIZATION_RATIO = 3e18; // 300%
+  VaultManager  public immutable vaultManager;
+  ERC20         public immutable asset;
+  IAggregatorV3 public immutable oracle;
+  uint          public immutable minCollatRatio; 
 
-  struct Permission {
-    bool    hasPermission; 
-    uint248 lastUpdated;
+  mapping(uint => uint) public id2asset;
+
+  modifier onlyVaultManager() {
+    if (msg.sender != address(vaultManager)) revert NotVaultManager();
+    _;
   }
-
-  mapping(uint => uint)                            public id2eth;
-  mapping(uint => uint)                            public id2dyad;
-
-  Dyad          public dyad;
-  IAggregatorV3 public oracle;
 
   constructor(
-      address _dyad,
-      address _oracle, 
-      address _owner
+      address       _owner,
+      VaultManager  _vaultManager,
+      ERC20         _asset,
+      IAggregatorV3 _oracle, 
+      uint          _minCollatRatio
   ) Owned(_owner) {
-      dyad   = Dyad(_dyad);
-      oracle = IAggregatorV3(_oracle);
+      vaultManager   = _vaultManager;
+      asset          = _asset;
+      oracle         = _oracle;
+      minCollatRatio = _minCollatRatio;
   }
 
-  /// @inheritdoc IVault
-  function deposit(uint id) 
+  function deposit(uint id, uint amount)
     external 
     payable
+      onlyVaultManager
   {
-    id2eth[id] += msg.value;
-    emit Deposit(id, msg.value);
+    asset.safeTransferFrom(msg.sender, address(this), amount);
+    id2asset[id] += amount;
+    emit Deposit(id, amount);
   }
 
-  /// @inheritdoc IVault
-  function withdraw(uint from, address to, uint amount) 
+  function withdraw(uint id, address to, uint amount) 
     external 
+      onlyVaultManager
     {
-      id2eth[from] -= amount;
-      if (_collatRatio(from) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
-      to.safeTransferETH(amount); // re-entrancy
-      emit Withdraw(from, to, amount);
+      id2asset[id] -= amount;
+      asset.safeTransfer(to, amount);
+      emit Withdraw(id, to, amount);
   }
 
-  /// @inheritdoc IVault
-  function mintDyad(uint from, address to, uint amount)
+  function getPrice() 
     external 
-    {
-      id2dyad[from] += amount;
-      if (_collatRatio(from) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
-      dyad.mint(to, amount);
-      emit MintDyad(from, to, amount);
-  }
-
-  /// @inheritdoc IVault
-  function burnDyad(uint id, uint amount) 
-    external 
-  {
-    dyad.burn(msg.sender, amount);
-    id2dyad[id] -= amount;
-    emit BurnDyad(id, amount);
-  }
-
-  /// @inheritdoc IVault
-  function redeem(uint from, address to, uint amount)
-    external 
-    returns (uint) { 
-      dyad.burn(msg.sender, amount);
-      id2dyad[from] -= amount;
-      uint eth       = amount * (10**oracle.decimals()) / _getEthPrice();
-      id2eth[from]  -= eth;
-      to.safeTransferETH(eth); // re-entrancy 
-      emit Redeem(from, amount, to, eth);
-      return eth;
-  }
-
-  // Get Collateralization Ratio of the dNFT
-  function _collatRatio(uint id) 
-    private 
-    view 
-    returns (uint) {
-      uint _dyad = id2dyad[id]; // save gas
-      if (_dyad == 0) return type(uint).max;
-      // cr = deposit / withdrawn
-      return (id2eth[id] * _getEthPrice() / (10**oracle.decimals())).divWadDown(_dyad);
-  }
-
-  // ETH price in USD
-  function _getEthPrice() 
-    private 
     view 
     returns (uint) {
       (
