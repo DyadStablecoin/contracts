@@ -79,11 +79,36 @@ contract VaultManager is IVaultManager {
   }
 
   function withdraw(uint id, address vault, address to, uint amount) 
-  external 
+  public 
     isDNftOwner(id)
   {
     Vault(vault).withdraw(id, to, amount);
     if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
+  }
+
+  function mintDyad(uint id, address to, uint amount)
+  external 
+    isDNftOwner(id)
+  {
+    dyad.mint(id, to, amount);
+    if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
+  }
+
+  function burnDyad(uint id, uint amount) 
+  external 
+  {
+    dyad.burn(id, msg.sender, amount);
+  }
+
+  function redeemDyad(uint id, address vault, address to, uint amount)
+  external 
+    isDNftOwner(id)
+  returns (uint) { 
+    dyad.burn(id, msg.sender, amount);
+    Vault _vault = Vault(vault);
+    uint asset  = amount * (10**_vault.oracle().decimals()) / _vault.assetPrice();
+    withdraw(id, vault, to, asset);
+    return asset;
   }
 
   function collatRatio(uint id)
