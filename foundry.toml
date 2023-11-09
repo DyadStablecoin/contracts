@@ -1,0 +1,9 @@
+# See more config options https://github.com/foundry-rs/foundry/tree/master/config
+
+[profile.default]
+src = 'src'
+out = 'out'
+libs = ['lib']
+
+# viaIR = true 
+optimizer_runs = 1_000_000

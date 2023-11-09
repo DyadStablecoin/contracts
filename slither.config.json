@@ -1,0 +1,7 @@
+{
+  "filter_paths": "lib", 
+  "solc_remaps": [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "@solmate/=lib/solmate/"
+  ]
+}
