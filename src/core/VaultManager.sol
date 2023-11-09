@@ -3,6 +3,7 @@ pragma solidity =0.8.17;
 
 import {DNft} from "./DNft.sol";
 import {Licenser} from "./Licenser.sol";
+import {Vault} from "./Vault.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 
 contract VaultManager is IVaultManager {
@@ -48,5 +49,34 @@ contract VaultManager is IVaultManager {
       vaults[id].pop();
       isDNftVault[id][vault] = false;
       emit Removed(id, vault);
+  }
+
+  function collatRatio(uint id)
+  public 
+  returns (uint) {
+    // uint totalUsdValue = getVaultsUsdValue(id);
+    // uint _dyad = dyad.mintedDyad(address(this), id); // save gas
+    // if (_dyad == 0) return type(uint).max;
+    // return totalUsdValue.divWadDown(_dyad);
+  }
+
+
+  function getTotalUsdValue(uint id) 
+  public 
+  view
+  returns (uint) {
+    uint totalUsdValue;
+    uint numberOfVaults = vaults[id].length; 
+    for (uint i = 0; i < numberOfVaults; i++) {
+      Vault vault = Vault(vaults[id][i]);
+      uint usdValue;
+      if (licenser.isLicensed(address(vault))) {
+        usdValue = vault.id2asset(id) 
+                    * vault.assetPrice() 
+                    / (10**vault.oracle().decimals());
+      }
+      totalUsdValue += usdValue;
+    }
+    return totalUsdValue;
   }
 }

@@ -61,7 +61,7 @@ contract Vault is Owned, IVault {
       emit Withdraw(id, to, amount);
   }
 
-  function getPrice() 
+  function assetPrice() 
     external 
     view 
     returns (uint) {
