@@ -5,12 +5,4 @@ import "forge-std/Script.sol";
 import {DeployBase} from "./DeployBase.s.sol";
 import {Parameters} from "../../src/Parameters.sol";
 
-contract DeployMainnet is Script, Parameters {
-  function run() public {
-      new DeployBase().deploy(
-        MAINNET_ORACLE,
-        MAINNET_OWNER
-      );
-  }
-}
-
+contract DeployMainnet is Script, Parameters {}
