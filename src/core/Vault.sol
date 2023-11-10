@@ -65,7 +65,7 @@ contract Vault is Owned, IVault {
     external
       onlyVaultManager
   {
-    uint amount = id2asset[from];
+    uint amount    = id2asset[from];
     id2asset[from] = 0;
     id2asset[to]  += amount;
   }
@@ -81,7 +81,7 @@ contract Vault is Owned, IVault {
         uint256 timeStamp, 
         uint80 answeredInRound
       ) = oracle.latestRoundData();
-      if (timeStamp == 0) revert IncompleteRound();
+      if (timeStamp == 0)            revert IncompleteRound();
       if (answeredInRound < roundID) revert StaleData();
       return price.toUint256();
   }
