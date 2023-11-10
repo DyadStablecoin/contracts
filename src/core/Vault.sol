@@ -42,7 +42,10 @@ contract Vault is Owned, IVault {
       minCollatRatio = _minCollatRatio;
   }
 
-  function deposit(uint id, uint amount)
+  function deposit(
+    uint id,
+    uint amount
+  )
     external 
     payable
       onlyVaultManager
@@ -52,7 +55,11 @@ contract Vault is Owned, IVault {
     emit Deposit(id, amount);
   }
 
-  function withdraw(uint id, address to, uint amount) 
+  function withdraw(
+    uint    id,
+    address to,
+    uint    amount
+  ) 
     external 
       onlyVaultManager
   {
@@ -61,7 +68,10 @@ contract Vault is Owned, IVault {
     emit Withdraw(id, to, amount);
   }
 
-  function move(uint from, uint to)
+  function move(
+    uint from,
+    uint to
+  )
     external
       onlyVaultManager
   {
@@ -70,8 +80,17 @@ contract Vault is Owned, IVault {
     id2asset[to]  += amount;
   }
 
+  function getUsdValue(
+    uint id
+  )
+    external
+    view 
+    returns (uint) {
+      return id2asset[id] * assetPrice() / 10**oracle.decimals();
+  }
+
   function assetPrice() 
-    external 
+    public 
     view 
     returns (uint) {
       (

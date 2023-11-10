@@ -178,9 +178,7 @@ contract VaultManager is IVaultManager {
         Vault vault = Vault(vaults[id][i]);
         uint usdValue;
         if (licenser.isLicensed(address(vault))) {
-          usdValue = vault.id2asset(id) 
-                      * vault.assetPrice() 
-                      / (10**vault.oracle().decimals());
+          usdValue = vault.getUsdValue(id);        
         }
         totalUsdValue += usdValue;
       }
