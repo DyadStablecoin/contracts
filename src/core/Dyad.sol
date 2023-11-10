@@ -26,7 +26,7 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
     _; 
   }
 
-  modifier licensed() {
+  modifier licensedVaultManager() {
     if (!licenser.isLicensed(msg.sender)) revert NotLicensed();
     _;
   }
@@ -38,7 +38,7 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
       uint    amount
   ) external 
       exists(id) 
-      licensed 
+      licensedVaultManager 
     {
       mintedDyad[msg.sender][id] += amount;
       _mint(to, amount);
@@ -51,7 +51,7 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
       uint    amount
   ) external 
       exists(id) 
-      licensed 
+      licensedVaultManager 
     {
       mintedDyad[msg.sender][id] -= amount;
       _burn(from, amount);
