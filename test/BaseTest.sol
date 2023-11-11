@@ -14,7 +14,7 @@ import {OracleMock} from "./OracleMock.sol";
 import {ERC20Mock} from "./ERC20Mock.sol";
 
 contract BaseTest is Test, Parameters {
-  DNft         dnft;
+  DNft         dNft;
   Licenser     vaultManagerLicenser;
   Licenser     vaultLicenser;
   Dyad         dyad;
@@ -24,13 +24,13 @@ contract BaseTest is Test, Parameters {
   OracleMock   oracle;
 
   function setUp() public {
-    dnft   = new DNft();
+    dNft   = new DNft();
     weth   = new ERC20Mock("WETH-TEST", "WETHT");
     oracle = new OracleMock();
 
     Contracts memory contracts = new DeployBase().deploy(
       msg.sender,
-      address(dnft),
+      address(dNft),
       address(weth),
       address(oracle)
     );
