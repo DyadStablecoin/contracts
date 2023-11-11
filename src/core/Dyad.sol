@@ -2,28 +2,19 @@
 pragma solidity =0.8.17;
 
 import {IDyad}    from "../interfaces/IDyad.sol";
-import {DNft}     from "./DNft.sol";
 import {Licenser} from "./Licenser.sol";
 import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
 
 contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
-  DNft     public immutable dNft;
   Licenser public immutable licenser;  
 
   // vault manager => (dNFT ID => dyad)
   mapping (address => mapping (uint => uint)) public mintedDyad; 
 
   constructor(
-    DNft      _dNft,
-    Licenser  _licenser
+    Licenser _licenser
   ) { 
-    dNft     = _dNft;
     licenser = _licenser; 
-  }
-
-  modifier exists(uint id) {
-    if (dNft.ownerOf(id) == address(0)) revert DNftDoesNotExist(); 
-    _; 
   }
 
   modifier licensedVaultManager() {
@@ -37,7 +28,6 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
       address to,
       uint    amount
   ) external 
-      exists(id) 
       licensedVaultManager 
     {
       mintedDyad[msg.sender][id] += amount;
@@ -50,7 +40,6 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
       address from,
       uint    amount
   ) external 
-      exists(id) 
       licensedVaultManager 
     {
       mintedDyad[msg.sender][id] -= amount;

@@ -116,6 +116,7 @@ contract VaultManager is IVaultManager {
     uint amount
   ) 
     external 
+      isValidDNft(id)
   {
     dyad.burn(id, msg.sender, amount);
   }

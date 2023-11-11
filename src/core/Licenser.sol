@@ -3,7 +3,7 @@ pragma solidity =0.8.17;
 
 import {Owned} from "@solmate/src/auth/Owned.sol";
 
-abstract contract Licenser is Owned(msg.sender) {
+contract Licenser is Owned(msg.sender) {
 
   mapping (address => bool) public isLicensed; 
 

@@ -9,10 +9,9 @@ import {IAggregatorV3} from "../interfaces/AggregatorV3Interface.sol";
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
-import {Owned} from "@solmate/src/auth/Owned.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
-contract Vault is Owned, IVault {
+contract Vault is IVault {
   using SafeTransferLib   for ERC20;
   using SafeCast          for int;
   using FixedPointMathLib for uint;
@@ -20,7 +19,6 @@ contract Vault is Owned, IVault {
   VaultManager  public immutable vaultManager;
   ERC20         public immutable asset;
   IAggregatorV3 public immutable oracle;
-  uint          public immutable minCollatRatio; 
 
   mapping(uint => uint) public id2asset;
 
@@ -30,16 +28,13 @@ contract Vault is Owned, IVault {
   }
 
   constructor(
-      address       _owner,
-      VaultManager  _vaultManager,
-      ERC20         _asset,
-      IAggregatorV3 _oracle, 
-      uint          _minCollatRatio
-  ) Owned(_owner) {
-      vaultManager   = _vaultManager;
-      asset          = _asset;
-      oracle         = _oracle;
-      minCollatRatio = _minCollatRatio;
+    VaultManager  _vaultManager,
+    ERC20         _asset,
+    IAggregatorV3 _oracle
+  ) {
+    vaultManager   = _vaultManager;
+    asset          = _asset;
+    oracle         = _oracle;
   }
 
   function deposit(
