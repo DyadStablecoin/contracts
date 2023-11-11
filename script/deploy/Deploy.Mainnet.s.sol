@@ -8,6 +8,7 @@ import {Parameters} from "../../src/Parameters.sol";
 contract DeployMainnet is Script, Parameters {
   function run() public {
     new DeployBase().deploy(
+      MAINNET_OWNER,
       MAINNET_DNFT,
       MAINNET_WETH,
       MAINNET_WETH_ORACLE

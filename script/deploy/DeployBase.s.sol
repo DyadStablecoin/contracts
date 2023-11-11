@@ -11,9 +11,19 @@ import {IAggregatorV3} from "../../src/interfaces/AggregatorV3Interface.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
+// only used for stack too deep issues
+struct Contracts {
+  Licenser     vaultManagerLicenser;
+  Licenser     vaultLicenser;
+  Dyad         dyad;
+  VaultManager vaultManager;
+  Vault        vault;
+}
+
 contract DeployBase is Script {
 
   function deploy(
+    address _owner, 
     address _dNft,
     address _asset,
     address _oracle
@@ -21,11 +31,7 @@ contract DeployBase is Script {
     public 
     payable 
     returns (
-      address, 
-      address, 
-      address, 
-      address, 
-      address
+      Contracts memory
     ) {
       DNft dNft = DNft(_dNft);
 
@@ -50,14 +56,22 @@ contract DeployBase is Script {
         IAggregatorV3(_oracle)
       );
 
+      // 
+      vaultManagerLicenser.add(address(vaultManager));
+      vaultLicenser       .add(address(vault));
+
+      //
+      vaultManagerLicenser.transferOwnership(_owner);
+      vaultLicenser       .transferOwnership(_owner);
+
       vm.stopBroadcast();  // ------------------------------------------
 
-      return (
-        address(vaultManagerLicenser), 
-        address(vaultLicenser),
-        address(dyad),
-        address(vaultManager),
-        address(vault)
+      return Contracts(
+        vaultManagerLicenser,
+        vaultLicenser,
+        dyad,
+        vaultManager,
+        vault
       );
   }
 }
