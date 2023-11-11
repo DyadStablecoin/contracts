@@ -17,7 +17,7 @@ contract VaultManager is IVaultManager {
 
   DNft     public immutable dNft;
   Dyad     public immutable dyad;
-  Licenser public immutable licenser;
+  Licenser public immutable vaultLicenser;
 
   mapping (uint => address[])                 public vaults; 
   mapping (uint => mapping (address => bool)) public isDNftVault;
@@ -29,7 +29,7 @@ contract VaultManager is IVaultManager {
     if (id >= dNft.totalSupply()) revert InvalidNft(); _;
   }
   modifier isLicensed(address vault) {
-    if (!licenser.isLicensed(vault)) revert NotLicensed(); _;
+    if (!vaultLicenser.isLicensed(vault)) revert NotLicensed(); _;
   }
 
   constructor(
@@ -37,9 +37,9 @@ contract VaultManager is IVaultManager {
     Dyad     _dyad,
     Licenser _licenser
   ) {
-    dNft     = _dNft;
-    dyad     = _dyad;
-    licenser = _licenser;
+    dNft          = _dNft;
+    dyad          = _dyad;
+    vaultLicenser = _licenser;
   }
 
   function add(
@@ -49,9 +49,9 @@ contract VaultManager is IVaultManager {
     external
       isDNftOwner(id)
   {
-    if (vaults[id].length >= MAX_VAULTS) revert TooManyVaults();
-    if (!licenser.isLicensed(vault))     revert VaultNotLicensed();
-    if (isDNftVault[id][vault])          revert VaultAlreadyAdded();
+    if (vaults[id].length >= MAX_VAULTS)  revert TooManyVaults();
+    if (!vaultLicenser.isLicensed(vault)) revert VaultNotLicensed();
+    if (isDNftVault[id][vault])           revert VaultAlreadyAdded();
     vaults[id].push(vault);
     isDNftVault[id][vault] = true;
     emit Added(id, vault);
@@ -81,7 +81,6 @@ contract VaultManager is IVaultManager {
     external 
     payable
       isValidDNft(id) 
-      isLicensed(vault)
   {
     Vault(vault).deposit(id, amount);
   }
@@ -178,7 +177,7 @@ contract VaultManager is IVaultManager {
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[id][i]);
         uint usdValue;
-        if (licenser.isLicensed(address(vault))) {
+        if (vaultLicenser.isLicensed(address(vault))) {
           usdValue = vault.getUsdValue(id);        
         }
         totalUsdValue += usdValue;
