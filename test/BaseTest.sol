@@ -5,16 +5,41 @@ import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import {DeployBase, Contracts} from "../script/deploy/DeployBase.s.sol";
 import {Parameters} from "../src/Parameters.sol";
+import {DNft} from "../src/core/DNft.sol";
+import {Dyad} from "../src/core/Dyad.sol";
+import {Licenser} from "../src/core/Licenser.sol";
+import {VaultManager} from "../src/core/VaultManager.sol";
+import {Vault} from "../src/core/Vault.sol";
+import {OracleMock} from "./OracleMock.sol";
+import {ERC20Mock} from "./ERC20Mock.sol";
 
 contract BaseTest is Test, Parameters {
+  DNft         dnft;
+  Licenser     vaultManagerLicenser;
+  Licenser     vaultLicenser;
+  Dyad         dyad;
+  VaultManager vaultManager;
+  Vault        vault;
+  ERC20Mock    weth;
+  OracleMock   oracle;
 
   function setUp() public {
+    dnft   = new DNft();
+    weth   = new ERC20Mock("WETH-TEST", "WETHT");
+    oracle = new OracleMock();
+
     Contracts memory contracts = new DeployBase().deploy(
       msg.sender,
-      GOERLI_DNFT,
-      GOERLI_WETH,
-      GOERLI_WETH_ORACLE
+      address(dnft),
+      address(weth),
+      address(oracle)
     );
+
+    vaultManagerLicenser = contracts.vaultManagerLicenser;
+    vaultLicenser        = contracts.vaultLicenser;
+    dyad                 = contracts.dyad;
+    vaultManager         = contracts.vaultManager;
+    vault                = contracts.vault;
   }
 
   receive() external payable {}
