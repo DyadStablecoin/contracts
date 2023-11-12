@@ -35,7 +35,7 @@ contract DeployBase is Script {
     ) {
       DNft dNft = DNft(_dNft);
 
-      vm.startBroadcast();  // ------------------------------------------
+      vm.startBroadcast();  // ----------------------
 
       Licenser vaultManagerLicenser = new Licenser();
       Licenser vaultLicenser        = new Licenser();
@@ -64,7 +64,7 @@ contract DeployBase is Script {
       vaultManagerLicenser.transferOwnership(_owner);
       vaultLicenser       .transferOwnership(_owner);
 
-      vm.stopBroadcast();  // ------------------------------------------
+      vm.stopBroadcast();  // ----------------------------
 
       return Contracts(
         vaultManagerLicenser,
