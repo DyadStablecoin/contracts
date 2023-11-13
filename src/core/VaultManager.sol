@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
+import "forge-std/console.sol";
+
 import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {Licenser}      from "./Licenser.sol";
@@ -65,15 +67,15 @@ contract VaultManager is IVaultManager {
       isDNftOwner(id)
   {
     if (!isDNftVault[id][vault]) revert NotDNftVault();
-    uint vaultsLength = vaults[id].length;
+    uint numberOfVaults = vaults[id].length;
     uint index; 
-    for (uint i = 0; i < vaultsLength; i++) {
+    for (uint i = 0; i < numberOfVaults; i++) {
       if (vaults[id][i] == vault) {
         index = i;
         break;
       }
     }
-    vaults[id][index] = vaults[id][vaultsLength - 1];
+    vaults[id][index] = vaults[id][numberOfVaults - 1];
     vaults[id].pop();
     isDNftVault[id][vault] = false;
     emit Removed(id, vault);
@@ -88,7 +90,9 @@ contract VaultManager is IVaultManager {
     payable
       isValidDNft(id) 
   {
-    Vault(vault).deposit(id, amount);
+    Vault _vault = Vault(vault);
+    _vault.asset().transferFrom(msg.sender, address(vault), amount);
+    _vault.deposit(id, amount);
   }
 
   function withdraw(

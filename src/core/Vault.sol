@@ -45,7 +45,6 @@ contract Vault is IVault {
     payable
       onlyVaultManager
   {
-    asset.safeTransferFrom(msg.sender, address(this), amount);
     id2asset[id] += amount;
     emit Deposit(id, amount);
   }
