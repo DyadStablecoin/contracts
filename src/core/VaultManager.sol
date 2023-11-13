@@ -58,15 +58,21 @@ contract VaultManager is IVaultManager {
   }
 
   function remove(
-      uint id,
-      uint index
+      uint    id,
+      address vault
   ) 
     external
       isDNftOwner(id)
   {
-    address vault = vaults[id][index];
-    if (!isDNftVault[id][vault])        revert NotDNftVault();
+    if (!isDNftVault[id][vault]) revert NotDNftVault();
     uint vaultsLength = vaults[id].length;
+    uint index; 
+    for (uint i = 0; i < vaultsLength; i++) {
+      if (vaults[id][i] == vault) {
+        index = i;
+        break;
+      }
+    }
     vaults[id][index] = vaults[id][vaultsLength - 1];
     vaults[id].pop();
     isDNftVault[id][vault] = false;

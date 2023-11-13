@@ -61,7 +61,7 @@ contract VaultManagerTest is VaultManagerTestHelper {
   function test_remove() public {
     uint id = dNft.mintNft{value: 1 ether}(address(this));
     vaultManager.add(id, address(vault));
-    vaultManager.remove(id, 0);
+    vaultManager.remove(id, address(vault));
   }
 
   function testCannot_remove_exceptForDNftOwner() public {
@@ -69,6 +69,6 @@ contract VaultManagerTest is VaultManagerTestHelper {
     vaultManager.add(id, address(vault));
     vm.prank(address(1));
     vm.expectRevert(IVaultManager.NotOwner.selector);
-    vaultManager.remove(id, 0);
+    vaultManager.remove(id, address(vault));
   }
 }
