@@ -6,6 +6,9 @@ import {VaultManagerTestHelper} from "./VaultManagerHelper.t.sol";
 import {IVaultManager} from "../src/interfaces/IVaultManager.sol";
 
 contract VaultManagerTest is VaultManagerTestHelper {
+
+  ///////////////////////////
+  // add
   function test_add() public {
     uint id = dNft.mintNft{value: 1 ether}(address(this));
     vaultManager.add(id, address(vault));
@@ -47,6 +50,14 @@ contract VaultManagerTest is VaultManagerTestHelper {
     vaultManager.add(id, RANDOM_VAULT_1);
   }
 
+  function testFail_cannotAddSameVaultTwice() public {
+    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    addVault(id, RANDOM_VAULT_1);
+    addVault(id, RANDOM_VAULT_1);
+  }
+
+  ///////////////////////////
+  // remove
   function test_remove() public {
     uint id = dNft.mintNft{value: 1 ether}(address(this));
     vaultManager.add(id, address(vault));

@@ -12,6 +12,6 @@ contract VaultManagerTestHelper is BaseTest {
   function addVault(uint id, address vault) public {
     vm.prank(vaultLicenser.owner());
     vaultLicenser.add(vault);
-    vaultManager.add(id, vault);
+    vaultManager. add(id, vault);
   }
 }
