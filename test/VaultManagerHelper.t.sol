@@ -5,9 +5,15 @@ import "forge-std/console.sol";
 import {BaseTest} from "./BaseTest.sol";
 
 contract VaultManagerTestHelper is BaseTest {
+  address constant RECEIVER = address(0xdead);
+
   address constant RANDOM_VAULT_1 = address(42);
   address constant RANDOM_VAULT_2 = address(314159);
   address constant RANDOM_VAULT_3 = address(69);
+
+  function mintDNft() public returns (uint) {
+    return dNft.mintNft{value: 1 ether}(address(this));
+  }
 
   function addVault(uint id, address vault) public {
     vm.prank(vaultLicenser.owner());

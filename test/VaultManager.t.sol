@@ -10,13 +10,13 @@ contract VaultManagerTest is VaultManagerTestHelper {
   ///////////////////////////
   // add
   function test_add() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     vaultManager.add(id, address(vault));
     assertEq(vaultManager.vaults(id, 0), address(vault));
   }
 
   function test_addTwoVaults() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     addVault(id, RANDOM_VAULT_1);
     addVault(id, RANDOM_VAULT_2);
     assertEq(vaultManager.isDNftVault(id, RANDOM_VAULT_1), true);
@@ -28,14 +28,14 @@ contract VaultManagerTest is VaultManagerTestHelper {
   }
 
   function testCannot_add_exceptForDNftOwner() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     vm.prank(address(1));
     vm.expectRevert(IVaultManager.NotOwner.selector);
     vaultManager.add(id, address(vault));
   }
 
   function testFail_add_moreThanMaxNumberOfVaults() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
 
     for (uint i = 0; i < vaultManager.MAX_VAULTS(); i++) {
       addVault(id, address(uint160(i)));
@@ -45,13 +45,13 @@ contract VaultManagerTest is VaultManagerTestHelper {
   }
 
   function testCannot_add_unlicensedVault() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     vm.expectRevert(IVaultManager.VaultNotLicensed.selector);
     vaultManager.add(id, RANDOM_VAULT_1);
   }
 
   function testFail_cannotAddSameVaultTwice() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     addVault(id, RANDOM_VAULT_1);
     addVault(id, RANDOM_VAULT_1);
   }
@@ -59,13 +59,13 @@ contract VaultManagerTest is VaultManagerTestHelper {
   ///////////////////////////
   // remove
   function test_remove() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     vaultManager.add(id, address(vault));
     vaultManager.remove(id, address(vault));
   }
 
   function testCannot_remove_exceptForDNftOwner() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     vaultManager.add(id, address(vault));
     vm.prank(address(1));
     vm.expectRevert(IVaultManager.NotOwner.selector);
@@ -75,7 +75,7 @@ contract VaultManagerTest is VaultManagerTestHelper {
   ///////////////////////////
   // deposit
   function test_deposit() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     uint AMOUNT = 1e18;
     deposit(id, address(vault), AMOUNT);
     assertEq(vault.id2asset(id), AMOUNT);
@@ -84,8 +84,25 @@ contract VaultManagerTest is VaultManagerTestHelper {
   ///////////////////////////
   // withdraw
   function test_withdraw() public {
-    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    uint id = mintDNft();
     deposit(id, address(vault), 1e18);
-    vaultManager.withdraw(id, address(vault), 1e18, address(1));
+    vaultManager.withdraw(id, address(vault), 1e18, RECEIVER);
+  }
+
+  ///////////////////////////
+  // mintDyad
+  function test_mintDyad() public {
+    uint id = mintDNft();
+    deposit(id, address(vault), 1e22);
+    vaultManager.mintDyad(id, 1e20, RECEIVER);
+  }
+
+  ///////////////////////////
+  // burnDyad
+  function test_burnDyad() public {
+    uint id = mintDNft();
+    deposit(id, address(vault), 1e22);
+    vaultManager.mintDyad(id, 1e20, address(this));
+    vaultManager.burnDyad(id, 1e20);
   }
 }
