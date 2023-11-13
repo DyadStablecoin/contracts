@@ -105,4 +105,13 @@ contract VaultManagerTest is VaultManagerTestHelper {
     vaultManager.mintDyad(id, 1e20, address(this));
     vaultManager.burnDyad(id, 1e20);
   }
+
+  ///////////////////////////
+  // redeemDyad
+  function test_redeemDyad() public {
+    uint id = mintDNft();
+    deposit(id, address(vault), 1e22);
+    vaultManager.mintDyad(id, 1e20, address(this));
+    vaultManager.redeemDyad(id, address(vault), 1e20, RECEIVER);
+  }
 }
