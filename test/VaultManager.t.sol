@@ -76,10 +76,16 @@ contract VaultManagerTest is VaultManagerTestHelper {
   // deposit
   function test_deposit() public {
     uint id = dNft.mintNft{value: 1 ether}(address(this));
-    vaultManager.add(id, address(vault));
     uint AMOUNT = 1e18;
-    weth.mint(address(this), AMOUNT);
-    weth.approve(address(vaultManager), AMOUNT);
-    vaultManager.deposit(id, address(vault), AMOUNT);
+    deposit(id, address(vault), AMOUNT);
+    assertEq(vault.id2asset(id), AMOUNT);
+  }
+
+  ///////////////////////////
+  // withdraw
+  function test_withdraw() public {
+    uint id = dNft.mintNft{value: 1 ether}(address(this));
+    deposit(id, address(vault), 1e18);
+    vaultManager.withdraw(id, address(vault), 1e18, address(1));
   }
 }

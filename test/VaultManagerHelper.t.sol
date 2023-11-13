@@ -14,4 +14,11 @@ contract VaultManagerTestHelper is BaseTest {
     vaultLicenser.add(vault);
     vaultManager. add(id, vault);
   }
+
+  function deposit(uint id, address vault, uint amount) public {
+    vaultManager.add(id, vault);
+    weth.mint(address(this), amount);
+    weth.approve(address(vaultManager), amount);
+    vaultManager.deposit(id, address(vault), amount);
+  }
 }
