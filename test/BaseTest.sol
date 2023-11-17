@@ -12,6 +12,8 @@ import {VaultManager} from "../src/core/VaultManager.sol";
 import {Vault} from "../src/core/Vault.sol";
 import {OracleMock} from "./OracleMock.sol";
 import {ERC20Mock} from "./ERC20Mock.sol";
+import {IAggregatorV3} from "../src/interfaces/IAggregatorV3.sol";
+import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract BaseTest is Test, Parameters {
   DNft         dNft;
@@ -19,9 +21,16 @@ contract BaseTest is Test, Parameters {
   Licenser     vaultLicenser;
   Dyad         dyad;
   VaultManager vaultManager;
-  Vault        vault;
+
+  // weth
+  Vault        wethVault;
   ERC20Mock    weth;
   OracleMock   wethOracle;
+
+  // dai
+  Vault        daiVault;
+  ERC20Mock    dai;
+  OracleMock   daiOracle;
 
   function setUp() public {
     dNft       = new DNft();
@@ -39,7 +48,16 @@ contract BaseTest is Test, Parameters {
     vaultLicenser        = contracts.vaultLicenser;
     dyad                 = contracts.dyad;
     vaultManager         = contracts.vaultManager;
-    vault                = contracts.vault;
+    wethVault            = contracts.vault;
+
+    // add the DAI vault
+    daiVault = new Vault(
+      vaultManager,
+      ERC20(address(dai)),
+      IAggregatorV3(address(daiOracle))
+    );
+    vm.prank(vaultLicenser.owner());
+    vaultLicenser.add(address(daiVault));
   }
 
   receive() external payable {}

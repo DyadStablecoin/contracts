@@ -4,7 +4,7 @@ pragma solidity =0.8.17;
 import {VaultManager} from "./VaultManager.sol";
 import {IDNft} from "../interfaces/IDNft.sol";
 import {IVault} from "../interfaces/IVault.sol";
-import {IAggregatorV3} from "../interfaces/AggregatorV3Interface.sol";
+import {IAggregatorV3} from "../interfaces/IAggregatorV3.sol";
 
 import {SafeCast} from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
