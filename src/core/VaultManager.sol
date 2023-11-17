@@ -170,10 +170,9 @@ contract VaultManager is IVaultManager {
     public 
     view
     returns (uint) {
-      uint totalUsdValue = getTotalUsdValue(id);
       uint _dyad = dyad.mintedDyad(address(this), id);
       if (_dyad == 0) return type(uint).max;
-      return totalUsdValue.divWadDown(_dyad);
+      return getTotalUsdValue(id).divWadDown(_dyad);
   }
 
   function getTotalUsdValue(

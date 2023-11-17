@@ -21,18 +21,18 @@ contract BaseTest is Test, Parameters {
   VaultManager vaultManager;
   Vault        vault;
   ERC20Mock    weth;
-  OracleMock   oracle;
+  OracleMock   wethOracle;
 
   function setUp() public {
-    dNft   = new DNft();
-    weth   = new ERC20Mock("WETH-TEST", "WETHT");
-    oracle = new OracleMock();
+    dNft       = new DNft();
+    weth       = new ERC20Mock("WETH-TEST", "WETHT");
+    wethOracle = new OracleMock(1000e8);
 
     Contracts memory contracts = new DeployBase().deploy(
       msg.sender,
       address(dNft),
       address(weth),
-      address(oracle)
+      address(wethOracle)
     );
 
     vaultManagerLicenser = contracts.vaultManagerLicenser;

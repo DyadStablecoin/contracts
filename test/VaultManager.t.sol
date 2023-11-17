@@ -114,4 +114,26 @@ contract VaultManagerTest is VaultManagerTestHelper {
     vaultManager.mintDyad(id, 1e20, address(this));
     vaultManager.redeemDyad(id, address(vault), 1e20, RECEIVER);
   }
+
+  ///////////////////////////
+  // collatRatio
+  function test_collatRatio() public {
+    uint id = mintDNft();
+    uint cr = vaultManager.collatRatio(id);
+    assertEq(cr, type(uint).max);
+    deposit(id, address(vault), 1e22);
+    vaultManager.mintDyad(id, 1e24, address(this));
+    cr = vaultManager.collatRatio(id);
+    assertEq(cr, 10000000000000000000);
+  }
+
+  ///////////////////////////
+  // getTotalUsdValue
+  function test_getTotalUsdValue() public {
+    uint id = mintDNft();
+    uint DEPOSIT = 1e22;
+    deposit(id, address(vault), DEPOSIT);
+    uint usdValue = vaultManager.getTotalUsdValue(id);
+    assertEq(usdValue, 10000000000000000000000000);
+  }
 }

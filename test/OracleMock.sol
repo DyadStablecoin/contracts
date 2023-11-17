@@ -2,18 +2,22 @@
 pragma solidity =0.8.17;
 
 contract OracleMock {
-  int public price = 1000e8; // ETH/USD
+  uint public price;
 
-  function setPrice(int _price) external {
+  constructor(uint _price) {
+    price = _price;
+  }
+
+  function setPrice(uint _price) external {
     price = _price;
   }
 
   function latestRoundData() public view returns (
-      uint80 roundId,
-      int256 answer,
+      uint80  roundId,
+      uint256 answer,
       uint256 startedAt,
       uint256 updatedAt,
-      uint80 answeredInRound
+      uint80  answeredInRound
   ) {
       return (1, price, 1, 1, 1);  
   }
