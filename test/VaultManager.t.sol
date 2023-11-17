@@ -77,15 +77,27 @@ contract VaultManagerTest is VaultManagerTestHelper {
   function test_deposit() public {
     uint id = mintDNft();
     uint AMOUNT = 1e18;
-    deposit(id, address(wethVault), AMOUNT);
+    deposit(weth, id, address(wethVault), AMOUNT);
     assertEq(wethVault.id2asset(id), AMOUNT);
+  }
+
+  function test_depositMultipleCollateralTypes() public {
+    uint id = mintDNft();
+
+    uint WETH_AMOUNT = 1e18;
+    deposit(weth, id, address(wethVault), WETH_AMOUNT);
+    assertEq(wethVault.id2asset(id), WETH_AMOUNT);
+
+    uint DAI_AMOUNT = 22e16;
+    deposit(dai, id, address(daiVault), DAI_AMOUNT);
+    assertEq(daiVault.id2asset(id), DAI_AMOUNT);
   }
 
   ///////////////////////////
   // withdraw
   function test_withdraw() public {
     uint id = mintDNft();
-    deposit(id, address(wethVault), 1e18);
+    deposit(weth, id, address(wethVault), 1e18);
     vaultManager.withdraw(id, address(wethVault), 1e18, RECEIVER);
   }
 
@@ -93,7 +105,7 @@ contract VaultManagerTest is VaultManagerTestHelper {
   // mintDyad
   function test_mintDyad() public {
     uint id = mintDNft();
-    deposit(id, address(wethVault), 1e22);
+    deposit(weth, id, address(wethVault), 1e22);
     vaultManager.mintDyad(id, 1e20, RECEIVER);
   }
 
@@ -101,7 +113,7 @@ contract VaultManagerTest is VaultManagerTestHelper {
   // burnDyad
   function test_burnDyad() public {
     uint id = mintDNft();
-    deposit(id, address(wethVault), 1e22);
+    deposit(weth, id, address(wethVault), 1e22);
     vaultManager.mintDyad(id, 1e20, address(this));
     vaultManager.burnDyad(id, 1e20);
   }
@@ -110,7 +122,7 @@ contract VaultManagerTest is VaultManagerTestHelper {
   // redeemDyad
   function test_redeemDyad() public {
     uint id = mintDNft();
-    deposit(id, address(wethVault), 1e22);
+    deposit(weth, id, address(wethVault), 1e22);
     vaultManager.mintDyad(id, 1e20, address(this));
     vaultManager.redeemDyad(id, address(wethVault), 1e20, RECEIVER);
   }
@@ -121,7 +133,7 @@ contract VaultManagerTest is VaultManagerTestHelper {
     uint id = mintDNft();
     uint cr = vaultManager.collatRatio(id);
     assertEq(cr, type(uint).max);
-    deposit(id, address(wethVault), 1e22);
+    deposit(weth, id, address(wethVault), 1e22);
     vaultManager.mintDyad(id, 1e24, address(this));
     cr = vaultManager.collatRatio(id);
     assertEq(cr, 10000000000000000000);
@@ -132,7 +144,7 @@ contract VaultManagerTest is VaultManagerTestHelper {
   function test_getTotalUsdValue() public {
     uint id = mintDNft();
     uint DEPOSIT = 1e22;
-    deposit(id, address(wethVault), DEPOSIT);
+    deposit(weth, id, address(wethVault), DEPOSIT);
     uint usdValue = vaultManager.getTotalUsdValue(id);
     assertEq(usdValue, 10000000000000000000000000);
   }

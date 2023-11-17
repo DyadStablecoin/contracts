@@ -3,6 +3,7 @@ pragma solidity =0.8.17;
 
 import "forge-std/console.sol";
 import {BaseTest} from "./BaseTest.sol";
+import {ERC20Mock} from "./ERC20Mock.sol";
 
 contract VaultManagerTestHelper is BaseTest {
   address constant RECEIVER = address(0xdead);
@@ -21,10 +22,15 @@ contract VaultManagerTestHelper is BaseTest {
     vaultManager. add(id, vault);
   }
 
-  function deposit(uint id, address vault, uint amount) public {
+  function deposit(
+    ERC20Mock token,
+    uint      id,
+    address   vault,
+    uint      amount
+  ) public {
     vaultManager.add(id, vault);
-    weth.mint(address(this), amount);
-    weth.approve(address(vaultManager), amount);
+    token.mint(address(this), amount);
+    token.approve(address(vaultManager), amount);
     vaultManager.deposit(id, address(vault), amount);
   }
 }

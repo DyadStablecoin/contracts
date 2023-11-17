@@ -51,7 +51,9 @@ contract BaseTest is Test, Parameters {
     wethVault            = contracts.vault;
 
     // add the DAI vault
-    daiVault = new Vault(
+    dai       = new ERC20Mock("DAI-TEST", "DAIT");
+    daiOracle = new OracleMock(1e6);
+    daiVault  = new Vault(
       vaultManager,
       ERC20(address(dai)),
       IAggregatorV3(address(daiOracle))
