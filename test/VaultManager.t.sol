@@ -147,5 +147,9 @@ contract VaultManagerTest is VaultManagerTestHelper {
     deposit(weth, id, address(wethVault), DEPOSIT);
     uint usdValue = vaultManager.getTotalUsdValue(id);
     assertEq(usdValue, 10000000000000000000000000);
+
+    deposit(dai, id, address(daiVault), DEPOSIT);
+    usdValue = vaultManager.getTotalUsdValue(id);
+    assertEq(usdValue, 10000100000000000000000000);
   }
 }
