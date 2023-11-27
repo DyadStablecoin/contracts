@@ -10,9 +10,12 @@ import {Vault}         from "./Vault.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
+import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
+import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 
 contract VaultManager is IVaultManager {
   using FixedPointMathLib for uint;
+  using SafeTransferLib   for ERC20;
 
   uint public constant MAX_VAULTS                = 5;
   uint public constant MIN_COLLATERIZATION_RATIO = 15e17; // 150%
@@ -90,7 +93,7 @@ contract VaultManager is IVaultManager {
       isValidDNft(id) 
   {
     Vault _vault = Vault(vault);
-    _vault.asset().transferFrom(msg.sender, address(vault), amount);
+    _vault.asset().safeTransferFrom(msg.sender, address(vault), amount);
     _vault.deposit(id, amount);
   }
 
