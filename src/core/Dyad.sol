@@ -30,8 +30,8 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
   ) external 
       licensedVaultManager 
     {
-      mintedDyad[msg.sender][id] += amount;
       _mint(to, amount);
+      mintedDyad[msg.sender][id] += amount;
   }
 
   /// @inheritdoc IDyad
@@ -42,7 +42,7 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
   ) external 
       licensedVaultManager 
     {
-      mintedDyad[msg.sender][id] -= amount;
       _burn(from, amount);
+      mintedDyad[msg.sender][id] -= amount;
   }
 }
