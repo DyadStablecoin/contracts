@@ -87,7 +87,6 @@ contract VaultManager is IVaultManager {
     uint    amount
   ) 
     external 
-    payable
       isValidDNft(id) 
   {
     Vault _vault = Vault(vault);
@@ -153,7 +152,7 @@ contract VaultManager is IVaultManager {
     external 
       isValidDNft(id)
       isValidDNft(to)
-    payable {
+    {
       if (collatRatio(id) >= MIN_COLLATERIZATION_RATIO) revert CrTooHigh(); 
       uint mintedDyad = dyad.mintedDyad(address(this), id);
       dyad.burn(id, msg.sender, mintedDyad);

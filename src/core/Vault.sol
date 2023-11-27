@@ -42,7 +42,6 @@ contract Vault is IVault {
     uint amount
   )
     external 
-    payable
       onlyVaultManager
   {
     id2asset[id] += amount;
