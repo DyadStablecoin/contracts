@@ -61,7 +61,7 @@ contract Vault is IVault {
     emit Withdraw(id, to, amount);
   }
 
-  function move(
+  function moveAll(
     uint from,
     uint to
   )

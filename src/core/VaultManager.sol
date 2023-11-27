@@ -165,7 +165,7 @@ contract VaultManager is IVaultManager {
 
       uint numberOfVaults = vaults[id].length;
       for (uint i = 0; i < numberOfVaults; i++) {
-        Vault(vaults[id][i]).move(id, to);
+        Vault(vaults[id][i]).moveAll(id, to);
       }
       emit Liquidate(id, msg.sender, to);
   }
