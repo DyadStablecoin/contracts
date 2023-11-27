@@ -71,6 +71,7 @@ contract Vault is IVault {
     uint amount    = id2asset[from];
     id2asset[from] = 0;
     id2asset[to]  += amount;
+    emit Move(from, to, amount);
   }
 
   function getUsdValue(

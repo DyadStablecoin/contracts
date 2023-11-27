@@ -28,7 +28,7 @@ contract VaultManager is IVaultManager {
     if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
   }
   modifier isValidDNft(uint id) {
-    if (dNft.ownerOf(id) == address(0))   revert InvalidNft();  _;
+    if (dNft.ownerOf(id) == address(0))   revert InvalidDNft();  _;
   }
   modifier isLicensed(address vault) {
     if (!vaultLicenser.isLicensed(vault)) revert NotLicensed(); _;
@@ -117,6 +117,7 @@ contract VaultManager is IVaultManager {
   {
     dyad.mint(id, to, amount);
     if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
+    emit MintDyad(id, amount, to);
   }
 
   function burnDyad(
@@ -127,6 +128,7 @@ contract VaultManager is IVaultManager {
       isValidDNft(id)
   {
     dyad.burn(id, msg.sender, amount);
+    emit BurnDyad(id, amount, msg.sender);
   }
 
   function redeemDyad(
@@ -142,6 +144,7 @@ contract VaultManager is IVaultManager {
       Vault _vault = Vault(vault);
       uint asset = amount * (10**_vault.oracle().decimals()) / _vault.assetPrice();
       withdraw(id, vault, asset, to);
+      emit RedeemDyad(id, vault, amount, to);
       return asset;
   }
 
@@ -161,6 +164,7 @@ contract VaultManager is IVaultManager {
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault(vaults[id][i]).move(id, to);
       }
+      emit Liquidate(id, msg.sender, to);
   }
 
   function collatRatio(
