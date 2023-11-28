@@ -69,7 +69,8 @@ contract VaultManager is IVaultManager {
     external
       isDNftOwner(id)
   {
-    if (!isDNftVault[id][vault]) revert NotDNftVault();
+    if (Vault(vault).id2asset(id) > 0) revert VaultHasAssets();
+    if (!isDNftVault[id][vault])       revert NotDNftVault();
     uint numberOfVaults = vaults[id].length;
     uint index; 
     for (uint i = 0; i < numberOfVaults; i++) {
