@@ -4,11 +4,15 @@ pragma solidity =0.8.17;
 import {Owned} from "@solmate/src/auth/Owned.sol";
 
 contract Licenser is Owned(msg.sender) {
+    mapping(address => bool) public isLicensed;
 
-  mapping (address => bool) public isLicensed; 
+    constructor() {}
 
-  constructor() {}
+    function add(address vault) external onlyOwner {
+        isLicensed[vault] = true;
+    }
 
-  function add   (address vault) external onlyOwner { isLicensed[vault] = true; }
-  function remove(address vault) external onlyOwner { isLicensed[vault] = false; }
+    function remove(address vault) external onlyOwner {
+        isLicensed[vault] = false;
+    }
 }

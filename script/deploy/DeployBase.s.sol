@@ -13,65 +13,42 @@ import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 // only used for stack too deep issues
 struct Contracts {
-  Licenser     vaultManagerLicenser;
-  Licenser     vaultLicenser;
-  Dyad         dyad;
-  VaultManager vaultManager;
-  Vault        vault;
+    Licenser vaultManagerLicenser;
+    Licenser vaultLicenser;
+    Dyad dyad;
+    VaultManager vaultManager;
+    Vault vault;
 }
 
 contract DeployBase is Script {
+    function deploy(address _owner, address _dNft, address _asset, address _oracle)
+        public
+        payable
+        returns (Contracts memory)
+    {
+        DNft dNft = DNft(_dNft);
 
-  function deploy(
-    address _owner, 
-    address _dNft,
-    address _asset,
-    address _oracle
-  )
-    public 
-    payable 
-    returns (
-      Contracts memory
-    ) {
-      DNft dNft = DNft(_dNft);
+        vm.startBroadcast(); // ----------------------
 
-      vm.startBroadcast();  // ----------------------
+        Licenser vaultManagerLicenser = new Licenser();
+        Licenser vaultLicenser = new Licenser();
 
-      Licenser vaultManagerLicenser = new Licenser();
-      Licenser vaultLicenser        = new Licenser();
+        Dyad dyad = new Dyad(vaultManagerLicenser);
 
-      Dyad dyad                     = new Dyad(
-        vaultManagerLicenser
-      );
+        VaultManager vaultManager = new VaultManager(dNft, dyad, vaultLicenser);
 
-      VaultManager vaultManager     = new VaultManager(
-        dNft,
-        dyad,
-        vaultLicenser
-      );
+        Vault vault = new Vault(vaultManager, ERC20(_asset), IAggregatorV3(_oracle));
 
-      Vault vault                   = new Vault(
-        vaultManager,
-        ERC20(_asset),
-        IAggregatorV3(_oracle)
-      );
+        //
+        vaultManagerLicenser.add(address(vaultManager));
+        vaultLicenser.add(address(vault));
 
-      // 
-      vaultManagerLicenser.add(address(vaultManager));
-      vaultLicenser       .add(address(vault));
+        //
+        vaultManagerLicenser.transferOwnership(_owner);
+        vaultLicenser.transferOwnership(_owner);
 
-      //
-      vaultManagerLicenser.transferOwnership(_owner);
-      vaultLicenser       .transferOwnership(_owner);
+        vm.stopBroadcast(); // ----------------------------
 
-      vm.stopBroadcast();  // ----------------------------
-
-      return Contracts(
-        vaultManagerLicenser,
-        vaultLicenser,
-        dyad,
-        vaultManager,
-        vault
-      );
-  }
+        return Contracts(vaultManagerLicenser, vaultLicenser, dyad, vaultManager, vault);
+    }
 }

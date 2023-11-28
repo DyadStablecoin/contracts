@@ -6,12 +6,7 @@ import {DeployBase} from "./DeployBase.s.sol";
 import {Parameters} from "../../src/Parameters.sol";
 
 contract DeployGoerli is Script, Parameters {
-  function run() public {
-    new DeployBase().deploy(
-      GOERLI_OWNER,
-      GOERLI_DNFT,
-      GOERLI_WETH,
-      GOERLI_WETH_ORACLE
-    );
-  }
+    function run() public {
+        new DeployBase().deploy(GOERLI_OWNER, GOERLI_DNFT, GOERLI_WETH, GOERLI_WETH_ORACLE);
+    }
 }

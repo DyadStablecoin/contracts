@@ -16,63 +16,49 @@ import {IAggregatorV3} from "../src/interfaces/IAggregatorV3.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract BaseTest is Test, Parameters {
-  DNft         dNft;
-  Licenser     vaultManagerLicenser;
-  Licenser     vaultLicenser;
-  Dyad         dyad;
-  VaultManager vaultManager;
+    DNft dNft;
+    Licenser vaultManagerLicenser;
+    Licenser vaultLicenser;
+    Dyad dyad;
+    VaultManager vaultManager;
 
-  // weth
-  Vault        wethVault;
-  ERC20Mock    weth;
-  OracleMock   wethOracle;
+    // weth
+    Vault wethVault;
+    ERC20Mock weth;
+    OracleMock wethOracle;
 
-  // dai
-  Vault        daiVault;
-  ERC20Mock    dai;
-  OracleMock   daiOracle;
+    // dai
+    Vault daiVault;
+    ERC20Mock dai;
+    OracleMock daiOracle;
 
-  function setUp() public {
-    dNft       = new DNft();
-    weth       = new ERC20Mock("WETH-TEST", "WETHT");
-    wethOracle = new OracleMock(1000e8);
+    function setUp() public {
+        dNft = new DNft();
+        weth = new ERC20Mock("WETH-TEST", "WETHT");
+        wethOracle = new OracleMock(1000e8);
 
-    Contracts memory contracts = new DeployBase().deploy(
-      msg.sender,
-      address(dNft),
-      address(weth),
-      address(wethOracle)
-    );
+        Contracts memory contracts =
+            new DeployBase().deploy(msg.sender, address(dNft), address(weth), address(wethOracle));
 
-    vaultManagerLicenser = contracts.vaultManagerLicenser;
-    vaultLicenser        = contracts.vaultLicenser;
-    dyad                 = contracts.dyad;
-    vaultManager         = contracts.vaultManager;
-    wethVault            = contracts.vault;
+        vaultManagerLicenser = contracts.vaultManagerLicenser;
+        vaultLicenser = contracts.vaultLicenser;
+        dyad = contracts.dyad;
+        vaultManager = contracts.vaultManager;
+        wethVault = contracts.vault;
 
-    // create the DAI vault
-    dai       = new ERC20Mock("DAI-TEST", "DAIT");
-    daiOracle = new OracleMock(1e6);
-    daiVault  = new Vault(
-      vaultManager,
-      ERC20(address(dai)),
-      IAggregatorV3(address(daiOracle))
-    );
+        // create the DAI vault
+        dai = new ERC20Mock("DAI-TEST", "DAIT");
+        daiOracle = new OracleMock(1e6);
+        daiVault = new Vault(vaultManager, ERC20(address(dai)), IAggregatorV3(address(daiOracle)));
 
-    // add the DAI vault
-    vm.prank(vaultLicenser.owner());
-    vaultLicenser.add(address(daiVault));
-  }
+        // add the DAI vault
+        vm.prank(vaultLicenser.owner());
+        vaultLicenser.add(address(daiVault));
+    }
 
-  receive() external payable {}
+    receive() external payable {}
 
-  function onERC721Received(
-    address,
-    address,
-    uint256,
-    bytes calldata
-  ) external pure returns (bytes4) {
-    return 0x150b7a02;
-  }
+    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+        return 0x150b7a02;
+    }
 }
-
