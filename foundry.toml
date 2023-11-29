@@ -7,3 +7,6 @@ libs = ['lib']
 
 # viaIR = true 
 optimizer_runs = 1_000_000
+
+[invariant]
+fail_on_revert = true

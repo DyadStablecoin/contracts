@@ -34,8 +34,8 @@ contract BaseTest is Test, Parameters {
 
     function setUp() public {
         dNft = new DNft();
-        weth = new ERC20Mock("WETH-TEST", "WETHT");
-        wethOracle = new OracleMock(1000e8);
+        weth = new ERC20Mock("WETH-TEST", "WETHT", 18);
+        wethOracle = new OracleMock(1000e8, 8);
 
         Contracts memory contracts =
             new DeployBase().deploy(msg.sender, address(dNft), address(weth), address(wethOracle));
@@ -47,8 +47,8 @@ contract BaseTest is Test, Parameters {
         wethVault = contracts.vault;
 
         // create the DAI vault
-        dai = new ERC20Mock("DAI-TEST", "DAIT");
-        daiOracle = new OracleMock(1e6);
+        dai = new ERC20Mock("DAI-TEST", "DAIT", 18);
+        daiOracle = new OracleMock(1e6, 8);
         daiVault = new Vault(vaultManager, ERC20(address(dai)), IAggregatorV3(address(daiOracle)));
 
         // add the DAI vault
