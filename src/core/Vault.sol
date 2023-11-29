@@ -80,7 +80,10 @@ contract Vault is IVault {
     external
     view 
     returns (uint) {
-      return id2asset[id] * assetPrice() / 10**oracle.decimals();
+      return id2asset[id] * assetPrice() 
+              * 1e18 
+              / 10**oracle.decimals() 
+              / 10**asset.decimals();
   }
 
   function assetPrice() 
