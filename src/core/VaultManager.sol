@@ -19,6 +19,7 @@ contract VaultManager is IVaultManager {
 
   uint public constant MAX_VAULTS                = 5;
   uint public constant MIN_COLLATERIZATION_RATIO = 15e17; // 150%
+  uint public constant LIQUIDATION_REWARD        =  8e17; //  80%
 
   DNft     public immutable dNft;
   Dyad     public immutable dyad;
@@ -166,7 +167,9 @@ contract VaultManager is IVaultManager {
 
       uint numberOfVaults = vaults[id].length;
       for (uint i = 0; i < numberOfVaults; i++) {
-        Vault(vaults[id][i]).moveAll(id, to);
+        Vault vault = Vault(vaults[id][i]);
+        uint collateral = vault.id2asset(id).mulWadDown(LIQUIDATION_PENALTY);
+        Vault(vaults[id][i]).move(id, to, collateral);
       }
       emit Liquidate(id, msg.sender, to);
   }

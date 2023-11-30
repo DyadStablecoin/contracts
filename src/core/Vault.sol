@@ -61,16 +61,16 @@ contract Vault is IVault {
     emit Withdraw(id, to, amount);
   }
 
-  function moveAll(
+  function move(
     uint from,
-    uint to
+    uint to,
+    uint amount
   )
     external
       onlyVaultManager
   {
-    uint amount    = id2asset[from];
-    id2asset[from] = 0;
-    id2asset[to]  += amount;
+    id2asset[from] -= amount;
+    id2asset[to]   += amount;
     emit Move(from, to, amount);
   }
 
