@@ -163,18 +163,16 @@ contract VaultManager is IVaultManager {
     {
       uint cr = collatRatio(id);
       if (cr >= MIN_COLLATERIZATION_RATIO) revert CrTooHigh();
-      uint mintedDyad = dyad.mintedDyad(address(this), id);
-      dyad.burn(id, msg.sender, mintedDyad);
+      dyad.burn(id, msg.sender, dyad.mintedDyad(address(this), id));
 
-      // Allows someone to liquidate at a loss if protocol has accrued bad debt.
-      uint cappedCr = cr < 1e18 ? 1e18 : cr;
+      uint cappedCr               = cr < 1e18 ? 1e18 : cr;
       uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
-      uint liquidationAssetShare = (liquidationEquityShare + 1e18).mulWadDown(cappedCr);
+      uint liquidationAssetShare  = (liquidationEquityShare + 1e18).mulWadDown(cappedCr);
 
       uint numberOfVaults = vaults[id].length;
       for (uint i = 0; i < numberOfVaults; i++) {
-          Vault vault = Vault(vaults[id][i]);
-          uint collateral = vault.id2asset(id).mulWadDown(liquidationAssetShare);
+          Vault vault      = Vault(vaults[id][i]);
+          uint  collateral = vault.id2asset(id).mulWadDown(liquidationAssetShare);
           vault.move(id, to, collateral);
       }
       emit Liquidate(id, msg.sender, to);
