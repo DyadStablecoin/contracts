@@ -167,9 +167,9 @@ contract VaultManager is IVaultManager {
 
       uint numberOfVaults = vaults[id].length;
       for (uint i = 0; i < numberOfVaults; i++) {
-        Vault vault = Vault(vaults[id][i]);
-        uint collateral = vault.id2asset(id).mulWadDown(LIQUIDATION_PENALTY);
-        Vault(vaults[id][i]).move(id, to, collateral);
+        Vault vault      = Vault(vaults[id][i]);
+        uint  collateral = vault.id2asset(id).mulWadDown(LIQUIDATION_REWARD);
+        vault.move(id, to, collateral);
       }
       emit Liquidate(id, msg.sender, to);
   }
