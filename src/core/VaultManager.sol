@@ -18,8 +18,8 @@ contract VaultManager is IVaultManager {
   using SafeTransferLib   for ERC20;
 
   uint public constant MAX_VAULTS                = 5;
-  uint public constant MIN_COLLATERIZATION_RATIO = 15e17; // 150%
-  uint public constant LIQUIDATION_REWARD        =  8e17; // 80%
+  uint public constant MIN_COLLATERIZATION_RATIO = 1.5e18; // 150%
+  uint public constant LIQUIDATION_REWARD        = 0.8e18; // 80%
 
   DNft     public immutable dNft;
   Dyad     public immutable dyad;
