@@ -165,7 +165,7 @@ contract VaultManager is IVaultManager {
 
       uint cappedCr               = cr < 1e18 ? 1e18 : cr;
       uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
-      uint liquidationAssetShare  = (liquidationEquityShare + 1e18).mulWadDown(cappedCr);
+      uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
 
       uint numberOfVaults = vaults[id].length;
       for (uint i = 0; i < numberOfVaults; i++) {
