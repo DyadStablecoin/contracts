@@ -198,4 +198,18 @@ contract VaultManager is IVaultManager {
       }
       return totalUsdValue;
   }
+
+  function getVaults(
+    uint id
+  ) 
+    external 
+    view 
+    returns (address[] memory) {
+      uint numberOfVaults = vaults[id].length();
+      address[] memory _vaults = new address[](numberOfVaults);
+      for (uint i = 0; i < numberOfVaults; i++) {
+        _vaults[i] = vaults[id].at(i);
+      }
+      return _vaults;
+  }
 }
