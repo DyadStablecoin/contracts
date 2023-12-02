@@ -26,7 +26,7 @@ contract VaultManager is IVaultManager {
   Licenser public immutable vaultLicenser;
 
   mapping (uint => EnumerableSet.AddressSet)  internal vaults; 
-  mapping (uint => mapping (address => bool)) public isDNftVault;
+  mapping (uint => mapping (address => bool)) public   isDNftVault;
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
