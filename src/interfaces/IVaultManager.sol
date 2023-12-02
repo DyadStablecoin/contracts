@@ -15,6 +15,7 @@ interface IVaultManager {
   error VaultNotLicensed();
   error TooManyVaults();
   error VaultAlreadyAdded();
+  error VaultNotAdded();
   error VaultHasAssets();
   error NotDNftVault();
   error InvalidDNft();

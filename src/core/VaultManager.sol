@@ -56,8 +56,7 @@ contract VaultManager is IVaultManager {
   {
     if (vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
     if (!vaultLicenser.isLicensed(vault))  revert VaultNotLicensed();
-    if (vaults[id].contains(vault))        revert VaultAlreadyAdded();
-    vaults[id].add(vault);
+    if (!vaults[id].add(vault))            revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 
@@ -69,8 +68,7 @@ contract VaultManager is IVaultManager {
       isDNftOwner(id)
   {
     if (Vault(vault).id2asset(id) > 0) revert VaultHasAssets();
-    if (!vaults[id].contains(vault))   revert VaultAlreadyAdded();
-    vaults[id].remove(vault);
+    if (!vaults[id].remove(vault))     revert VaultNotAdded();
     emit Removed(id, vault);
   }
 
