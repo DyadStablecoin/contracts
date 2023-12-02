@@ -25,8 +25,7 @@ contract VaultManager is IVaultManager {
   Dyad     public immutable dyad;
   Licenser public immutable vaultLicenser;
 
-  mapping (uint => EnumerableSet.AddressSet)  internal vaults; 
-  mapping (uint => mapping (address => bool)) public   isDNftVault;
+  mapping (uint => EnumerableSet.AddressSet) internal vaults; 
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
@@ -57,9 +56,8 @@ contract VaultManager is IVaultManager {
   {
     if (vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
     if (!vaultLicenser.isLicensed(vault))  revert VaultNotLicensed();
-    if (isDNftVault[id][vault])            revert VaultAlreadyAdded();
+    if (vaults[id].contains(vault))        revert VaultAlreadyAdded();
     vaults[id].add(vault);
-    isDNftVault[id][vault] = true;
     emit Added(id, vault);
   }
 
@@ -71,9 +69,8 @@ contract VaultManager is IVaultManager {
       isDNftOwner(id)
   {
     if (Vault(vault).id2asset(id) > 0) revert VaultHasAssets();
-    if (!isDNftVault[id][vault])       revert NotDNftVault();
+    if (!vaults[id].contains(vault))   revert VaultAlreadyAdded();
     vaults[id].remove(vault);
-    isDNftVault[id][vault] = false;
     emit Removed(id, vault);
   }
 
@@ -205,11 +202,6 @@ contract VaultManager is IVaultManager {
     external 
     view 
     returns (address[] memory) {
-      uint numberOfVaults = vaults[id].length();
-      address[] memory _vaults = new address[](numberOfVaults);
-      for (uint i = 0; i < numberOfVaults; i++) {
-        _vaults[i] = vaults[id].at(i);
-      }
-      return _vaults;
+      return vaults[id].values();
   }
 }

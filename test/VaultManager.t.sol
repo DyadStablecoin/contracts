@@ -19,8 +19,6 @@ contract VaultManagerTest is VaultManagerTestHelper {
     uint id = mintDNft();
     addVault(id, RANDOM_VAULT_1);
     addVault(id, RANDOM_VAULT_2);
-    assertEq(vaultManager.isDNftVault(id, RANDOM_VAULT_1), true);
-    assertEq(vaultManager.isDNftVault(id, RANDOM_VAULT_2), true);
     assertEq(vaultManager.getVaults(id)[0], RANDOM_VAULT_1);
     assertEq(vaultManager.getVaults(id)[1], RANDOM_VAULT_2);
     address[] memory vaults = vaultManager.getVaults(id);
