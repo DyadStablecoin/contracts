@@ -10,8 +10,10 @@ import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
+import {EnumerableSet}     from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 contract VaultManager is IVaultManager {
+  using EnumerableSet for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
 
@@ -23,8 +25,7 @@ contract VaultManager is IVaultManager {
   Dyad     public immutable dyad;
   Licenser public immutable vaultLicenser;
 
-  mapping (uint => address[])                 public vaults; 
-  mapping (uint => mapping (address => bool)) public isDNftVault;
+  mapping (uint => EnumerableSet.AddressSet) internal vaults; 
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
@@ -53,11 +54,9 @@ contract VaultManager is IVaultManager {
     external
       isDNftOwner(id)
   {
-    if (vaults[id].length >= MAX_VAULTS)  revert TooManyVaults();
-    if (!vaultLicenser.isLicensed(vault)) revert VaultNotLicensed();
-    if (isDNftVault[id][vault])           revert VaultAlreadyAdded();
-    vaults[id].push(vault);
-    isDNftVault[id][vault] = true;
+    if (vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
+    if (!vaultLicenser.isLicensed(vault))  revert VaultNotLicensed();
+    if (!vaults[id].add(vault))            revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 
@@ -69,18 +68,7 @@ contract VaultManager is IVaultManager {
       isDNftOwner(id)
   {
     if (Vault(vault).id2asset(id) > 0) revert VaultHasAssets();
-    if (!isDNftVault[id][vault])       revert NotDNftVault();
-    uint numberOfVaults = vaults[id].length;
-    uint index; 
-    for (uint i = 0; i < numberOfVaults; i++) {
-      if (vaults[id][i] == vault) {
-        index = i;
-        break;
-      }
-    }
-    vaults[id][index] = vaults[id][numberOfVaults - 1];
-    vaults[id].pop();
-    isDNftVault[id][vault] = false;
+    if (!vaults[id].remove(vault))     revert VaultNotAdded();
     emit Removed(id, vault);
   }
 
@@ -167,9 +155,9 @@ contract VaultManager is IVaultManager {
       uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
       uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
 
-      uint numberOfVaults = vaults[id].length;
+      uint numberOfVaults = vaults[id].length();
       for (uint i = 0; i < numberOfVaults; i++) {
-          Vault vault      = Vault(vaults[id][i]);
+          Vault vault      = Vault(vaults[id].at(i));
           uint  collateral = vault.id2asset(id).mulWadDown(liquidationAssetShare);
           vault.move(id, to, collateral);
       }
@@ -194,9 +182,9 @@ contract VaultManager is IVaultManager {
     view
     returns (uint) {
       uint totalUsdValue;
-      uint numberOfVaults = vaults[id].length; 
+      uint numberOfVaults = vaults[id].length(); 
       for (uint i = 0; i < numberOfVaults; i++) {
-        Vault vault = Vault(vaults[id][i]);
+        Vault vault = Vault(vaults[id].at(i));
         uint usdValue;
         if (vaultLicenser.isLicensed(address(vault))) {
           usdValue = vault.getUsdValue(id);        
@@ -204,5 +192,14 @@ contract VaultManager is IVaultManager {
         totalUsdValue += usdValue;
       }
       return totalUsdValue;
+  }
+
+  function getVaults(
+    uint id
+  ) 
+    external 
+    view 
+    returns (address[] memory) {
+      return vaults[id].values();
   }
 }
