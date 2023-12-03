@@ -13,7 +13,7 @@ import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 import {EnumerableSet}     from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 contract VaultManager is IVaultManager {
-  using EnumerableSet for EnumerableSet.AddressSet;
+  using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
 
