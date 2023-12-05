@@ -197,6 +197,8 @@ contract VaultManager is IVaultManager {
       return totalUsdValue;
   }
 
+  // ----------------- MISC ----------------- //
+
   function getVaults(
     uint id
   ) 
@@ -204,5 +206,15 @@ contract VaultManager is IVaultManager {
     view 
     returns (address[] memory) {
       return vaults[id].values();
+  }
+
+  function hasVault(
+    uint    id,
+    address vault
+  ) 
+    external 
+    view 
+    returns (bool) {
+      return vaults[id].contains(vault);
   }
 }
