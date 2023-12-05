@@ -92,13 +92,12 @@ contract Vault is IVault {
     returns (uint) {
       (
         uint80 roundID,
-        int256 price,
+        int256 answer,
         , 
-        uint256 timeStamp, 
+        uint256 updatedAt, 
         uint80 answeredInRound
       ) = oracle.latestRoundData();
-      if (timeStamp == 0)                           revert IncompleteRound();
-      if (block.timestamp > updatedAt + 90 minutes) revert StaleData()
-      return price.toUint256();
+      if (block.timestamp > updatedAt + 90 minutes) revert StaleData();
+      return answer.toUint256();
   }
 }
