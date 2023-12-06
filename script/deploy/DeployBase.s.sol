@@ -2,11 +2,12 @@
 pragma solidity =0.8.17;
 
 import "forge-std/Script.sol";
-import {DNft} from "../../src/core/DNft.sol";
-import {Dyad} from "../../src/core/Dyad.sol";
-import {Licenser} from "../../src/core/Licenser.sol";
-import {VaultManager} from "../../src/core/VaultManager.sol";
-import {Vault} from "../../src/core/Vault.sol";
+import {DNft}          from "../../src/core/DNft.sol";
+import {Dyad}          from "../../src/core/Dyad.sol";
+import {Licenser}      from "../../src/core/Licenser.sol";
+import {VaultManager}  from "../../src/core/VaultManager.sol";
+import {Vault}         from "../../src/core/Vault.sol";
+import {Payments}      from "../../src/periphery/Payments.sol";
 import {IAggregatorV3} from "../../src/interfaces/IAggregatorV3.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -56,6 +57,10 @@ contract DeployBase is Script {
         IAggregatorV3(_oracle)
       );
 
+      Payments payments             = new Payments(
+        vaultManager
+      );
+
       // 
       vaultManagerLicenser.add(address(vaultManager));
       vaultLicenser       .add(address(vault));
@@ -63,6 +68,7 @@ contract DeployBase is Script {
       //
       vaultManagerLicenser.transferOwnership(_owner);
       vaultLicenser       .transferOwnership(_owner);
+      payments            .transferOwnership(_owner);
 
       vm.stopBroadcast();  // ----------------------------
 
