@@ -31,7 +31,7 @@ contract VaultManager is IVaultManager {
     if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
   }
   modifier isValidDNft(uint id) {
-    if (dNft.ownerOf(id) == address(0))   revert InvalidDNft();  _;
+    if (dNft.ownerOf(id) == address(0))   revert InvalidDNft(); _;
   }
   modifier isLicensed(address vault) {
     if (!vaultLicenser.isLicensed(vault)) revert NotLicensed(); _;
