@@ -47,10 +47,12 @@ contract Payments is Owned(msg.sender) {
   ) 
     external 
   {
-    uint feeAmount = amount.mulWadDown(fee);
     ERC20 asset = Vault(vault).asset();
     asset.safeTransferFrom(msg.sender, address(this), amount);
+
+    uint feeAmount = amount.mulWadDown(fee);
     asset.safeTransfer(feeRecipient, feeAmount);
+
     uint netAmount = amount - feeAmount;
     asset.approve(address(vaultManager), netAmount);
     vaultManager.deposit(id, vault, netAmount);
