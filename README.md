@@ -1,14 +1,19 @@
 # DYAD
 
-![dyad](https://pbs.twimg.com/profile_images/1580864472079532032/uCLwW3nb_200x200.jpg)
+![dyad](https://pbs.twimg.com/profile_images/1715367809843175424/LCqtLCJn_400x400.jpg)
 
 ## Contracts
 
 ```ml
 core
-├─ Dyad — "Stablecoin backed by ETH"
 ├─ DNft — "A dNFT gives you the right to mint DYAD"
-├─ PermissionManager — "dNFT Permission Manager"
+├─ Dyad — "Stablecoin backed by ETH"
+├─ VaultManager
+├─ Vault 
+├─ Licenser 
+
+periphery
+├─ Payments
 ```
 
 ## Usage
