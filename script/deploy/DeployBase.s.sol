@@ -19,6 +19,7 @@ struct Contracts {
   Dyad         dyad;
   VaultManager vaultManager;
   Vault        vault;
+  Payments     payments;
 }
 
 contract DeployBase is Script {
@@ -82,7 +83,8 @@ contract DeployBase is Script {
         vaultLicenser,
         dyad,
         vaultManager,
-        vault
+        vault, 
+        payments
       );
   }
 }

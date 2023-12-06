@@ -10,6 +10,7 @@ import {Dyad} from "../src/core/Dyad.sol";
 import {Licenser} from "../src/core/Licenser.sol";
 import {VaultManager} from "../src/core/VaultManager.sol";
 import {Vault} from "../src/core/Vault.sol";
+import {Payments} from "../src/periphery/Payments.sol";
 import {OracleMock} from "./OracleMock.sol";
 import {ERC20Mock} from "./ERC20Mock.sol";
 import {IAggregatorV3} from "../src/interfaces/IAggregatorV3.sol";
@@ -21,6 +22,7 @@ contract BaseTest is Test, Parameters {
   Licenser     vaultLicenser;
   Dyad         dyad;
   VaultManager vaultManager;
+  Payments     payments;
 
   // weth
   Vault        wethVault;
@@ -42,7 +44,7 @@ contract BaseTest is Test, Parameters {
       address(dNft),
       address(weth),
       address(wethOracle), 
-      0.001e18 // frontend fee
+      GOERLI_FEE
     );
 
     vaultManagerLicenser = contracts.vaultManagerLicenser;
@@ -50,6 +52,7 @@ contract BaseTest is Test, Parameters {
     dyad                 = contracts.dyad;
     vaultManager         = contracts.vaultManager;
     wethVault            = contracts.vault;
+    payments             = contracts.payments;
 
     // create the DAI vault
     dai       = new ERC20Mock("DAI-TEST", "DAIT");
