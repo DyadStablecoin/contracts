@@ -16,6 +16,8 @@ contract Vault is IVault {
   using SafeCast          for int;
   using FixedPointMathLib for uint;
 
+  uint public constant STALE_DATA_TIMEOUT = 90 minutes; 
+
   VaultManager  public immutable vaultManager;
   ERC20         public immutable asset;
   IAggregatorV3 public immutable oracle;
@@ -91,14 +93,13 @@ contract Vault is IVault {
     view 
     returns (uint) {
       (
-        uint80 roundID,
-        int256 price,
+        ,
+        int256 answer,
         , 
-        uint256 timeStamp, 
+        uint256 updatedAt, 
         uint80 answeredInRound
       ) = oracle.latestRoundData();
-      if (timeStamp == 0)            revert IncompleteRound();
-      if (answeredInRound < roundID) revert StaleData();
-      return price.toUint256();
+      if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) revert StaleData();
+      return answer.toUint256();
   }
 }
