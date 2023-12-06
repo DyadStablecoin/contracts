@@ -41,7 +41,8 @@ contract BaseTest is Test, Parameters {
       msg.sender,
       address(dNft),
       address(weth),
-      address(wethOracle)
+      address(wethOracle), 
+      0.001e18 // frontend fee
     );
 
     vaultManagerLicenser = contracts.vaultManagerLicenser;
