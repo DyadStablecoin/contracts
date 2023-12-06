@@ -11,7 +11,8 @@ contract DeployGoerli is Script, Parameters {
       GOERLI_OWNER,
       GOERLI_DNFT,
       GOERLI_WETH,
-      GOERLI_WETH_ORACLE
+      GOERLI_WETH_ORACLE, 
+      GOERLI_FEE 
     );
   }
 }

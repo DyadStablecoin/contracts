@@ -18,9 +18,27 @@ contract Payments is Owned(msg.sender) {
   uint    public fee;
   address public feeRecipient;
 
-  constructor(VaultManager _vaultManager) { vaultManager = _vaultManager; }
+  constructor(VaultManager _vaultManager) { 
+    vaultManager = _vaultManager;
+  }
 
-  function setFee(uint _fee) external onlyOwner { fee = _fee; }
+  function setFee(
+    uint _fee
+  ) 
+    external 
+    onlyOwner 
+  {
+    fee = _fee;
+  }
+
+  function setFeeRecipient(
+    address _feeRecipient
+  ) 
+    external 
+    onlyOwner 
+  {
+    feeRecipient = _feeRecipient;
+  }
 
   function deposit(
     uint    id,

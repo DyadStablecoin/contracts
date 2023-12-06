@@ -27,7 +27,8 @@ contract DeployBase is Script {
     address _owner, 
     address _dNft,
     address _asset,
-    address _oracle
+    address _oracle, 
+    uint    _fee
   )
     public 
     payable 
@@ -60,6 +61,10 @@ contract DeployBase is Script {
       Payments payments             = new Payments(
         vaultManager
       );
+
+      //
+      payments.setFee(_fee);
+      payments.setFeeRecipient(_owner);
 
       // 
       vaultManagerLicenser.add(address(vaultManager));
