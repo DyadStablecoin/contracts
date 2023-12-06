@@ -3,7 +3,7 @@ pragma solidity =0.8.17;
 
 import "forge-std/Script.sol";
 import {DeployBase} from "./DeployBase.s.sol";
-import {Parameters} from "../../src/Parameters.sol";
+import {Parameters} from "../../src/params/Parameters.sol";
 
 contract DeployGoerli is Script, Parameters {
   function run() public {

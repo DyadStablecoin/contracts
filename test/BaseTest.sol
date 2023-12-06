@@ -4,7 +4,7 @@ pragma solidity =0.8.17;
 import "forge-std/Test.sol";
 import "forge-std/console.sol";
 import {DeployBase, Contracts} from "../script/deploy/DeployBase.s.sol";
-import {Parameters} from "../src/Parameters.sol";
+import {Parameters} from "../src/params/Parameters.sol";
 import {DNft} from "../src/core/DNft.sol";
 import {Dyad} from "../src/core/Dyad.sol";
 import {Licenser} from "../src/core/Licenser.sol";

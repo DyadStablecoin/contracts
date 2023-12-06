@@ -97,7 +97,6 @@ contract Vault is IVault {
         int256 answer,
         , 
         uint256 updatedAt, 
-        uint80 answeredInRound
       ) = oracle.latestRoundData();
       if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) revert StaleData();
       return answer.toUint256();
