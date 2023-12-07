@@ -40,7 +40,8 @@ contract Payments is Owned(msg.sender) {
     feeRecipient = _feeRecipient;
   }
 
-  function deposit(
+  // Calls the Vault Manager `deposit` function, but takes a fee.
+  function depositWithFee(
     uint    id,
     address vault,
     uint    amount

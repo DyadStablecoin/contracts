@@ -15,7 +15,6 @@ contract PaymentsTest is BaseTest {
     weth.mint(address(this), amount);
 
     weth.approve(address(payments), amount);
-    payments.deposit(id, address(wethVault), amount);
+    payments.depositWithFee(id, address(wethVault), amount);
   }
-
 }
