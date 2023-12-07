@@ -44,7 +44,8 @@ contract BaseTest is Test, Parameters {
       address(dNft),
       address(weth),
       address(wethOracle), 
-      GOERLI_FEE
+      GOERLI_FEE,
+      GOERLI_FEE_RECIPIENT
     );
 
     vaultManagerLicenser = contracts.vaultManagerLicenser;

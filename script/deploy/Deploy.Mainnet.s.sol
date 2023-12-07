@@ -12,7 +12,8 @@ contract DeployMainnet is Script, Parameters {
       MAINNET_DNFT,
       MAINNET_WETH,
       MAINNET_WETH_ORACLE,
-      MAINNET_FEE
+      MAINNET_FEE, 
+      MAINNET_FEE_RECIPIENT
     );
   }
 }
