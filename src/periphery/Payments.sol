@@ -58,4 +58,16 @@ contract Payments is Owned(msg.sender) {
     asset.approve(address(vaultManager), netAmount);
     vaultManager.deposit(id, vault, netAmount);
   }
+
+  function depositEthWithFee(
+    uint    id,
+    address vault,
+    uint    amount
+  ) 
+    external 
+    payable
+  {
+    require(msg.value == amount);
+    weth.depsoit{value: msg.value}(amount);
+  }
 }
