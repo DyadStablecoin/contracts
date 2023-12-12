@@ -57,12 +57,7 @@ contract Payments is Owned(msg.sender) {
     ERC20 asset = Vault(vault).asset();
     asset.safeTransferFrom(msg.sender, address(this), amount);
 
-    uint feeAmount = amount.mulWadDown(fee);
-    asset.safeTransfer(feeRecipient, feeAmount);
-
-    uint netAmount = amount - feeAmount;
-    asset.approve(address(vaultManager), netAmount);
-    vaultManager.deposit(id, vault, netAmount);
+    _deposit(id, vault, amount);
   }
 
   function depositETHWithFee(
@@ -73,13 +68,22 @@ contract Payments is Owned(msg.sender) {
     payable
   {
     weth.deposit{value: msg.value}();
+    _deposit(id, vault, msg.value);
+  }
 
+  function _deposit(
+    uint    id,
+    address vault,
+    uint    amount
+  ) 
+    internal 
+  {
     ERC20 asset = Vault(vault).asset();
 
-    uint feeAmount = msg.value.mulWadDown(fee);
+    uint feeAmount = amount.mulWadDown(fee);
     asset.safeTransfer(feeRecipient, feeAmount);
 
-    uint netAmount = msg.value - feeAmount;
+    uint netAmount = amount - feeAmount;
     asset.approve(address(vaultManager), netAmount);
     vaultManager.deposit(id, vault, netAmount);
   }
