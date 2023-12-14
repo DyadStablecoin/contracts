@@ -9,6 +9,7 @@ import {VaultManager}  from "../../src/core/VaultManager.sol";
 import {Vault}         from "../../src/core/Vault.sol";
 import {Payments}      from "../../src/periphery/Payments.sol";
 import {IAggregatorV3} from "../../src/interfaces/IAggregatorV3.sol";
+import {IWETH}         from "../../src/interfaces/IWETH.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
@@ -61,7 +62,8 @@ contract DeployBase is Script {
       );
 
       Payments payments             = new Payments(
-        vaultManager
+        vaultManager,
+        IWETH(_asset)
       );
 
       //

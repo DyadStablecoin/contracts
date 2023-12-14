@@ -1,6 +1,6 @@
 import json
 
-P = "../broadcast/Deploy.Goerli.s.sol/5/run-latest.json"
+P = "../broadcast/Deploy.Mainnet.s.sol/1/run-latest.json"
 
 f = open(P)
 d = json.load(f)

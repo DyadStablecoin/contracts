@@ -3,6 +3,7 @@ pragma solidity =0.8.17;
 
 import {VaultManager} from "../core/VaultManager.sol";
 import {Vault}        from "../core/Vault.sol";
+import {IWETH}        from "../interfaces/IWETH.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
@@ -14,12 +15,17 @@ contract Payments is Owned(msg.sender) {
   using SafeTransferLib   for ERC20;
 
   VaultManager public immutable vaultManager;
+  IWETH        public immutable weth;
 
   uint    public fee;
   address public feeRecipient;
 
-  constructor(VaultManager _vaultManager) { 
+  constructor(
+    VaultManager _vaultManager,
+    IWETH        _weth
+  ) { 
     vaultManager = _vaultManager;
+    weth         = _weth;
   }
 
   function setFee(
@@ -50,6 +56,29 @@ contract Payments is Owned(msg.sender) {
   {
     ERC20 asset = Vault(vault).asset();
     asset.safeTransferFrom(msg.sender, address(this), amount);
+
+    _deposit(id, vault, amount);
+  }
+
+  function depositETHWithFee(
+    uint    id,
+    address vault
+  ) 
+    external 
+    payable
+  {
+    weth.deposit{value: msg.value}();
+    _deposit(id, vault, msg.value);
+  }
+
+  function _deposit(
+    uint    id,
+    address vault,
+    uint    amount
+  ) 
+    internal 
+  {
+    ERC20 asset = Vault(vault).asset();
 
     uint feeAmount = amount.mulWadDown(fee);
     asset.safeTransfer(feeRecipient, feeAmount);
