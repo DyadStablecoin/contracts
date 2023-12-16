@@ -13,6 +13,7 @@ import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 contract Payments is Owned(msg.sender) {
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
+  using SafeTransferLib   for address;
 
   VaultManager public immutable vaultManager;
   IWETH        public immutable weth;
@@ -86,5 +87,12 @@ contract Payments is Owned(msg.sender) {
     uint netAmount = amount - feeAmount;
     asset.approve(address(vaultManager), netAmount);
     vaultManager.deposit(id, vault, netAmount);
+  }
+
+  function drain(address to)
+    external
+      onlyOwner
+  {
+    to.safeTransferETH(address(this).balance);
   }
 }
