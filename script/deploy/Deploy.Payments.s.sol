@@ -13,7 +13,7 @@ contract DeployPayments is Script, Parameters {
     vm.startBroadcast();  // ----------------------
 
     Payments payments = new Payments(
-      VaultManager(address(0)), // TODO: change!!!!!!!
+      VaultManager(0xfaa785c041181a54c700fD993CDdC61dbBfb420f), 
       IWETH(MAINNET_WETH)
     );
 
