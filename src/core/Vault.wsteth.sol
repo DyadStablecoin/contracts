@@ -88,6 +88,7 @@ contract Vault is IVault {
               / 10**asset.decimals();
   }
 
+  // 222174360236 * 1152397397221848713 / 1e18
   function assetPrice() 
     public 
     view 
