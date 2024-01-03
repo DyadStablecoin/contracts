@@ -17,7 +17,7 @@ contract DeployPayments is Script, Parameters {
     Vault vault = new Vault(
       VaultManager (MAINNET_VAULT_MANAGER), 
       ERC20        (MAINNET_WETH), 
-      IAggregatorV3(MAINNET_CHAINLINK_STETH)
+      IAggregatorV3(MAINNET_CHAINLINK_WSTETH)
     );
 
     vm.stopBroadcast();  // ----------------------------

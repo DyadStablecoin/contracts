@@ -11,6 +11,10 @@ import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 
+interface IWstETH {
+    function stEthPerToken() external view returns (uint256);
+}
+
 contract Vault is IVault {
   using SafeTransferLib   for ERC20;
   using SafeCast          for int;
@@ -21,6 +25,7 @@ contract Vault is IVault {
   VaultManager  public immutable vaultManager;
   ERC20         public immutable asset;
   IAggregatorV3 public immutable oracle;
+  IWstETH       public immutable wstETH;
 
   mapping(uint => uint) public id2asset;
 
@@ -32,11 +37,13 @@ contract Vault is IVault {
   constructor(
     VaultManager  _vaultManager,
     ERC20         _asset,
-    IAggregatorV3 _oracle
+    IAggregatorV3 _oracle,
+    IWstETH       _wstETH
   ) {
     vaultManager   = _vaultManager;
     asset          = _asset;
     oracle         = _oracle;
+    wstETH         = _wstETH;
   }
 
   function deposit(
@@ -100,6 +107,6 @@ contract Vault is IVault {
         uint256 updatedAt, 
       ) = oracle.latestRoundData();
       if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) revert StaleData();
-      return answer.toUint256();
+      return answer.toUint256() * wstETH.stEthPerToken() / 1e18;
   }
 }
