@@ -5,15 +5,12 @@ import {VaultManager}  from "./VaultManager.sol";
 import {IDNft}         from "../interfaces/IDNft.sol";
 import {IVault}        from "../interfaces/IVault.sol";
 import {IAggregatorV3} from "../interfaces/IAggregatorV3.sol";
+import {IWstETH} from "../interfaces/IWstETH.sol";
 
 import {SafeCast}          from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
-
-interface IWstETH {
-    function stEthPerToken() external view returns (uint256);
-}
 
 contract Vault is IVault {
   using SafeTransferLib   for ERC20;
