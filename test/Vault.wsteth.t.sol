@@ -17,7 +17,7 @@ contract VaultWstEthTest is Test, Parameters {
     vault = new VaultWstEth(
       VaultManager (MAINNET_VAULT_MANAGER), 
       ERC20        (MAINNET_WETH), 
-      IAggregatorV3(MAINNET_CHAINLINK_WSTETH),
+      IAggregatorV3(MAINNET_CHAINLINK_STETH),
       IWstETH      (MAINNET_WSTETH)
     );
   }
