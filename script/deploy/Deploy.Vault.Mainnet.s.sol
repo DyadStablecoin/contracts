@@ -17,9 +17,8 @@ contract DeployVault is Script, Parameters {
 
     new VaultWstEth(
       VaultManager (MAINNET_VAULT_MANAGER), 
-      ERC20        (MAINNET_WETH), 
-      IAggregatorV3(MAINNET_CHAINLINK_STETH),
-      IWstETH      (MAINNET_WSTETH)
+      ERC20        (MAINNET_WSTETH), 
+      IAggregatorV3(MAINNET_CHAINLINK_STETH)
     );
 
     vm.stopBroadcast();  // ----------------------------

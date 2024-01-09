@@ -18,8 +18,7 @@ contract DeployVault is Script, Parameters {
     new VaultWstEth(
       VaultManager (GOERLI_VAULT_MANAGER), 
       ERC20        (GOERLI_WETH), 
-      IAggregatorV3(GOERLI_CHAINLINK_STETH),
-      IWstETH      (GOERLI_WSTETH)
+      IAggregatorV3(GOERLI_CHAINLINK_STETH)
     );
 
     vm.stopBroadcast();  // ----------------------------

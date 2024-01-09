@@ -22,7 +22,6 @@ contract VaultWstEth is IVault {
   VaultManager  public immutable vaultManager;
   ERC20         public immutable asset;
   IAggregatorV3 public immutable oracle;
-  IWstETH       public immutable wstETH;
 
   mapping(uint => uint) public id2asset;
 
@@ -34,13 +33,11 @@ contract VaultWstEth is IVault {
   constructor(
     VaultManager  _vaultManager,
     ERC20         _asset,
-    IAggregatorV3 _oracle,
-    IWstETH       _wstETH
+    IAggregatorV3 _oracle
   ) {
     vaultManager   = _vaultManager;
     asset          = _asset;
     oracle         = _oracle;
-    wstETH         = _wstETH;
   }
 
   function deposit(
@@ -104,6 +101,8 @@ contract VaultWstEth is IVault {
         uint256 updatedAt, 
       ) = oracle.latestRoundData();
       if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) revert StaleData();
-      return answer.toUint256() * wstETH.stEthPerToken() / 1e18;
+      return answer.toUint256()                        // 1e8
+             * IWstETH(address(asset)).stEthPerToken() // 1e18
+             / 1e18;
   }
 }
