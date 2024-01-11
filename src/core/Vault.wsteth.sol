@@ -101,8 +101,6 @@ contract VaultWstEth is IVault {
         uint256 updatedAt, 
       ) = oracle.latestRoundData();
       if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) revert StaleData();
-      return answer.toUint256()                        // 1e8
-             * IWstETH(address(asset)).stEthPerToken() // 1e18
-             / 1e18;
+      return IWstETH(address(asset)).getStETHByWstETH(answer.toUint256()) / 1e18;
   }
 }
