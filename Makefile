@@ -8,7 +8,7 @@ ifdef FUNC
 endif
 
 test = forge test $(matchFile) $(matchFunction)
-fork-block-number = --fork-block-number 16386958
+# fork-block-number = --fork-block-number 18941929 #16386958
 
 # test locally
 t:
@@ -39,3 +39,12 @@ pdeploy:
 
 read:
 	forge script script/Read.s.sol --rpc-url $(GOERLI_RPC) --fork-block-number 8416091
+
+ldeploy:
+	forge script script/deploy/Deploy.Mainnet.s.sol --fork-url http://localhost:8545 --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --broadcast --verify -i 1 -vvvv
+
+gdeployVault:
+	forge script script/deploy/Deploy.Vault.Goerli.s.sol --rpc-url $(GOERLI_RPC) --sender $(PUBLIC_KEY) --broadcast --verify -i 1 -vvvv
+
+mdeployVault:
+	forge script script/deploy/Deploy.Vault.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender $(PUBLIC_KEY) --broadcast --verify -i 1 -vvvv
