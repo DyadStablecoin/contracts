@@ -45,3 +45,6 @@ ldeploy:
 
 gdeployVault:
 	forge script script/deploy/Deploy.Vault.Goerli.s.sol --rpc-url $(GOERLI_RPC) --sender $(PUBLIC_KEY) --broadcast --verify -i 1 -vvvv
+
+mdeployVault:
+	forge script script/deploy/Deploy.Vault.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender $(PUBLIC_KEY) --broadcast --verify -i 1 -vvvv
