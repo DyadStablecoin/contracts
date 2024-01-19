@@ -2,6 +2,7 @@
 pragma solidity =0.8.17;
 
 import {Licenser} from "./Licenser.sol";
+
 import {Owned}         from "@solmate/src/auth/Owned.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
@@ -22,6 +23,7 @@ contract LicenserManager is Owned(msg.sender) {
       onlyOwner {
     require(licensedVaults.length() < maxVaults);
     require(licensedVaults.add(_vault));
+    licenser.add(_vault);
   }
 
   function unlicenseVault(
@@ -29,6 +31,15 @@ contract LicenserManager is Owned(msg.sender) {
   ) external 
       onlyOwner {
     require(licensedVaults.remove(_vault));
+    licenser.remove(_vault);
+  }
+
+  function increaseMaxVaults(
+      uint _maxVaults
+  ) external 
+      onlyOwner {
+    require(_maxVaults > maxVaults);
+    maxVaults = _maxVaults;
   }
 
   function getLicensedVaults() 
@@ -42,11 +53,10 @@ contract LicenserManager is Owned(msg.sender) {
       return vaults;
   }
 
-  function setMaxVaults(
-      uint _maxVaults
-  ) external 
-      onlyOwner {
-    require(_maxVaults > maxVaults);
-    maxVaults = _maxVaults;
+  function getLicensedVaultsLength() 
+    external 
+    view 
+    returns (uint) {
+      return licensedVaults.length();
   }
 }
