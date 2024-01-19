@@ -46,11 +46,7 @@ contract LicenserManager is Owned(msg.sender) {
     external 
     view 
     returns (address[] memory) {
-      address[] memory vaults = new address[](licensedVaults.length());
-      for (uint i = 0; i < licensedVaults.length(); i++) {
-        vaults[i] = licensedVaults.at(i);
-      }
-      return vaults;
+      return licensedVaults.values();
   }
 
   function getLicensedVaultsLength() 
