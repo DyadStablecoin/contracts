@@ -10,7 +10,7 @@ contract Staking is Owned(msg.sender) {
     ERC20 public immutable rewardsToken;
 
     // Duration of rewards to be paid out (in seconds)
-    uint public duration = 7 years;
+    uint public duration = 10 years;
     // Timestamp of when the rewards finish
     uint public finishAt;
     // Minimum of last updated time and reward finish time
