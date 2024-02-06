@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.17;
 
+import {IStaking} from "../interfaces/IStaking.sol";
+
 import {Owned} from "@solmate/src/auth/Owned.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 // from https://solidity-by-example.org/defi/staking-rewards/
-contract Staking is Owned(msg.sender) {
+contract Staking is IStaking, Owned(msg.sender) {
     ERC20 public immutable stakingToken;
     ERC20 public immutable rewardsToken;
 
     // Duration of rewards to be paid out (in seconds)
-    uint public duration = 10 years;
+    uint public duration = 365 days * 10; // 10 years
     // Timestamp of when the rewards finish
     uint public finishAt;
     // Minimum of last updated time and reward finish time
@@ -66,6 +68,7 @@ contract Staking is Owned(msg.sender) {
       stakingToken.transferFrom(msg.sender, address(this), _amount);
       balanceOf[msg.sender] += _amount;
       totalSupply += _amount;
+      emit Staked(msg.sender, _amount);
     }
 
     function withdraw(uint _amount) external updateReward(msg.sender) {
@@ -73,6 +76,7 @@ contract Staking is Owned(msg.sender) {
       balanceOf[msg.sender] -= _amount;
       totalSupply -= _amount;
       stakingToken.transfer(msg.sender, _amount);
+      emit Withdrawn(msg.sender, _amount);
     }
 
     function earned(address _account) public view returns (uint) {
@@ -87,12 +91,14 @@ contract Staking is Owned(msg.sender) {
       if (reward > 0) {
           rewards[msg.sender] = 0;
           rewardsToken.transfer(msg.sender, reward);
+          emit RewardPaid(msg.sender, reward);
       }
     }
 
     function setRewardsDuration(uint _duration) external onlyOwner {
       require(finishAt < block.timestamp, "reward duration not finished");
       duration = _duration;
+      emit RewardsDurationUpdated(_duration);
     }
 
     function notifyRewardAmount(
@@ -113,6 +119,7 @@ contract Staking is Owned(msg.sender) {
 
       finishAt = block.timestamp + duration;
       updatedAt = block.timestamp;
+      emit RewardAdded(_amount);
     }
 
     function _min(uint x, uint y) private pure returns (uint) {
