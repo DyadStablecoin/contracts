@@ -2,9 +2,9 @@
 pragma solidity =0.8.17;
 
 import {VaultManager}  from "./VaultManager.sol";
+import {Dyad}          from "./Dyad.sol";
 import {IDNft}         from "../interfaces/IDNft.sol";
 import {IVault}        from "../interfaces/IVault.sol";
-import {IAggregatorV3} from "../interfaces/IAggregatorV3.sol";
 
 import {SafeCast}          from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
@@ -12,15 +12,11 @@ import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 
 contract Vault is IVault {
-  using SafeTransferLib   for ERC20;
-  using SafeCast          for int;
-  using FixedPointMathLib for uint;
-
-  uint public constant STALE_DATA_TIMEOUT = 90 minutes; 
+  using SafeTransferLib for ERC20;
 
   VaultManager  public immutable vaultManager;
   ERC20         public immutable asset;
-  IAggregatorV3 public immutable oracle;
+  Dyad          public immutable dyad;
 
   mapping(uint => uint) public id2asset;
 
@@ -31,12 +27,12 @@ contract Vault is IVault {
 
   constructor(
     VaultManager  _vaultManager,
-    ERC20         _asset,
-    IAggregatorV3 _oracle
+    ERC20         _asset, 
+    Dyad          _dyad
   ) {
     vaultManager   = _vaultManager;
     asset          = _asset;
-    oracle         = _oracle;
+    dyad           = _dyad;
   }
 
   function deposit(
@@ -82,23 +78,14 @@ contract Vault is IVault {
     external
     view 
     returns (uint) {
-      return id2asset[id] * assetPrice() 
-              * 1e18 
-              / 10**oracle.decimals() 
-              / 10**asset.decimals();
+      return id2asset[id] * assetPrice();
   }
 
   function assetPrice() 
     public 
     view 
     returns (uint) {
-      (
-        ,
-        int256 answer,
-        , 
-        uint256 updatedAt, 
-      ) = oracle.latestRoundData();
-      if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) revert StaleData();
-      return answer.toUint256();
+      // (TVL - DYAD supply) / Kerosine supply
+      return (0 - dyad.totalSupply()) / asset.totalSupply();
   }
 }
