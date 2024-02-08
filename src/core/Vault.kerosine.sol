@@ -12,7 +12,7 @@ import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
 import {Owned}           from "@solmate/src/auth/Owned.sol";
 
-contract KerosineVault is IVault, Owned(msg.sender) {
+abstract contract KerosineVault is IVault, Owned(msg.sender) {
   using EnumerableSet   for EnumerableSet.AddressSet;
   using SafeTransferLib for ERC20;
 
@@ -98,7 +98,8 @@ contract KerosineVault is IVault, Owned(msg.sender) {
   function getUsdValue(
     uint id
   )
-    external
+    public
+    virtual
     view 
     returns (uint) {
       return id2asset[id] * assetPrice();
