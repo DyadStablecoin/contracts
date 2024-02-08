@@ -1,18 +1,22 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
-import {VaultManager} from "./VaultManager.sol";
-import {Dyad}         from "./Dyad.sol";
-import {Vault}        from "./Vault.sol";
-import {IVault}       from "../interfaces/IVault.sol";
+import {VaultManager}  from "./VaultManager.sol";
+import {Dyad}          from "./Dyad.sol";
+import {Vault}         from "./Vault.sol";
+import {IDNft}         from "../interfaces/IDNft.sol";
+import {IVault}        from "../interfaces/IVault.sol";
 
-import {ERC20}         from "@solmate/src/tokens/ERC20.sol";
-import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {EnumerableSet}   from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
+import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
+import {Owned}           from "@solmate/src/auth/Owned.sol";
 
-contract BoundedKerosineVault is IVault {
+contract KerosineVault is IVault, Owned(msg.sender) {
   using EnumerableSet   for EnumerableSet.AddressSet;
+  using SafeTransferLib for ERC20;
 
-    // TODO: add a limit to the number of vaults
+  // TODO: add a limit to the number of vaults
   EnumerableSet.AddressSet private vaults;
 
   VaultManager  public immutable vaultManager;
@@ -36,6 +40,24 @@ contract BoundedKerosineVault is IVault {
     dyad           = _dyad;
   }
 
+  function addVault(
+    address vault
+  ) 
+    external 
+      onlyOwner
+  {
+    vaults.add(vault);
+  }
+
+  function removeVault(
+    address vault
+  ) 
+    external 
+      onlyOwner
+  {
+    vaults.remove(vault);
+  }
+
   function deposit(
     uint id,
     uint amount
@@ -45,6 +67,19 @@ contract BoundedKerosineVault is IVault {
   {
     id2asset[id] += amount;
     emit Deposit(id, amount);
+  }
+
+  function withdraw(
+    uint    id,
+    address to,
+    uint    amount
+  ) 
+    external 
+      onlyVaultManager
+  {
+    id2asset[id] -= amount;
+    asset.safeTransfer(to, amount); 
+    emit Withdraw(id, to, amount);
   }
 
   function move(
@@ -66,7 +101,7 @@ contract BoundedKerosineVault is IVault {
     external
     view 
     returns (uint) {
-      return id2asset[id] * assetPrice() * 2;
+      return id2asset[id] * assetPrice();
   }
 
   function assetPrice() 
