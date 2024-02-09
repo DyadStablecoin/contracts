@@ -71,8 +71,8 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     view 
     returns (uint) {
       uint tvl = getTvl();
-      if (dyad.mintedDyad(address(vaultManager), id) < tvl) return 0;
-      uint assetPrice =  (tvl - dyad.totalSupply()) / getTotalKerosine();
+      if (tvl < dyad.mintedDyad(address(vaultManager), id)) return 0;
+      uint assetPrice = (tvl - dyad.totalSupply()) / getTotalKerosine();
       return id2asset[id] * assetPrice;
   }
 
