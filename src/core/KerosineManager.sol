@@ -5,9 +5,12 @@ import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet
 import {Owned}         from "@solmate/src/auth/Owned.sol";
 
 contract KerosineManager is Owned(msg.sender) {
+  error TooManyVaults();
+
   using EnumerableSet for EnumerableSet.AddressSet;
 
-  // TODO: add a limit to the number of vaults
+  uint public constant MAX_VAULTS = 10;
+
   EnumerableSet.AddressSet private vaults;
 
   function add(
@@ -16,6 +19,7 @@ contract KerosineManager is Owned(msg.sender) {
     external 
       onlyOwner
   {
+    if (vaults.length() >= MAX_VAULTS) revert TooManyVaults();
     vaults.add(vault);
   }
 
