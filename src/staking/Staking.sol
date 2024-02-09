@@ -31,9 +31,9 @@ contract Staking is IStaking, Owned(msg.sender) {
     // User address => staked amount
     mapping(address => uint) public balanceOf;
 
-    constructor(address _stakingToken, address _rewardToken) {
-      stakingToken = ERC20(_stakingToken);
-      rewardsToken = ERC20(_rewardToken);
+    constructor(ERC20 _stakingToken, ERC20 _rewardToken) {
+      stakingToken = _stakingToken;
+      rewardsToken = _rewardToken;
     }
 
     modifier updateReward(address _account) {
