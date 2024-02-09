@@ -50,19 +50,6 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     emit Deposit(id, amount);
   }
 
-  function withdraw(
-    uint    id,
-    address to,
-    uint    amount
-  ) 
-    external 
-      onlyVaultManager
-  {
-    id2asset[id] -= amount;
-    asset.safeTransfer(to, amount); 
-    emit Withdraw(id, to, amount);
-  }
-
   function move(
     uint from,
     uint to,
@@ -83,10 +70,13 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     virtual
     view 
     returns (uint) {
-      return id2asset[id] * assetPrice();
+      uint tvl = getTvl();
+      if (dyad.mintedDyad(address(vaultManager), id) < tvl) return 0;
+      uint assetPrice =  (tvl - dyad.totalSupply()) / getTotalKerosine();
+      return id2asset[id] * assetPrice;
   }
 
-  function assetPrice() 
+  function getTvl() 
     public 
     view 
     returns (uint) {
@@ -97,6 +87,12 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
         Vault vault = Vault(vaults[i]);
         tvl += vault.asset().balanceOf(address(vault)) * vault.assetPrice();
       }
-      return (tvl - dyad.totalSupply()) / asset.totalSupply();
+      return tvl;
   }
+
+  function getTotalKerosine() 
+    public 
+    view 
+    virtual
+    returns (uint);   
 }

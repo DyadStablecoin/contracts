@@ -51,6 +51,9 @@ contract KerosineDeployBase is Script {
       kerosineManager
     );
 
+    unboundedKerosineVault.setBoundedKerosineVault(boundedKerosineVault);
+    boundedKerosineVault.setUnboundedKerosineVault(unboundedKerosineVault);
+
     return (
       kerosine,
       kerosineManager,
