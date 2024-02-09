@@ -35,6 +35,7 @@ contract KerosineDeployBase is Script {
     kerosineManager.transferOwnership(_owner);
     staking.        transferOwnership(_owner);
 
+    // IMPORTANT: Vault needs to be licensed!
     UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
       _vaultManager,
       kerosine, 
@@ -42,6 +43,7 @@ contract KerosineDeployBase is Script {
       kerosineManager
     );
 
+    // IMPORTANT: Vault needs to be licensed!
     BoundedKerosineVault boundedKerosineVault     = new BoundedKerosineVault(
       _vaultManager,
       kerosine, 
