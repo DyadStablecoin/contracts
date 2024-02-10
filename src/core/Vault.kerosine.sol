@@ -70,13 +70,30 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     virtual
     view 
     returns (uint) {
-      uint tvl = getTvl();
-      if (tvl < dyad.mintedDyad(address(vaultManager), id)) return 0;
-      uint assetPrice = (tvl - dyad.totalSupply()) / getTotalKerosine();
+      uint localTvl  = getLocalTvl(id);
+      if (localTvl < dyad.mintedDyad(address(vaultManager), id)) return 0;
+      uint globalTvl = getGlobalTvl();
+      uint assetPrice = (globalTvl - dyad.totalSupply()) / getTotalKerosine();
       return id2asset[id] * assetPrice;
   }
 
-  function getTvl() 
+  // tvl for one dnft
+  function getLocalTvl(uint id) 
+    public 
+    view 
+    returns (uint) {
+      uint tvl;
+      address[] memory vaults = vaultManager.getVaults(id);
+      uint numberOfVaults = vaults.length;
+      for (uint i = 0; i < numberOfVaults; i++) {
+        Vault vault = Vault(vaults[i]);
+        tvl += vault.getUsdValue(id);
+      }
+      return tvl;
+  }
+
+  // tvl for the whole protocol
+  function getGlobalTvl() 
     public 
     view 
     returns (uint) {

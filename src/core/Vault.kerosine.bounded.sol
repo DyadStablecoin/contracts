@@ -30,14 +30,6 @@ contract BoundedKerosineVault is KerosineVault {
     unboundedKerosineVault = _unboundedKerosineVault;
   }
 
-  function withdraw(
-    uint    id,
-    address to,
-    uint    amount
-  ) external {
-    revert NotWithdrawable();
-  }
-
   function getUsdValue(
     uint id
   )
