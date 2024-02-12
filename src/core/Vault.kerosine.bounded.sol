@@ -10,7 +10,7 @@ import {UnboundedKerosineVault} from "./Vault.kerosine.unbounded.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract BoundedKerosineVault is KerosineVault {
-  error NotWithdrawable();
+  error NotWithdrawable(uint id, address to, uint amount);
 
   UnboundedKerosineVault public unboundedKerosineVault;
 
@@ -38,6 +38,18 @@ contract BoundedKerosineVault is KerosineVault {
     view 
     returns (uint) {
       return super.getUsdValue(id) * 2;
+  }
+
+  function withdraw(
+    uint    id,
+    address to,
+    uint    amount
+  ) 
+    external 
+    view
+      onlyVaultManager
+  {
+    revert NotWithdrawable(id, to, amount);
   }
 
   function getTotalKerosine()
