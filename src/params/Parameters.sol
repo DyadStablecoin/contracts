@@ -15,6 +15,8 @@ contract Parameters {
   // NOTE: There is no stETH on Goerli, so we use the WETH oracle instead.
   address GOERLI_CHAINLINK_STETH = 0xD4a33860578De61DBAbDc8BFdb98FD742fA7028e;
   address GOERLI_WSTETH          = 0x6320cD32aA674d2898A68ec82e869385Fc5f7E2f;
+  address GOERLI_DYAD            = 0xCf0c2d6aeD80aFD8cB299e7E7F3f311F81C3a766;
+  address GOERLI_WETH_DYAD_UNI   = 0x1F79BeD01b0fF658dbb47b4005F1B571Ef06D0FD;
 
   // ---------------- Mainnet ----------------
   address MAINNET_OWNER           = 0xDeD796De6a14E255487191963dEe436c45995813;
@@ -26,4 +28,7 @@ contract Parameters {
   address MAINNET_VAULT_MANAGER   = 0xfaa785c041181a54c700fD993CDdC61dbBfb420f;
   address MAINNET_CHAINLINK_STETH = 0xCfE54B5cD566aB89272946F602D76Ea879CAb4a8;
   address MAINNET_WSTETH          = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+  address MAINNET_DYAD            = 0x305B58c5F6B5b6606fb13edD11FbDD5e532d5A26;
+
+  address MAINNET_WETH_DYAD_UNI   = 0x1F79BeD01b0fF658dbb47b4005F1B571Ef06D0FD;
 }
