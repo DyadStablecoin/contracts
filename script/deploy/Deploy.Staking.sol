@@ -33,6 +33,8 @@ contract DeployStaking is Script, Parameters {
       kerosine.totalSupply() - STAKING_REWARDS // the rest
     );
 
+    staking.transferOwnership(MAINNET_OWNER);
+
     vm.stopBroadcast();  // ----------------------------
   }
 }
