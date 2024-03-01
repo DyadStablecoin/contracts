@@ -25,6 +25,7 @@ contract DeployStaking is Script, Parameters {
       STAKING_REWARDS
     );
 
+    staking.setRewardsDuration(5 days);
     staking.notifyRewardAmount(STAKING_REWARDS);
 
     kerosine.transfer(
