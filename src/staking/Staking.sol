@@ -12,13 +12,13 @@ contract Staking is IStaking, Owned(msg.sender) {
     ERC20 public immutable rewardsToken;
 
     // Duration of rewards to be paid out (in seconds)
-    uint public duration = 365 days * 10; // 10 years
+    uint public duration; 
     // Timestamp of when the rewards finish
     uint public finishAt;
     // Minimum of last updated time and reward finish time
     uint public updatedAt;
     // Reward to be paid out per second
-    uint public rewardRate = 2.22 * 10**18; // 2.22 per second
+    uint public rewardRate;
     // Sum of (reward rate * dt * 1e18 / total supply)
     uint public rewardPerTokenStored;
     // User address => rewardPerTokenStored

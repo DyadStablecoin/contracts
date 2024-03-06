@@ -12,7 +12,8 @@ import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 contract DeployStaking is Script, Parameters {
   function run() public {
 
-    uint ONE_MILLION = 1_000_000;
+    uint ONE_MILLION     = 1_000_000;
+    uint STAKING_REWARDS = ONE_MILLION * 10**18;
 
     vm.startBroadcast();  // ----------------------
 
@@ -21,13 +22,18 @@ contract DeployStaking is Script, Parameters {
 
     kerosine.transfer(
       address(staking),
-      ONE_MILLION * 10**18 // 1 million
+      STAKING_REWARDS
     );
 
+    staking.setRewardsDuration(5 days);
+    staking.notifyRewardAmount(STAKING_REWARDS);
+
     kerosine.transfer(
-      MAINNET_OWNER,                                // multi-sig
-      kerosine.totalSupply() - ONE_MILLION * 10**18 // the rest
+      MAINNET_OWNER,                           // multi-sig
+      kerosine.totalSupply() - STAKING_REWARDS // the rest
     );
+
+    staking.transferOwnership(MAINNET_OWNER);
 
     vm.stopBroadcast();  // ----------------------------
   }
