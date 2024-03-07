@@ -20,6 +20,7 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   Dyad            public immutable dyad;
   KerosineManager public immutable kerosineManager;
 
+  uint                  public totalDepositAmount;
   mapping(uint => uint) public id2asset;
 
   modifier onlyVaultManager() {
@@ -46,7 +47,8 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     external 
       onlyVaultManager
   {
-    id2asset[id] += amount;
+    id2asset[id]       += amount;
+    totalDepositAmount += amount;
     emit Deposit(id, amount);
   }
 

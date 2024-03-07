@@ -58,7 +58,7 @@ contract BoundedKerosineVault is KerosineVault {
     view
     returns (uint) {
       return
-        asset.balanceOf(address(unboundedKerosineVault)) 
-      - asset.balanceOf(address(this));
+        unboundedKerosineVault.totalDepositAmount()
+      - totalDepositAmount;
   }
 }

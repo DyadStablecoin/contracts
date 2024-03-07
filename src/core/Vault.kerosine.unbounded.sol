@@ -39,7 +39,8 @@ contract UnboundedKerosineVault is KerosineVault {
     external 
       onlyVaultManager
   {
-    id2asset[id] -= amount;
+    id2asset[id]       -= amount;
+    totalDepositAmount -= amount;
     asset.safeTransfer(to, amount); 
     emit Withdraw(id, to, amount);
   }
@@ -50,7 +51,7 @@ contract UnboundedKerosineVault is KerosineVault {
     view
     returns (uint) {
       return 
-        asset.balanceOf(address(this)) 
-      - asset.balanceOf(address(boundedKerosineVault));
+        totalDepositAmount 
+      - boundedKerosineVault.totalDepositAmount();
   }
 }
