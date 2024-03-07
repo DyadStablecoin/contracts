@@ -14,6 +14,9 @@ import {Staking}                from "../../src/staking/Staking.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract KerosineDeployBase is Script {
+  uint ONE_MILLION     = 1_000_000;
+  uint STAKING_REWARDS = ONE_MILLION * 10**18;
+
   function deploy(
     address      _owner, 
     ERC20        _stakingToken1,
@@ -31,6 +34,19 @@ contract KerosineDeployBase is Script {
     Kerosine        kerosine        = new Kerosine();
     KerosineManager kerosineManager = new KerosineManager();
     Staking staking                 = new Staking(_stakingToken1, kerosine);
+
+    kerosine.transfer(
+      address(staking),
+      STAKING_REWARDS
+    );
+
+    staking.setRewardsDuration(5 days);
+    staking.notifyRewardAmount(STAKING_REWARDS);
+
+    kerosine.transfer(
+      _owner,
+      kerosine.totalSupply() - STAKING_REWARDS // the rest
+    );
 
     kerosineManager.transferOwnership(_owner);
     staking.        transferOwnership(_owner);
