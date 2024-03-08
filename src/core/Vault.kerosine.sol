@@ -3,7 +3,6 @@ pragma solidity =0.8.17;
 
 import {VaultManager}    from "./VaultManager.sol";
 import {Dyad}            from "./Dyad.sol";
-import {Vault}           from "./Vault.sol";
 import {KerosineManager} from "./KerosineManager.sol";
 import {IDNft}           from "../interfaces/IDNft.sol";
 import {IVault}          from "../interfaces/IVault.sol";
@@ -20,7 +19,6 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   Dyad            public immutable dyad;
   KerosineManager public immutable kerosineManager;
 
-  uint                  public totalDepositAmount;
   mapping(uint => uint) public id2asset;
 
   modifier onlyVaultManager() {
@@ -44,11 +42,11 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     uint id,
     uint amount
   )
-    external 
+    virtual
+    public 
       onlyVaultManager
   {
-    id2asset[id]       += amount;
-    totalDepositAmount += amount;
+    id2asset[id] += amount;
     emit Deposit(id, amount);
   }
 
@@ -69,7 +67,6 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     uint id
   )
     public
-    virtual
     view 
     returns (uint) {
       return id2asset[id] * assetPrice();
@@ -78,20 +75,6 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   function assetPrice() 
     public 
     view 
-    returns (uint) {
-      uint tvl;
-      address[] memory vaults = kerosineManager.getVaults();
-      uint numberOfVaults = vaults.length;
-      for (uint i = 0; i < numberOfVaults; i++) {
-        Vault vault = Vault(vaults[i]);
-        tvl += vault.asset().balanceOf(address(vault)) * vault.assetPrice();
-      }
-      return (tvl - dyad.totalSupply()) / getTotalKerosine();
-  }
-
-  function getTotalKerosine() 
-    public 
-    view 
     virtual
-    returns (uint);   
+    returns (uint); 
 }

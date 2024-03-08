@@ -13,6 +13,7 @@ contract BoundedKerosineVault is KerosineVault {
   error NotWithdrawable(uint id, address to, uint amount);
 
   UnboundedKerosineVault public unboundedKerosineVault;
+  uint                   public totalDepositAmount;
 
   constructor(
     VaultManager    _vaultManager,
@@ -30,14 +31,16 @@ contract BoundedKerosineVault is KerosineVault {
     unboundedKerosineVault = _unboundedKerosineVault;
   }
 
-  function getUsdValue(
-    uint id
+  function deposit(
+    uint id,
+    uint amount
   )
-    public
     override
-    view 
-    returns (uint) {
-      return super.getUsdValue(id) * 2;
+    public 
+      onlyVaultManager
+  {
+    totalDepositAmount += amount;
+    super.deposit(id, amount);
   }
 
   function withdraw(
@@ -52,13 +55,11 @@ contract BoundedKerosineVault is KerosineVault {
     revert NotWithdrawable(id, to, amount);
   }
 
-  function getTotalKerosine()
-    public
+  function assetPrice() 
+    public 
+    view 
     override
-    view
     returns (uint) {
-      return
-        unboundedKerosineVault.totalDepositAmount()
-      - totalDepositAmount;
+      return unboundedKerosineVault.assetPrice() * 2;
   }
 }
