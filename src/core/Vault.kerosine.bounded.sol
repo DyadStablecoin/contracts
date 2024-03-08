@@ -13,7 +13,7 @@ contract BoundedKerosineVault is KerosineVault {
   error NotWithdrawable(uint id, address to, uint amount);
 
   UnboundedKerosineVault public unboundedKerosineVault;
-  uint                   public totalDepositAmount;
+  uint                   public deposits;
 
   constructor(
     VaultManager    _vaultManager,
@@ -39,7 +39,7 @@ contract BoundedKerosineVault is KerosineVault {
     public 
       onlyVaultManager
   {
-    totalDepositAmount += amount;
+    deposits += amount;
     super.deposit(id, amount);
   }
 

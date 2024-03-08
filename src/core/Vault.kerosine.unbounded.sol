@@ -40,7 +40,7 @@ contract UnboundedKerosineVault is KerosineVault {
     external 
       onlyVaultManager
   {
-    id2asset[id]       -= amount;
+    id2asset[id] -= amount;
     asset.safeTransfer(to, amount); 
     emit Withdraw(id, to, amount);
   }
@@ -57,8 +57,8 @@ contract UnboundedKerosineVault is KerosineVault {
         Vault vault = Vault(vaults[i]);
         tvl += vault.asset().balanceOf(address(vault)) * vault.assetPrice();
       }
-      uint kerosineMulti = asset.totalSupply()
-                           + 2*boundedKerosineVault.totalDepositAmount();
+      uint boundedKerosine = boundedKerosineVault.deposits();
+      uint kerosineMulti   = asset.totalSupply() + 2*boundedKerosine;
       return (tvl - dyad.totalSupply()) / kerosineMulti;
   }
 }
