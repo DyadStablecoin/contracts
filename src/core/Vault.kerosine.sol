@@ -69,7 +69,7 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     public
     view 
     returns (uint) {
-      return id2asset[id] * assetPrice();
+      return id2asset[id] * assetPrice() / 1e8;
   }
 
   function assetPrice() 
