@@ -53,3 +53,7 @@ mdeployVault:
 
 transferWsteth:
 	forge script script/mock/transfer.wsteth.s.sol   --rpc-url http://127.0.0.1:8545 --broadcast --sender 0x176F3DAb24a159341c0509bB36B833E7fdd0a132 --unlocked
+	
+# deploy staking contracts on goerli
+gdeployStaking:
+	forge script script/deploy/Deploy.Staking.Goerli.s.sol --rpc-url $(GOERLI_RPC) --sender $(PUBLIC_KEY) --broadcast --verify -i 1 -vvvv

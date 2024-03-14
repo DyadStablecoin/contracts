@@ -16,6 +16,7 @@ contract StakingDeployBase is Script {
       uint    _rewardsDuration,
       ERC20   _lpToken
   ) public {
+
       Kerosine kerosine = new Kerosine();
       Staking  staking  = new Staking(_lpToken, kerosine);
 
@@ -33,5 +34,6 @@ contract StakingDeployBase is Script {
       );
 
       staking.transferOwnership(_owner);
+
   }
 }
