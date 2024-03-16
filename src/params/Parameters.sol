@@ -29,6 +29,20 @@ contract Parameters {
   address MAINNET_CHAINLINK_STETH = 0xCfE54B5cD566aB89272946F602D76Ea879CAb4a8;
   address MAINNET_WSTETH          = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
   address MAINNET_DYAD            = 0x305B58c5F6B5b6606fb13edD11FbDD5e532d5A26;
-
   address MAINNET_WETH_DYAD_UNI   = 0x1F79BeD01b0fF658dbb47b4005F1B571Ef06D0FD;
+
+  // ---------------- Sepolia ----------------
+  address SEPOLIA_OWNER           = 0xEd6715D2172BFd50C2DBF608615c2AB497904803;
+  address SEPOLIA_DNFT            = address(0);
+  address SEPOLIA_WETH            = 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9;
+  address SEPOLIA_WETH_ORACLE     = 0x694AA1769357215DE4FAC081bf1f309aDC325306;
+  uint    SEPOLIA_FEE             = 0.001e18; // 0.1%
+  address SEPOLIA_FEE_RECIPIENT   = 0xDeD796De6a14E255487191963dEe436c45995813;
+  address SEPOLIA_VAULT_MANAGER   = address(0);
+
+  // NOTE: There is no stETH on Goerli, so we use the WETH oracle instead.
+  address SEPOLIA_CHAINLINK_STETH = address(0);
+  address SEPOLIA_WSTETH          = address(0);
+  address SEPOLIA_DYAD            = address(0);
+  address SEPOLIA_WETH_DYAD_UNI   = address(0);
 }
