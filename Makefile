@@ -57,3 +57,7 @@ transferWsteth:
 # deploy staking contracts on goerli
 gdeployStaking:
 	forge script script/deploy/Deploy.Staking.Goerli.s.sol --rpc-url $(SEPOLIA_RPC) --sender $(PUBLIC_KEY) --broadcast --verify -i 1 -vvvv
+	
+# deploy on sepolia
+sdeploy:
+	forge script script/deploy/Deploy.All.Sepolia.s.sol --rpc-url $(SEPOLIA_RPC) --sender 0x475F89AFe082b1e769789d70e045041c029fC8D3 --broadcast --verify -i 1 -vvvv
