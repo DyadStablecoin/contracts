@@ -4,7 +4,6 @@ P = "../broadcast/Deploy.All.Sepolia.s.sol/11155111/run-latest.json"
 
 f = open(P)
 d = json.load(f)
-
 # there are some dups that we need to filter out
 contractNames = []
 for k in d["transactions"]:
