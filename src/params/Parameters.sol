@@ -34,8 +34,8 @@ contract Parameters {
   // ---------------- Sepolia ----------------
   address SEPOLIA_OWNER           = 0xEd6715D2172BFd50C2DBF608615c2AB497904803;
   address SEPOLIA_DNFT            = address(0);
-  address SEPOLIA_WETH            = address(0);
-  address SEPOLIA_WETH_ORACLE     = address(0);
+  address SEPOLIA_WETH            = 0x7b79995e5f793A07Bc00c21412e50Ecae098E7f9;
+  address SEPOLIA_WETH_ORACLE     = 0x694AA1769357215DE4FAC081bf1f309aDC325306;
   uint    SEPOLIA_FEE             = 0.001e18; // 0.1%
   address SEPOLIA_FEE_RECIPIENT   = 0xDeD796De6a14E255487191963dEe436c45995813;
   address SEPOLIA_VAULT_MANAGER   = address(0);
