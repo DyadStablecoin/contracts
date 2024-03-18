@@ -40,9 +40,9 @@ contract Parameters {
   address SEPOLIA_FEE_RECIPIENT   = 0xDeD796De6a14E255487191963dEe436c45995813;
   address SEPOLIA_VAULT_MANAGER   = address(0);
 
-  // NOTE: There is no stETH on Goerli, so we use the WETH oracle instead.
-  address SEPOLIA_CHAINLINK_STETH = address(0);
-  address SEPOLIA_WSTETH          = address(0);
+  // NOTE: There is no stETH on Sepolia, so we use the WETH oracle instead.
+  address SEPOLIA_CHAINLINK_STETH = 0x694AA1769357215DE4FAC081bf1f309aDC325306;
+  address SEPOLIA_WSTETH          = 0xB82381A3fBD3FaFA77B3a7bE693342618240067b;
   address SEPOLIA_DYAD            = address(0);
-  address SEPOLIA_WETH_DYAD_UNI   = address(0);
+  address SEPOLIA_WETH_DYAD_UNI   = 0x1F79BeD01b0fF658dbb47b4005F1B571Ef06D0FD;
 }
