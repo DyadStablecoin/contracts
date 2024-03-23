@@ -60,4 +60,12 @@ gdeployStaking:
 	
 # deploy on sepolia
 sdeploy:
-	forge script script/deploy/Deploy.All.Sepolia.s.sol --rpc-url $(SEPOLIA_RPC) --sender 0x475F89AFe082b1e769789d70e045041c029fC8D3 --broadcast --verify -i 1 -vvvv
+	forge script script/deploy/Deploy.All.Sepolia.s.sol --rpc-url $(SEPOLIA_RPC) --sender 0x475F89AFe082b1e769789d70e045041c029fC8D3 --broadcast --verify -i 1 -vvvv --via-ir
+	
+# deploy on mainnet
+# mdeployKerosine:
+# 	forge script script/deploy/Deploy.Mainnet.Kerosine.s.sol --rpc-url $(MAINNET_RPC) --sender 0x475F89AFe082b1e769789d70e045041c029fC8D3 --broadcast --verify -i 1 -vvvv --via-ir
+	
+# deploy kerosine on mainnet
+mdeployKerosine:
+	forge script script/deploy/Deploy.Kerosine.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender 0x475F89AFe082b1e769789d70e045041c029fC8D3 --broadcast --verify -i 1 -vvvv --via-ir
