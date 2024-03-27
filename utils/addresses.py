@@ -1,6 +1,6 @@
 import json
 
-P = "../broadcast/Deploy.All.Sepolia.s.sol/11155111/run-latest.json"
+P = "../broadcast/Deploy.Staking.sol/1/run-latest.json"
 
 f = open(P)
 d = json.load(f)

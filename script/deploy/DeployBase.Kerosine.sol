@@ -23,7 +23,6 @@ contract KerosineDeployBase is Script {
     ERC20        _stakingToken1,
     VaultManager _vaultManager,
     Dyad         _dyad
-
   ) public returns (
     Kerosine, 
     KerosineManager, 
@@ -35,6 +34,11 @@ contract KerosineDeployBase is Script {
     Kerosine        kerosine        = new Kerosine();
     KerosineManager kerosineManager = new KerosineManager();
     Staking staking                 = new Staking(_stakingToken1, kerosine);
+
+    // weth
+    kerosineManager.add(0xcF97cEc1907CcF9d4A0DC4F492A3448eFc744F6c);
+    // wsteth
+    kerosineManager.add(0x7aE80418051b2897729Cbdf388b07C5158C557A1);
 
     kerosine.transfer(
       address(staking),
