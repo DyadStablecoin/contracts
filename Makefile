@@ -73,3 +73,7 @@ mdeployKerosine:
 # deploy kerosine on mainnet
 mdeployStaking:
 	forge script script/deploy/Deploy.Staking.sol --rpc-url $(MAINNET_RPC) --sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A --broadcast --verify -i 1 -vvvv --via-ir --optimize
+	
+# deploy kerosine vaults on mainnet
+mdeployKeroseneVaults:
+	forge script script/deploy/Deploy.Kerosene.Vaults.s.sol --rpc-url $(MAINNET_RPC) --sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A --broadcast --verify -i 1 -vvvv --via-ir --optimize
