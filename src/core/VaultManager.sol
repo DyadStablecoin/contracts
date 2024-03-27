@@ -19,7 +19,7 @@ contract VaultManager is IVaultManager {
 
   uint public constant MAX_VAULTS                = 5;
   uint public constant MIN_COLLATERIZATION_RATIO = 1.5e18; // 150%
-  uint public constant LIQUIDATION_REWARD        = 0.2e18; // 20%
+  uint public constant LIQUIDATION_REWARD        = 0.2e18; //  20%
 
   DNft     public immutable dNft;
   Dyad     public immutable dyad;

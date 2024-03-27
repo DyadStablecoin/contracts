@@ -53,3 +53,23 @@ mdeployVault:
 
 transferWsteth:
 	forge script script/mock/transfer.wsteth.s.sol   --rpc-url http://127.0.0.1:8545 --broadcast --sender 0x176F3DAb24a159341c0509bB36B833E7fdd0a132 --unlocked
+	
+# deploy staking contracts on goerli
+gdeployStaking:
+	forge script script/deploy/Deploy.Staking.Goerli.s.sol --rpc-url $(SEPOLIA_RPC) --sender $(PUBLIC_KEY) --broadcast --verify -i 1 -vvvv
+	
+# deploy on sepolia
+sdeploy:
+	forge script script/deploy/Deploy.All.Sepolia.s.sol --rpc-url $(SEPOLIA_RPC) --sender 0x475F89AFe082b1e769789d70e045041c029fC8D3 --broadcast --verify -i 1 -vvvv --via-ir
+	
+# deploy on mainnet
+# mdeployKerosine:
+# 	forge script script/deploy/Deploy.Mainnet.Kerosine.s.sol --rpc-url $(MAINNET_RPC) --sender 0x475F89AFe082b1e769789d70e045041c029fC8D3 --broadcast --verify -i 1 -vvvv --via-ir
+	
+# deploy kerosine on mainnet
+mdeployKerosine:
+	forge script script/deploy/Deploy.Kerosine.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A --broadcast --verify -i 1 -vvvv --via-ir --optimize
+	
+# deploy kerosine on mainnet
+mdeployStaking:
+	forge script script/deploy/Deploy.Staking.sol --rpc-url $(MAINNET_RPC) --sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A --broadcast --verify -i 1 -vvvv --via-ir --optimize
