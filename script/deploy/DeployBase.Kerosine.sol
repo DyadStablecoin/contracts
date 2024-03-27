@@ -9,6 +9,7 @@ import {BoundedKerosineVault}   from "../../src/core/Vault.kerosine.bounded.sol"
 import {VaultManager}           from "../../src/core/VaultManager.sol";
 import {Dyad}                   from "../../src/core/Dyad.sol";
 import {Kerosine}               from "../../src/staking/Kerosine.sol";
+import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol";
 import {Staking}                from "../../src/staking/Staking.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -69,6 +70,12 @@ contract KerosineDeployBase is Script {
 
     unboundedKerosineVault.setBoundedKerosineVault(boundedKerosineVault);
     boundedKerosineVault.setUnboundedKerosineVault(unboundedKerosineVault);
+
+    KerosineDenominator _kerosineDenominator = new KerosineDenominator(
+      boundedKerosineVault
+    );
+
+    unboundedKerosineVault.setDenominator(_kerosineDenominator);
 
     return (
       kerosine,

@@ -7,6 +7,7 @@ import {Vault}                from "./Vault.sol";
 import {Dyad}                 from "./Dyad.sol";
 import {KerosineManager}      from "./KerosineManager.sol";
 import {BoundedKerosineVault} from "./Vault.kerosine.bounded.sol";
+import {KerosineDenominator}  from "../staking/KerosineDenominator.sol";
 
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
@@ -15,6 +16,7 @@ contract UnboundedKerosineVault is KerosineVault {
   using SafeTransferLib for ERC20;
 
   BoundedKerosineVault public boundedKerosineVault;
+  KerosineDenominator  public kerosineDenominator;
 
   constructor(
     VaultManager    _vaultManager,
@@ -45,6 +47,13 @@ contract UnboundedKerosineVault is KerosineVault {
     emit Withdraw(id, to, amount);
   }
 
+  function setDenominator(KerosineDenominator _kerosineDenominator) 
+    external 
+    onlyOwner
+  {
+    kerosineDenominator = _kerosineDenominator;
+  }
+
   function assetPrice() 
     public 
     view 
@@ -57,8 +66,7 @@ contract UnboundedKerosineVault is KerosineVault {
         Vault vault = Vault(vaults[i]);
         tvl += vault.asset().balanceOf(address(vault)) * vault.assetPrice();
       }
-      uint boundedKerosine = boundedKerosineVault.deposits();
-      uint kerosineMulti   = asset.totalSupply() + 2*boundedKerosine;
-      return (tvl - dyad.totalSupply()) / kerosineMulti;
+      uint denominator = kerosineDenominator.denominator();
+      return (tvl - dyad.totalSupply()) / denominator;
   }
 }
