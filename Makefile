@@ -68,4 +68,8 @@ sdeploy:
 	
 # deploy kerosine on mainnet
 mdeployKerosine:
-	forge script script/deploy/Deploy.Kerosine.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender 0x475F89AFe082b1e769789d70e045041c029fC8D3 --broadcast --verify -i 1 -vvvv --via-ir
+	forge script script/deploy/Deploy.Kerosine.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A --broadcast --verify -i 1 -vvvv --via-ir --optimize
+	
+# deploy kerosine on mainnet
+mdeployStaking:
+	forge script script/deploy/Deploy.Staking.sol --rpc-url $(MAINNET_RPC) --sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A --broadcast --verify -i 1 -vvvv --via-ir --optimize
