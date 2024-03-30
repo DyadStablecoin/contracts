@@ -64,9 +64,11 @@ contract UnboundedKerosineVault is KerosineVault {
       uint numberOfVaults = vaults.length;
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[i]);
-        tvl += vault.asset().balanceOf(address(vault)) * vault.assetPrice();
+        tvl += vault.asset().balanceOf(address(vault)) * vault.assetPrice() * 1e18
+            / (10 ** vault.asset().decimals()) / (10 ** vault.oracle().decimals());
       }
+      uint numerator   = tvl - dyad.totalSupply();
       uint denominator = kerosineDenominator.denominator();
-      return (tvl - dyad.totalSupply()) / denominator;
+      return numerator * 1e8 / denominator;
   }
 }
