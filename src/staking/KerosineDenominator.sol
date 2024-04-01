@@ -16,7 +16,7 @@ contract KerosineDenominator {
 
   function denominator() external view returns (uint) {
     uint boundedKerosine = boundedKerosineVault.deposits();
-    return boundedKerosineVault.asset().totalSupply() + 2*boundedKerosine;
+    return boundedKerosineVault.asset().totalSupply() + boundedKerosine;
   } 
 
 }

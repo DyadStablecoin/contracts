@@ -15,7 +15,6 @@ import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 contract UnboundedKerosineVault is KerosineVault {
   using SafeTransferLib for ERC20;
 
-  BoundedKerosineVault public boundedKerosineVault;
   KerosineDenominator  public kerosineDenominator;
 
   constructor(
@@ -24,15 +23,6 @@ contract UnboundedKerosineVault is KerosineVault {
     Dyad            _dyad, 
     KerosineManager _kerosineManager
   ) KerosineVault(_vaultManager, _asset, _dyad, _kerosineManager) {}
-
-  function setBoundedKerosineVault(
-    BoundedKerosineVault _boundedKerosineVault
-  )
-    external
-    onlyOwner
-  {
-    boundedKerosineVault = _boundedKerosineVault;
-  }
 
   function withdraw(
     uint    id,

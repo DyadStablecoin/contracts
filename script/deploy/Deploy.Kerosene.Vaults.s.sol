@@ -40,7 +40,6 @@ contract DeployKeroseneVaults is Script, Parameters {
       kerosineManager
     );
 
-    unboundedKerosineVault.setBoundedKerosineVault(boundedKerosineVault);
     boundedKerosineVault.setUnboundedKerosineVault(unboundedKerosineVault);
 
     KerosineDenominator _kerosineDenominator = new KerosineDenominator(

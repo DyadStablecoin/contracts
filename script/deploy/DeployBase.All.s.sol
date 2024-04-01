@@ -131,7 +131,6 @@ contract DeployBase is Script {
         kerosineManager
       );
 
-      unboundedKerosineVault.setBoundedKerosineVault(boundedKerosineVault);
       boundedKerosineVault.setUnboundedKerosineVault(unboundedKerosineVault);
 
       vm.stopBroadcast();  // ----------------------------
