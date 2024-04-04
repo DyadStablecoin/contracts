@@ -21,4 +21,5 @@ interface IVaultManager {
   error InvalidDNft();
   error CrTooLow();
   error CrTooHigh();
+  error DepositedInThisBlock();
 }

@@ -12,7 +12,7 @@ import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 import {EnumerableSet}     from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-contract VaultManager is IVaultManager {
+contract VaultManagerV2 is IVaultManager {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
@@ -26,6 +26,9 @@ contract VaultManager is IVaultManager {
   Licenser public immutable vaultLicenser;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
+
+  // id => (block number => deposited)
+  mapping (uint => mapping (uint => bool)) public deposited;
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
@@ -80,6 +83,7 @@ contract VaultManager is IVaultManager {
     external 
       isValidDNft(id) 
   {
+    deposited[id][block.number] = true;
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, address(vault), amount);
     _vault.deposit(id, amount);
@@ -94,6 +98,7 @@ contract VaultManager is IVaultManager {
     public 
       isDNftOwner(id)
   {
+    if (!deposited[id][block.number]) revert DepositedInThisBlock();
     Vault(vault).withdraw(id, to, amount);
     if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
   }
