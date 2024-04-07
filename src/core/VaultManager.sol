@@ -77,8 +77,8 @@ contract VaultManager is IVaultManager {
     address vault,
     uint    amount
   ) 
-    external 
-      isValidDNft(id) 
+    virtual
+    public 
   {
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, address(vault), amount);
@@ -91,8 +91,8 @@ contract VaultManager is IVaultManager {
     uint    amount,
     address to
   ) 
+    virtual
     public 
-      isDNftOwner(id)
   {
     Vault(vault).withdraw(id, to, amount);
     if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
