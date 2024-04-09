@@ -2,7 +2,6 @@
 pragma solidity =0.8.17;
 
 import {BoundedKerosineVault} from "../core/Vault.kerosine.bounded.sol";
-import {ERC20}                from "@solmate/src/tokens/ERC20.sol";
 
 contract KerosineDenominator {
 

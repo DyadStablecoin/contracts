@@ -68,6 +68,9 @@ contract DeployV2 is Script, Parameters {
       kerosineManager
     );
 
+    unboundedKerosineVault.transferOwnership(MAINNET_OWNER);
+    boundedKerosineVault.  transferOwnership(MAINNET_OWNER);
+
     KerosineDenominator kerosineDenominator       = new KerosineDenominator(
       boundedKerosineVault
     );
