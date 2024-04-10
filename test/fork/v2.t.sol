@@ -27,6 +27,25 @@ contract V2Test is Test, Parameters {
     contracts.vaultLicenser.add(address(contracts.ethVault));
     vm.prank(MAINNET_OWNER);
     contracts.vaultLicenser.add(address(contracts.wstEth));
+    vm.prank(MAINNET_OWNER);
+    contracts.vaultLicenser.add(address(contracts.unboundedKerosineVault));
+    vm.prank(MAINNET_OWNER);
+    contracts.vaultLicenser.add(address(contracts.boundedKerosineVault));
+  }
+
+  function testKeroseneVaults() public {
+    address[] memory vaults = contracts.kerosineManager.getVaults();
+    assertEq(vaults.length, 2);
+    assertEq(vaults[0], address(contracts.ethVault));
+    assertEq(vaults[1], address(contracts.wstEth));
+  }
+
+  function testOwnership() public {
+    assertEq(contracts.kerosineManager.owner(),        MAINNET_OWNER);
+    assertEq(contracts.vaultLicenser.owner(),          MAINNET_OWNER);
+    assertEq(contracts.kerosineManager.owner(),        MAINNET_OWNER);
+    assertEq(contracts.unboundedKerosineVault.owner(), MAINNET_OWNER);
+    assertEq(contracts.boundedKerosineVault.owner(),   MAINNET_OWNER);
   }
 
   function testDenominator() public {
