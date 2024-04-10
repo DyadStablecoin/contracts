@@ -20,8 +20,19 @@ import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol"
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
+struct Contracts {
+  Licenser               vaultLicenser;
+  VaultManagerV2         vaultManager;
+  Vault                  ethVault;
+  VaultWstEth            wstEth;
+  KerosineManager        kerosineManager;
+  UnboundedKerosineVault unboundedKerosineVault;
+  BoundedKerosineVault   boundedKerosineVault;
+  KerosineDenominator    kerosineDenominator;
+}
+
 contract DeployV2 is Script, Parameters {
-  function run() public {
+  function run() public returns (Contracts memory) {
     vm.startBroadcast();  // ----------------------
 
     Licenser vaultLicenser = new Licenser();
@@ -85,5 +96,16 @@ contract DeployV2 is Script, Parameters {
     vaultLicenser.transferOwnership(MAINNET_OWNER);
 
     vm.stopBroadcast();  // ----------------------------
+
+    return Contracts(
+      vaultLicenser,
+      vaultManager,
+      ethVault,
+      wstEth,
+      kerosineManager,
+      unboundedKerosineVault,
+      boundedKerosineVault,
+      kerosineDenominator
+    );
   }
 }
