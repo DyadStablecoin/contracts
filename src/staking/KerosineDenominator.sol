@@ -17,5 +17,4 @@ contract KerosineDenominator is Parameters {
   function denominator() external view returns (uint) {
     return kerosine.totalSupply() - kerosine.balanceOf(MAINNET_OWNER);
   } 
-
 }
