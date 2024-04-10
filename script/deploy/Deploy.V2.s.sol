@@ -69,7 +69,7 @@ contract DeployV2 is Script, Parameters {
     );
 
     KerosineDenominator kerosineDenominator       = new KerosineDenominator(
-      boundedKerosineVault
+      Kerosine(MAINNET_KEROSENE)
     );
 
     unboundedKerosineVault.setDenominator(kerosineDenominator);

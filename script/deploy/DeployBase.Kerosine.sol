@@ -75,7 +75,7 @@ contract KerosineDeployBase is Script {
     boundedKerosineVault.setUnboundedKerosineVault(unboundedKerosineVault);
 
     KerosineDenominator _kerosineDenominator = new KerosineDenominator(
-      boundedKerosineVault
+      kerosine
     );
 
     unboundedKerosineVault.setDenominator(_kerosineDenominator);
