@@ -22,8 +22,15 @@ contract V2Test is Test, Parameters {
     licenser.add(address(contracts.vaultManager));
   }
 
+  function testLicenseVaults() public {
+    vm.prank(MAINNET_OWNER);
+    contracts.vaultLicenser.add(address(contracts.ethVault));
+    vm.prank(MAINNET_OWNER);
+    contracts.vaultLicenser.add(address(contracts.wstEth));
+  }
+
   function testDenominator() public {
     uint denominator = contracts.kerosineDenominator.denominator();
-    console.log(denominator);
+    assertTrue(denominator < contracts.kerosene.balanceOf(MAINNET_OWNER));
   }
 }
