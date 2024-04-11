@@ -6,6 +6,8 @@ import {Owned}         from "@solmate/src/auth/Owned.sol";
 
 contract KerosineManager is Owned(msg.sender) {
   error TooManyVaults();
+  error VaultAlreadyAdded();
+  error VaultNotFound();
 
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -20,7 +22,7 @@ contract KerosineManager is Owned(msg.sender) {
       onlyOwner
   {
     if (vaults.length() >= MAX_VAULTS) revert TooManyVaults();
-    vaults.add(vault);
+    if (!vaults.add(vault))            revert VaultAlreadyAdded();
   }
 
   function remove(
@@ -29,7 +31,7 @@ contract KerosineManager is Owned(msg.sender) {
     external 
       onlyOwner
   {
-    vaults.remove(vault);
+    if (!vaults.remove(vault)) revert VaultNotFound();
   }
 
   function getVaults() 
