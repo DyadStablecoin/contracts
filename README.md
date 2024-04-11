@@ -8,13 +8,24 @@
 core
 ├─ DNft — "A dNFT gives you the right to mint DYAD"
 ├─ Dyad — "Stablecoin backed by ETH"
-├─ VaultManager
-├─ Vault 
-├─ Licenser 
+├─ VaultManager - "Manage Vaults for DNfts"
+├─ VaultManagerV2 - "VaultManager with flash loan protection"
+├─ Vault - "Holds different collateral types"
+├─ Licenser - "License VaultManagers or Vaults"
+├─ KerosineManager - "Add/Remove Vaults to the Kerosene Calculation"
+
+staking
+├─ Kerosine - "Kerosene ERC20"
+├─ KerosineDenominator
+├─ Staking - "Simple staking contract"
 
 periphery
 ├─ Payments
 ```
+
+## Docs
+
+- [Kerosene](https://dyadstable.notion.site/KEROSENE-Equations-Final-8655c83e0b7d44f883b9a99f499866c3)
 
 ## Usage
 
