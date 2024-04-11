@@ -4,7 +4,6 @@ pragma solidity =0.8.17;
 import {VaultManager}    from "./VaultManager.sol";
 import {Dyad}            from "./Dyad.sol";
 import {KerosineManager} from "./KerosineManager.sol";
-import {IDNft}           from "../interfaces/IDNft.sol";
 import {IVault}          from "../interfaces/IVault.sol";
 
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";

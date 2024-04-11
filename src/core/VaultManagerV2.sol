@@ -8,7 +8,7 @@ import {Licenser}     from "../../src/core/Licenser.sol";
 
 contract VaultManagerV2 is VaultManager {
 
-  // id => (block number => deposited)
+  // dNFT id => (block number => deposited)
   mapping (uint => mapping (uint => bool)) public deposited;
 
   constructor(
