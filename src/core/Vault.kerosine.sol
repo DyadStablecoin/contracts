@@ -41,7 +41,6 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     uint id,
     uint amount
   )
-    virtual
     public 
       onlyVaultManager
   {
