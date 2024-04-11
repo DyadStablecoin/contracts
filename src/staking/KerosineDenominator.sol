@@ -15,6 +15,9 @@ contract KerosineDenominator is Parameters {
   }
 
   function denominator() external view returns (uint) {
+    // @dev: We subtract all the Kerosene in the multi-sig.
+    //       We are aware that this is not a great solution. That is
+    //       why we can switch out Denominator contracts.
     return kerosine.totalSupply() - kerosine.balanceOf(MAINNET_OWNER);
   } 
 }
