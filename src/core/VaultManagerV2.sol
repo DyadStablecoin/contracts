@@ -17,6 +17,7 @@ contract VaultManagerV2 is VaultManager {
     Licenser _licenser
   ) VaultManager(_dNft, _dyad, _licenser) {}
 
+  /// @inheritdoc VaultManager
   function deposit(
     uint    id,
     address vault,
@@ -30,6 +31,7 @@ contract VaultManagerV2 is VaultManager {
     super.deposit(id, vault, amount);
   }
 
+  /// @inheritdoc VaultManager
   function withdraw(
     uint    id,
     address vault,
