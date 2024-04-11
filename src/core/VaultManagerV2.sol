@@ -12,10 +12,10 @@ contract VaultManagerV2 is VaultManager {
   mapping (uint => mapping (uint => bool)) public deposited;
 
   constructor(
-    DNft     _dNft,
-    Dyad     _dyad,
-    Licenser _licenser
-  ) VaultManager(_dNft, _dyad, _licenser) {}
+    DNft     dNft,
+    Dyad     dyad,
+    Licenser licenser
+  ) VaultManager(dNft, dyad, licenser) {}
 
   /// @inheritdoc VaultManager
   function deposit(
