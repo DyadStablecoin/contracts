@@ -17,9 +17,8 @@ contract BoundedKerosineVault is KerosineVault {
   constructor(
     VaultManager    _vaultManager,
     ERC20           _asset, 
-    Dyad            _dyad, 
     KerosineManager _kerosineManager
-  ) KerosineVault(_vaultManager, _asset, _dyad, _kerosineManager) {}
+  ) KerosineVault(_vaultManager, _asset, _kerosineManager) {}
 
   function setUnboundedKerosineVault(
     UnboundedKerosineVault _unboundedKerosineVault

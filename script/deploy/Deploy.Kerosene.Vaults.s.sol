@@ -36,7 +36,6 @@ contract DeployKeroseneVaults is Script, Parameters {
     BoundedKerosineVault boundedKerosineVault     = new BoundedKerosineVault(
       VaultManager(MAINNET_VAULT_MANAGER),
       Kerosine(MAINNET_KEROSENE), 
-      Dyad(MAINNET_DYAD),
       kerosineManager
     );
 
