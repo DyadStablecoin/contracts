@@ -2,7 +2,6 @@
 pragma solidity =0.8.17;
 
 import {VaultManager}    from "./VaultManager.sol";
-import {Dyad}            from "./Dyad.sol";
 import {KerosineManager} from "./KerosineManager.sol";
 import {IVault}          from "../interfaces/IVault.sol";
 
@@ -15,7 +14,6 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
 
   VaultManager    public immutable vaultManager;
   ERC20           public immutable asset;
-  Dyad            public immutable dyad;
   KerosineManager public immutable kerosineManager;
 
   mapping(uint => uint) public id2asset;
@@ -28,12 +26,10 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   constructor(
     VaultManager    _vaultManager,
     ERC20           _asset, 
-    Dyad            _dyad,
     KerosineManager _kerosineManager 
   ) {
     vaultManager    = _vaultManager;
     asset           = _asset;
-    dyad            = _dyad;
     kerosineManager = _kerosineManager;
   }
 

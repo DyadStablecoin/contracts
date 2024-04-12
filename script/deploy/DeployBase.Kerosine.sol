@@ -68,7 +68,6 @@ contract KerosineDeployBase is Script {
     BoundedKerosineVault boundedKerosineVault     = new BoundedKerosineVault(
       _vaultManager,
       kerosine, 
-      _dyad,
       kerosineManager
     );
 
