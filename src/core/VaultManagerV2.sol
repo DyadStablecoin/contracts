@@ -6,10 +6,12 @@ import {DNft}         from "../../src/core/DNft.sol";
 import {Dyad}         from "../../src/core/Dyad.sol";
 import {Licenser}     from "../../src/core/Licenser.sol";
 
+// @dev: Same as VaultManager but with flash loan protection.
 contract VaultManagerV2 is VaultManager {
+  
+  error DepositedInSameBlock();
 
-  // dNFT id => (block number => deposited)
-  mapping (uint => mapping (uint => bool)) public deposited;
+  mapping (uint => uint) public idToBlockOfLastDeposit;
 
   constructor(
     DNft     dNft,
@@ -27,7 +29,7 @@ contract VaultManagerV2 is VaultManager {
     public 
       isValidDNft(id) 
   {
-    deposited[id][block.number] = true;
+    idToBlockOfLastDeposit[id] = block.number;
     super.deposit(id, vault, amount);
   }
 
@@ -42,7 +44,7 @@ contract VaultManagerV2 is VaultManager {
     public 
       isDNftOwner(id)
   {
-    if (!deposited[id][block.number]) revert DepositedInThisBlock();
+    if (idToBlockOfLastDeposit[id] == block.number) revert DepositedInSameBlock();
     super.withdraw(id, vault, amount, to);
   }
 }

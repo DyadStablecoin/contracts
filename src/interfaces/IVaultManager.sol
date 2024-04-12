@@ -20,7 +20,6 @@ interface IVaultManager {
   error InvalidDNft();
   error CrTooLow();
   error CrTooHigh();
-  error DepositedInThisBlock();
 
   /**
    * @notice Adds a vault to the dNFT position
