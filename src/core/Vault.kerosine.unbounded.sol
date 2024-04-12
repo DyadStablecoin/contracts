@@ -42,7 +42,7 @@ contract UnboundedKerosineVault is KerosineVault {
 
   function setDenominator(KerosineDenominator _kerosineDenominator) 
     external 
-    onlyOwner
+      onlyOwner
   {
     kerosineDenominator = _kerosineDenominator;
   }
