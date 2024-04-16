@@ -19,9 +19,9 @@ contract VaultManagerV2 is VaultManager {
   mapping (uint => uint) public idToBlockOfLastDeposit;
 
   constructor(
-      DNft            dNft,
-      Dyad            dyad,
-      Licenser        licenser
+    DNft     dNft,
+    Dyad     dyad,
+    Licenser licenser
   ) VaultManager(dNft, dyad, licenser) {}
 
   function setKerosineManager(
@@ -57,9 +57,9 @@ contract VaultManagerV2 is VaultManager {
     public 
       isDNftOwner(id)
   {
-    if (idToBlockOfLastDeposit[id] == block.number)     revert DepositedInSameBlock();
+    if (idToBlockOfLastDeposit[id] == block.number)    revert DepositedInSameBlock();
     uint dyadMinted = dyad.mintedDyad(address(this), id);
-    if (getNonKeroseneValue(id) - amount < dyadMinteed) revert NotEnoughExoCollat();
+    if (getNonKeroseneValue(id) - amount < dyadMinted) revert NotEnoughExoCollat();
     super.withdraw(id, vault, amount, to);
   }
 
