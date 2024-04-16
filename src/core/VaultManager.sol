@@ -1,31 +1,38 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
-import {DNft}          from "./DNft.sol";
-import {Dyad}          from "./Dyad.sol";
-import {Licenser}      from "./Licenser.sol";
-import {Vault}         from "./Vault.sol";
-import {IVaultManager} from "../interfaces/IVaultManager.sol";
+import {DNft}            from "./DNft.sol";
+import {Dyad}            from "./Dyad.sol";
+import {Licenser}        from "./Licenser.sol";
+import {Vault}           from "./Vault.sol";
+import {IVaultManager}   from "../interfaces/IVaultManager.sol";
+import {KerosineManager} from "../../src/core/KerosineManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 import {EnumerableSet}     from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {Initializable}     from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-contract VaultManager is IVaultManager {
+contract VaultManager is IVaultManager, Initializable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
 
-  uint public constant MAX_VAULTS                = 5;
+  uint public constant MAX_VAULTS          = 5;
+  uint public constant MAX_VAULTS_KEROSENE = 5;
+
   uint public constant MIN_COLLATERIZATION_RATIO = 1.5e18; // 150%
   uint public constant LIQUIDATION_REWARD        = 0.2e18; //  20%
 
-  DNft     public immutable dNft;
-  Dyad     public immutable dyad;
-  Licenser public immutable vaultLicenser;
+  DNft            public immutable dNft;
+  Dyad            public immutable dyad;
+  Licenser        public immutable vaultLicenser;
+
+  KerosineManager public keroseneManager;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
+  mapping (uint => EnumerableSet.AddressSet) internal vaultsKerosene; 
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
@@ -38,13 +45,20 @@ contract VaultManager is IVaultManager {
   }
 
   constructor(
-    DNft     _dNft,
-    Dyad     _dyad,
-    Licenser _licenser
+    DNft            _dNft,
+    Dyad            _dyad,
+    Licenser        _licenser
   ) {
-    dNft          = _dNft;
-    dyad          = _dyad;
-    vaultLicenser = _licenser;
+    dNft            = _dNft;
+    dyad            = _dyad;
+    vaultLicenser   = _licenser;
+  }
+
+  function setKeroseneManager(KerosineManager _keroseneManager) 
+    external
+      initializer 
+    {
+      keroseneManager = _keroseneManager;
   }
 
   /// @inheritdoc IVaultManager
@@ -61,6 +75,19 @@ contract VaultManager is IVaultManager {
     emit Added(id, vault);
   }
 
+  function addKerosene(
+      uint    id,
+      address vault
+  ) 
+    external
+      isDNftOwner(id)
+  {
+    if (vaultsKerosene[id].length() >= MAX_VAULTS_KEROSENE) revert TooManyVaults();
+    if (!keroseneManager.isLicensed(vault))                 revert VaultNotLicensed();
+    if (!vaultsKerosene[id].add(vault))                     revert VaultAlreadyAdded();
+    emit Added(id, vault);
+  }
+
   /// @inheritdoc IVaultManager
   function remove(
       uint    id,
@@ -71,6 +98,18 @@ contract VaultManager is IVaultManager {
   {
     if (Vault(vault).id2asset(id) > 0) revert VaultHasAssets();
     if (!vaults[id].remove(vault))     revert VaultNotAdded();
+    emit Removed(id, vault);
+  }
+
+  function removeKerosene(
+      uint    id,
+      address vault
+  ) 
+    external
+      isDNftOwner(id)
+  {
+    if (Vault(vault).id2asset(id) > 0)     revert VaultHasAssets();
+    if (!vaultsKerosene[id].remove(vault)) revert VaultNotAdded();
     emit Removed(id, vault);
   }
 
@@ -192,12 +231,40 @@ contract VaultManager is IVaultManager {
     public 
     view
     returns (uint) {
+      return getNonKeroseneValue(id) + getKeroseneValue(id);
+  }
+
+  function getNonKeroseneValue(
+    uint id
+  ) 
+    public 
+    view
+    returns (uint) {
       uint totalUsdValue;
       uint numberOfVaults = vaults[id].length(); 
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[id].at(i));
         uint usdValue;
         if (vaultLicenser.isLicensed(address(vault))) {
+          usdValue = vault.getUsdValue(id);        
+        }
+        totalUsdValue += usdValue;
+      }
+      return totalUsdValue;
+  }
+
+  function getKeroseneValue(
+    uint id
+  ) 
+    public 
+    view
+    returns (uint) {
+      uint totalUsdValue;
+      uint numberOfVaults = vaultsKerosene[id].length(); 
+      for (uint i = 0; i < numberOfVaults; i++) {
+        Vault vault = Vault(vaultsKerosene[id].at(i));
+        uint usdValue;
+        if (keroseneManager.isLicensed(address(vault))) {
           usdValue = vault.getUsdValue(id);        
         }
         totalUsdValue += usdValue;

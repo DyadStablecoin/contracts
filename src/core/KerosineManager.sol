@@ -40,4 +40,13 @@ contract KerosineManager is Owned(msg.sender) {
     returns (address[] memory) {
       return vaults.values();
   }
+
+  function isLicensed(
+    address vault
+  ) 
+    external 
+    view 
+    returns (bool) {
+      return vaults.contains(vault);
+  }
 }

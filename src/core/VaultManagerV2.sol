@@ -24,14 +24,6 @@ contract VaultManagerV2 is VaultManager {
     Licenser licenser
   ) VaultManager(dNft, dyad, licenser) {}
 
-  function setKerosineManager(
-    KerosineManager _kerosineManager
-  ) 
-    external 
-  {
-    kerosineManager = _kerosineManager;
-  }
-
   /// @inheritdoc VaultManager
   function deposit(
     uint    id,
@@ -75,21 +67,5 @@ contract VaultManagerV2 is VaultManager {
     uint newDyadMinted = dyad.mintedDyad(address(this), id) + amount;
     if (getNonKeroseneValue(id) < newDyadMinted) revert NotEnoughExoCollat();
     super.mintDyad(id, amount, to);
-  }
-
-  function getNonKeroseneValue(
-    uint id
-  ) 
-    public 
-    view 
-    returns (uint) 
-  {
-    uint totalUsdValue;
-    address[] memory vaults = kerosineManager.getVaults();
-    uint numberOfVaults = vaults.length;
-    for (uint i = 0; i < numberOfVaults; i++) {
-      totalUsdValue += Vault(vaults[i]).getUsdValue(id);
-    }
-    return totalUsdValue;
   }
 }
