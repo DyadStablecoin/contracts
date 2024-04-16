@@ -91,7 +91,7 @@ contract DeployV2 is Script, Parameters {
     vaultLicenser.add(address(ethVault));
     vaultLicenser.add(address(wstEth));
     vaultLicenser.add(address(unboundedKerosineVault));
-    vaultLicenser.add(address(boundedKerosineVault));
+    // vaultLicenser.add(address(boundedKerosineVault));
 
     vaultLicenser.transferOwnership(MAINNET_OWNER);
 
