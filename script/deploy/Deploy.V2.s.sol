@@ -64,6 +64,8 @@ contract DeployV2 is Script, Parameters {
     kerosineManager.add(address(ethVault));
     kerosineManager.add(address(wstEth));
 
+    vaultManager.setKerosineManager(kerosineManager);
+
     kerosineManager.transferOwnership(MAINNET_OWNER);
 
     UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(

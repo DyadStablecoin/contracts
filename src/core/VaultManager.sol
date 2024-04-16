@@ -108,8 +108,8 @@ contract VaultManager is IVaultManager {
     uint    amount,
     address to
   )
-    external 
-      isDNftOwner(id)
+    virtual
+    public 
   {
     dyad.mint(id, to, amount);
     if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
