@@ -2,7 +2,7 @@
 pragma solidity =0.8.17;
 
 import {KerosineVault}        from "./Vault.kerosine.sol";
-import {VaultManager}         from "./VaultManager.sol";
+import {IVaultManager}        from "../interfaces/IVaultManager.sol";
 import {Vault}                from "./Vault.sol";
 import {Dyad}                 from "./Dyad.sol";
 import {KerosineManager}      from "./KerosineManager.sol";
@@ -19,7 +19,7 @@ contract UnboundedKerosineVault is KerosineVault {
   KerosineDenominator  public kerosineDenominator;
 
   constructor(
-      VaultManager    _vaultManager,
+      IVaultManager   _vaultManager,
       ERC20           _asset, 
       Dyad            _dyad, 
       KerosineManager _kerosineManager

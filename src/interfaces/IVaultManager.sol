@@ -20,6 +20,8 @@ interface IVaultManager {
   error InvalidDNft();
   error CrTooLow();
   error CrTooHigh();
+  error DepositedInSameBlock();
+  error NotEnoughExoCollat();   // Not enough exogenous collateral
 
   /**
    * @notice Adds a vault to the dNFT position

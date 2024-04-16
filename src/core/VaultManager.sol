@@ -47,7 +47,6 @@ contract VaultManager is IVaultManager {
     vaultLicenser = _licenser;
   }
 
-  /// @inheritdoc IVaultManager
   function add(
       uint    id,
       address vault
@@ -61,7 +60,6 @@ contract VaultManager is IVaultManager {
     emit Added(id, vault);
   }
 
-  /// @inheritdoc IVaultManager
   function remove(
       uint    id,
       address vault
@@ -74,35 +72,32 @@ contract VaultManager is IVaultManager {
     emit Removed(id, vault);
   }
 
-  /// @inheritdoc IVaultManager
   function deposit(
     uint    id,
     address vault,
     uint    amount
   ) 
-    virtual
-    public 
+    external 
+      isValidDNft(id) 
   {
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, address(vault), amount);
     _vault.deposit(id, amount);
   }
 
-  /// @inheritdoc IVaultManager
   function withdraw(
     uint    id,
     address vault,
     uint    amount,
     address to
   ) 
-    virtual
     public 
+      isDNftOwner(id)
   {
     Vault(vault).withdraw(id, to, amount);
     if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
   }
 
-  /// @inheritdoc IVaultManager
   function mintDyad(
     uint    id,
     uint    amount,
@@ -116,7 +111,6 @@ contract VaultManager is IVaultManager {
     emit MintDyad(id, amount, to);
   }
 
-  /// @inheritdoc IVaultManager
   function burnDyad(
     uint id,
     uint amount
@@ -128,7 +122,6 @@ contract VaultManager is IVaultManager {
     emit BurnDyad(id, amount, msg.sender);
   }
 
-  /// @inheritdoc IVaultManager
   function redeemDyad(
     uint    id,
     address vault,
@@ -149,7 +142,6 @@ contract VaultManager is IVaultManager {
       return asset;
   }
 
-  /// @inheritdoc IVaultManager
   function liquidate(
     uint id,
     uint to
