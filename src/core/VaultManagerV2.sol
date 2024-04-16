@@ -138,11 +138,11 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     public
       isDNftOwner(id)
   {
-    if (idToBlockOfLastDeposit[id] == block.number)  revert DepositedInSameBlock();
+    if (idToBlockOfLastDeposit[id] == block.number)    revert DepositedInSameBlock();
     uint dyadMinted = dyad.mintedDyad(address(this), id);
     if (getNonKeroseneValue(id) - amount < dyadMinted) revert NotEnoughExoCollat();
     Vault(vault).withdraw(id, to, amount);
-    if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
+    if (collatRatio(id) < MIN_COLLATERIZATION_RATIO)   revert CrTooLow(); 
   }
 
   /// @inheritdoc IVaultManager
