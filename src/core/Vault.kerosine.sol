@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
-import {VaultManager}    from "./VaultManager.sol";
+import {IVaultManager}   from "../interfaces/IVaultManager.sol";
 import {KerosineManager} from "./KerosineManager.sol";
 import {IVault}          from "../interfaces/IVault.sol";
 
@@ -12,7 +12,7 @@ import {Owned}           from "@solmate/src/auth/Owned.sol";
 abstract contract KerosineVault is IVault, Owned(msg.sender) {
   using SafeTransferLib for ERC20;
 
-  VaultManager    public immutable vaultManager;
+  IVaultManager   public immutable vaultManager;
   ERC20           public immutable asset;
   KerosineManager public immutable kerosineManager;
 
@@ -24,7 +24,7 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   }
 
   constructor(
-    VaultManager    _vaultManager,
+    IVaultManager   _vaultManager,
     ERC20           _asset, 
     KerosineManager _kerosineManager 
   ) {
