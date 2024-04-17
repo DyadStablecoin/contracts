@@ -25,14 +25,15 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   uint public constant MIN_COLLATERIZATION_RATIO = 1.5e18; // 150%
   uint public constant LIQUIDATION_REWARD        = 0.2e18; //  20%
 
-  DNft            public immutable dNft;
-  Dyad            public immutable dyad;
-  Licenser        public immutable vaultLicenser;
+  DNft     public immutable dNft;
+  Dyad     public immutable dyad;
+  Licenser public immutable vaultLicenser;
 
   KerosineManager public keroseneManager;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
   mapping (uint => EnumerableSet.AddressSet) internal vaultsKerosene; 
+
   mapping (uint => uint)                     public   idToBlockOfLastDeposit;
 
   modifier isDNftOwner(uint id) {
@@ -46,13 +47,13 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   }
 
   constructor(
-    DNft            _dNft,
-    Dyad            _dyad,
-    Licenser        _licenser
+    DNft          _dNft,
+    Dyad          _dyad,
+    Licenser      _licenser
   ) {
-    dNft            = _dNft;
-    dyad            = _dyad;
-    vaultLicenser   = _licenser;
+    dNft          = _dNft;
+    dyad          = _dyad;
+    vaultLicenser = _licenser;
   }
 
   function setKeroseneManager(KerosineManager _keroseneManager) 
