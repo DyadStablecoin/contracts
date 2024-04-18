@@ -52,4 +52,29 @@ contract V2Test is Test, Parameters {
     uint denominator = contracts.kerosineDenominator.denominator();
     assertTrue(denominator < contracts.kerosene.balanceOf(MAINNET_OWNER));
   }
+
+  modifier hasDNft() {
+    uint startPrice    = contracts.dNft.START_PRICE();
+    uint priceIncrease = contracts.dNft.PRICE_INCREASE();
+    uint publicMints   = contracts.dNft.publicMints();
+    uint price = startPrice + (priceIncrease * publicMints);
+    vm.deal(address(this), price);
+    contracts.dNft.mintNft{value: price}(address(this));
+    _;
+  }
+
+  function testMintDNft() public hasDNft {
+    assertEq(contracts.dNft.balanceOf(address(this)), 1);
+  }
+
+  receive() external payable {}
+
+  function onERC721Received(
+    address,
+    address,
+    uint256,
+    bytes calldata
+  ) external pure returns (bytes4) {
+    return 0x150b7a02;
+  }
 }

@@ -21,6 +21,7 @@ import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol"
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 struct Contracts {
+  DNft                   dNft;
   Kerosine               kerosene;
   Licenser               vaultLicenser;
   VaultManagerV2         vaultManager;
@@ -100,6 +101,7 @@ contract DeployV2 is Script, Parameters {
     vm.stopBroadcast();  // ----------------------------
 
     return Contracts(
+      DNft(MAINNET_DNFT),
       Kerosine(MAINNET_KEROSENE),
       vaultLicenser,
       vaultManager,
