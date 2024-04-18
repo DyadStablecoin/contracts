@@ -159,4 +159,18 @@ contract V2Test is BaseTestV2 {
     ///      less than that.
     assertTrue(contracts.vaultManager.collatRatio(DNFT_ID_1) < type(uint).max);
   }
+
+  modifier addVaultKerosene(IVault vault) {
+    contracts.vaultManager.addKerosene(DNFT_ID_1, address(vault));
+    _;
+  }
+
+  function test_AddVaultKerosene() 
+    public 
+      mintDNft 
+      addVaultKerosene(contracts.unboundedKerosineVault) 
+  {
+    address firstVault = contracts.vaultManager.getVaultsKerosene(DNFT_ID_1)[0];
+    assertEq(firstVault, address(contracts.unboundedKerosineVault));
+  }
 }

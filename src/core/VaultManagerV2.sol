@@ -82,7 +82,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       isDNftOwner(id)
   {
     if (vaultsKerosene[id].length() >= MAX_VAULTS_KEROSENE) revert TooManyVaults();
-    if (!keroseneManager.isLicensed(vault))                 revert VaultNotLicensed();
+    if (!vaultLicenser.isLicensed(vault))                   revert VaultNotLicensed();
     if (!vaultsKerosene[id].add(vault))                     revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
@@ -269,7 +269,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaultsKerosene[id].at(i));
         uint usdValue;
-        if (keroseneManager.isLicensed(address(vault))) {
+        if (vaultLicenser.isLicensed(address(vault))) {
           usdValue = vault.getUsdValue(id);        
         }
         totalUsdValue += usdValue;
