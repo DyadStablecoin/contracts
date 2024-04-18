@@ -136,7 +136,24 @@ contract V2Test is BaseTestV2 {
       mintDyad(1e18)
   {
     assertEq(contracts.dyad.balanceOf(address(this)), 1e18);
+  }
 
+  function test_CollatRatio() 
+    public 
+      mintDNft 
+  {
+    /// @dev Before minting DYAD every DNft has the highest possible CR which 
+    ///      is equal to type(uint).max 
+    assertTrue(contracts.vaultManager.collatRatio(DNFT_ID_1) == type(uint).max);
+  }
+
+  function test_CollatRatioAfterMinting() 
+    public 
+      mintDNft 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      mintDyad(1e18)
+  {
     /// @dev Before minting DYAD every DNft has the highest possible CR which 
     ///      is equal to type(uint).max. After minting DYAD the CR should be
     ///      less than that.
