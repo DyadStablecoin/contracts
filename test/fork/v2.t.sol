@@ -8,14 +8,18 @@ import {DeployV2, Contracts} from "../../script/deploy/Deploy.V2.s.sol";
 import {Licenser} from "../../src/core/Licenser.sol";
 import {Parameters} from "../../src/params/Parameters.sol";
 
+import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+
 contract V2Test is Test, Parameters {
 
   Contracts contracts;
+  ERC20 weth;
 
   uint DNFT_ID_1;
 
   function setUp() public {
     contracts = new DeployV2().run();
+    weth = ERC20(MAINNET_WETH);
   }
 
   function testLicenseVaultManager() public {
@@ -84,12 +88,24 @@ contract V2Test is Test, Parameters {
     assertEq(firstVault, address(contracts.ethVault));
   }
 
+  modifier deposit100Eth() {
+    uint amount = 100 ether;
+    deal(MAINNET_WETH, address(this), amount);
+    weth.approve(address(contracts.vaultManager), amount);
+    contracts.vaultManager.deposit(DNFT_ID_1, address(contracts.ethVault), amount);
+    _;
+  }
+
   function testDeposit() 
     public 
       hasDNft 
       hasEthVault 
+      deposit100Eth
   {
+    assertEq(contracts.ethVault.id2asset(DNFT_ID_1), 100 ether);
   }
+
+  // --- RECEIVER ---
 
   receive() external payable {}
 
