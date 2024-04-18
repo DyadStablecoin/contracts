@@ -1,17 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
-import "forge-std/console.sol";
-import "forge-std/Test.sol";
-
+import {BaseTestV2}          from "./BaseV2.sol";
 import {DeployV2, Contracts} from "../../script/deploy/Deploy.V2.s.sol";
-import {Licenser} from "../../src/core/Licenser.sol";
-import {Parameters} from "../../src/params/Parameters.sol";
+import {Licenser}            from "../../src/core/Licenser.sol";
+import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
+import {IVault}              from "../../src/interfaces/IVault.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
-contract V2Test is Test, Parameters {
-
+contract V2Test is BaseTestV2 {
   Contracts contracts;
   ERC20 weth;
 
@@ -74,45 +72,40 @@ contract V2Test is Test, Parameters {
     assertEq(contracts.dNft.balanceOf(address(this)), 1);
   }
 
-  modifier addWEthVault() {
-    contracts.vaultManager.add(DNFT_ID_1, address(contracts.ethVault));
+  modifier addVault(IVault vault) {
+    contracts.vaultManager.add(DNFT_ID_1, address(vault));
     _;
   }
 
   function test_AddVault() 
     public 
       mintDNft 
-      addWEthVault 
+      addVault(contracts.ethVault) 
   {
     address firstVault = contracts.vaultManager.getVaults(DNFT_ID_1)[0];
     assertEq(firstVault, address(contracts.ethVault));
   }
 
-  modifier depositEth(uint amount) {
+  modifier deposit(IVault vault, uint amount) {
     deal(MAINNET_WETH, address(this), amount);
     weth.approve(address(contracts.vaultManager), amount);
-    contracts.vaultManager.deposit(DNFT_ID_1, address(contracts.ethVault), amount);
+    contracts.vaultManager.deposit(DNFT_ID_1, address(vault), amount);
     _;
   }
 
   function test_Deposit() 
     public 
       mintDNft 
-      addWEthVault 
-      depositEth(100 ether)
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
   {
     assertEq(contracts.ethVault.id2asset(DNFT_ID_1), 100 ether);
   }
 
-  modifier skip1Block() {
-    vm.roll(block.number + 1);
-    _;
-  }
-
-  modifier withdrawEth(uint amount) {
+  modifier withdraw(IVault vault, uint amount) {
     contracts.vaultManager.withdraw(
       DNFT_ID_1,
-      address(contracts.ethVault),
+      address(vault),
       amount,
       address(this)
     );
@@ -122,34 +115,35 @@ contract V2Test is Test, Parameters {
   function test_Withdraw() 
     public 
       mintDNft 
-      addWEthVault 
-      depositEth(100 ether)
-      skip1Block
-      withdrawEth(100 ether)
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      skipBlock(1)
+      withdraw(contracts.ethVault, 100 ether)
   {
     assertEq(contracts.ethVault.id2asset(DNFT_ID_1), 0 ether);
   }
 
-  function testFail_DepositAndWithdrawInSameBlock() 
+  /// @dev Test fails because deposit and withdraw are in the same block
+  ///      which is forbidden to prevent flash loan attacks.
+  function test_FailDepositAndWithdrawInSameBlock() 
     public 
       mintDNft 
-      addWEthVault 
-      depositEth(100 ether)
-      // skip1Block
-      withdrawEth(100 ether)
-  {
-  }
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      // skipBlock(1)
+      nextCallFails(IVaultManager.DepositedInSameBlock.selector)
+      withdraw(contracts.ethVault, 100 ether)
+  {}
 
-  // --- RECEIVER ---
-
-  receive() external payable {}
-
-  function onERC721Received(
-    address,
-    address,
-    uint256,
-    bytes calldata
-  ) external pure returns (bytes4) {
-    return 0x150b7a02;
-  }
+  /// @dev Test fails because deposit and withdraw are in the same block
+  ///      which is forbidden to prevent flash loan attacks.
+  function test_FailDepositAndWithdrawInSameBlock() 
+    public 
+      mintDNft 
+      addVault(ethVault)
+      deposit(ethVault, 100 ether)
+      // skipBlock(1)
+      nextCallFails(DepositedInSameBlock.selector)
+      withdraw(ethVault, 100 ether)
+  {}
 }
