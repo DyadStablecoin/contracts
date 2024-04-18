@@ -2,23 +2,11 @@
 pragma solidity =0.8.17;
 
 import {BaseTestV2}          from "./BaseV2.sol";
-import {DeployV2, Contracts} from "../../script/deploy/Deploy.V2.s.sol";
 import {Licenser}            from "../../src/core/Licenser.sol";
 import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
 import {IVault}              from "../../src/interfaces/IVault.sol";
 
-import {ERC20} from "@solmate/src/tokens/ERC20.sol";
-
 contract V2Test is BaseTestV2 {
-  Contracts contracts;
-  ERC20 weth;
-
-  uint DNFT_ID_1;
-
-  function setUp() public {
-    contracts = new DeployV2().run();
-    weth = ERC20(MAINNET_WETH);
-  }
 
   function test_LicenseVaultManager() public {
     Licenser licenser = Licenser(MAINNET_VAULT_MANAGER_LICENSER);
@@ -135,15 +123,23 @@ contract V2Test is BaseTestV2 {
       withdraw(contracts.ethVault, 100 ether)
   {}
 
-  /// @dev Test fails because deposit and withdraw are in the same block
-  ///      which is forbidden to prevent flash loan attacks.
-  function test_FailDepositAndWithdrawInSameBlock() 
+  modifier mintDyad(uint amount) {
+    contracts.vaultManager.mintDyad(DNFT_ID_1, amount, address(this));
+    _;
+  }
+
+  function test_MintDyad() 
     public 
       mintDNft 
-      addVault(ethVault)
-      deposit(ethVault, 100 ether)
-      // skipBlock(1)
-      nextCallFails(DepositedInSameBlock.selector)
-      withdraw(ethVault, 100 ether)
-  {}
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      mintDyad(1e18)
+  {
+    assertEq(contracts.dyad.balanceOf(address(this)), 1e18);
+
+    /// @dev Before minting DYAD every DNft has the highest possible CR which 
+    ///      is equal to type(uint).max. After minting DYAD the CR should be
+    ///      less than that.
+    assertTrue(contracts.vaultManager.collatRatio(DNFT_ID_1) < type(uint).max);
+  }
 }

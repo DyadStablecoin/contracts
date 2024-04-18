@@ -22,6 +22,7 @@ import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 struct Contracts {
   DNft                   dNft;
+  Dyad                   dyad;
   Kerosine               kerosene;
   Licenser               vaultLicenser;
   VaultManagerV2         vaultManager;
@@ -102,6 +103,7 @@ contract DeployV2 is Script, Parameters {
 
     return Contracts(
       DNft(MAINNET_DNFT),
+      Dyad(MAINNET_DYAD),
       Kerosine(MAINNET_KEROSENE),
       vaultLicenser,
       vaultManager,
