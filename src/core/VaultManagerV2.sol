@@ -34,7 +34,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
   mapping (uint => EnumerableSet.AddressSet) internal vaultsKerosene; 
 
-  mapping (uint => uint) public   idToBlockOfLastDeposit;
+  mapping (uint => uint) public idToBlockOfLastDeposit;
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
