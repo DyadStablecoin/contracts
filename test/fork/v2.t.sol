@@ -59,7 +59,7 @@ contract V2Test is Test, Parameters {
     assertTrue(denominator < contracts.kerosene.balanceOf(MAINNET_OWNER));
   }
 
-  modifier hasDNft() {
+  modifier mintDNft() {
     uint startPrice    = contracts.dNft.START_PRICE();
     uint priceIncrease = contracts.dNft.PRICE_INCREASE();
     uint publicMints   = contracts.dNft.publicMints();
@@ -70,19 +70,19 @@ contract V2Test is Test, Parameters {
     _;
   }
 
-  function test_MintDNft() public hasDNft {
+  function test_MintDNft() public mintDNft {
     assertEq(contracts.dNft.balanceOf(address(this)), 1);
   }
 
-  modifier hasEthVault() {
+  modifier addWEthVault() {
     contracts.vaultManager.add(DNFT_ID_1, address(contracts.ethVault));
     _;
   }
 
   function test_AddVault() 
     public 
-      hasDNft 
-      hasEthVault 
+      mintDNft 
+      addWEthVault 
   {
     address firstVault = contracts.vaultManager.getVaults(DNFT_ID_1)[0];
     assertEq(firstVault, address(contracts.ethVault));
@@ -97,8 +97,8 @@ contract V2Test is Test, Parameters {
 
   function test_Deposit() 
     public 
-      hasDNft 
-      hasEthVault 
+      mintDNft 
+      addWEthVault 
       depositEth(100 ether)
   {
     assertEq(contracts.ethVault.id2asset(DNFT_ID_1), 100 ether);
@@ -121,8 +121,8 @@ contract V2Test is Test, Parameters {
 
   function test_Withdraw() 
     public 
-      hasDNft 
-      hasEthVault 
+      mintDNft 
+      addWEthVault 
       depositEth(100 ether)
       skip1Block
       withdrawEth(100 ether)
@@ -132,8 +132,8 @@ contract V2Test is Test, Parameters {
 
   function testFail_DepositAndWithdrawInSameBlock() 
     public 
-      hasDNft 
-      hasEthVault 
+      mintDNft 
+      addWEthVault 
       depositEth(100 ether)
       // skip1Block
       withdrawEth(100 ether)
