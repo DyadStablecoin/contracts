@@ -12,6 +12,8 @@ contract V2Test is Test, Parameters {
 
   Contracts contracts;
 
+  uint DNFT_ID_1;
+
   function setUp() public {
     contracts = new DeployV2().run();
   }
@@ -59,12 +61,34 @@ contract V2Test is Test, Parameters {
     uint publicMints   = contracts.dNft.publicMints();
     uint price = startPrice + (priceIncrease * publicMints);
     vm.deal(address(this), price);
-    contracts.dNft.mintNft{value: price}(address(this));
+    uint id = contracts.dNft.mintNft{value: price}(address(this));
+    DNFT_ID_1 = id;
     _;
   }
 
   function testMintDNft() public hasDNft {
     assertEq(contracts.dNft.balanceOf(address(this)), 1);
+  }
+
+  modifier hasEthVault() {
+    contracts.vaultManager.add(DNFT_ID_1, address(contracts.ethVault));
+    _;
+  }
+
+  function testAddVault() 
+    public 
+      hasDNft 
+      hasEthVault 
+  {
+    address firstVault = contracts.vaultManager.getVaults(DNFT_ID_1)[0];
+    assertEq(firstVault, address(contracts.ethVault));
+  }
+
+  function testDeposit() 
+    public 
+      hasDNft 
+      hasEthVault 
+  {
   }
 
   receive() external payable {}

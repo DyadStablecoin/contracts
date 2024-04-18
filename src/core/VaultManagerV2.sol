@@ -42,9 +42,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   modifier isValidDNft(uint id) {
     if (dNft.ownerOf(id) == address(0))   revert InvalidDNft(); _;
   }
-  modifier isLicensed(address vault) {
-    if (!vaultLicenser.isLicensed(vault)) revert NotLicensed(); _;
-  }
 
   constructor(
     DNft          _dNft,
@@ -299,5 +296,24 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     view 
     returns (bool) {
       return vaults[id].contains(vault);
+  }
+
+  function getVaultsKerosene(
+    uint id
+  ) 
+    external 
+    view 
+    returns (address[] memory) {
+      return vaultsKerosene[id].values();
+  }
+
+  function hasVaultKerosene(
+    uint    id,
+    address vault
+  ) 
+    external 
+    view 
+    returns (bool) {
+      return vaultsKerosene[id].contains(vault);
   }
 }
