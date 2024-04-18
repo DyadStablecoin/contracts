@@ -22,13 +22,13 @@ contract V2Test is Test, Parameters {
     weth = ERC20(MAINNET_WETH);
   }
 
-  function testLicenseVaultManager() public {
+  function test_LicenseVaultManager() public {
     Licenser licenser = Licenser(MAINNET_VAULT_MANAGER_LICENSER);
     vm.prank(MAINNET_OWNER);
     licenser.add(address(contracts.vaultManager));
   }
 
-  function testLicenseVaults() public {
+  function test_LicenseVaults() public {
     vm.prank(MAINNET_OWNER);
     contracts.vaultLicenser.add(address(contracts.ethVault));
     vm.prank(MAINNET_OWNER);
@@ -39,14 +39,14 @@ contract V2Test is Test, Parameters {
     contracts.vaultLicenser.add(address(contracts.boundedKerosineVault));
   }
 
-  function testKeroseneVaults() public {
+  function test_KeroseneVaults() public {
     address[] memory vaults = contracts.kerosineManager.getVaults();
     assertEq(vaults.length, 2);
     assertEq(vaults[0], address(contracts.ethVault));
     assertEq(vaults[1], address(contracts.wstEth));
   }
 
-  function testOwnership() public {
+  function test_Ownership() public {
     assertEq(contracts.kerosineManager.owner(),        MAINNET_OWNER);
     assertEq(contracts.vaultLicenser.owner(),          MAINNET_OWNER);
     assertEq(contracts.kerosineManager.owner(),        MAINNET_OWNER);
@@ -54,7 +54,7 @@ contract V2Test is Test, Parameters {
     assertEq(contracts.boundedKerosineVault.owner(),   MAINNET_OWNER);
   }
 
-  function testDenominator() public {
+  function test_Denominator() public {
     uint denominator = contracts.kerosineDenominator.denominator();
     assertTrue(denominator < contracts.kerosene.balanceOf(MAINNET_OWNER));
   }
@@ -70,7 +70,7 @@ contract V2Test is Test, Parameters {
     _;
   }
 
-  function testMintDNft() public hasDNft {
+  function test_MintDNft() public hasDNft {
     assertEq(contracts.dNft.balanceOf(address(this)), 1);
   }
 
@@ -79,7 +79,7 @@ contract V2Test is Test, Parameters {
     _;
   }
 
-  function testAddVault() 
+  function test_AddVault() 
     public 
       hasDNft 
       hasEthVault 
@@ -88,21 +88,56 @@ contract V2Test is Test, Parameters {
     assertEq(firstVault, address(contracts.ethVault));
   }
 
-  modifier deposit100Eth() {
-    uint amount = 100 ether;
+  modifier depositEth(uint amount) {
     deal(MAINNET_WETH, address(this), amount);
     weth.approve(address(contracts.vaultManager), amount);
     contracts.vaultManager.deposit(DNFT_ID_1, address(contracts.ethVault), amount);
     _;
   }
 
-  function testDeposit() 
+  function test_Deposit() 
     public 
       hasDNft 
       hasEthVault 
-      deposit100Eth
+      depositEth(100 ether)
   {
     assertEq(contracts.ethVault.id2asset(DNFT_ID_1), 100 ether);
+  }
+
+  modifier skip1Block() {
+    vm.roll(block.number + 1);
+    _;
+  }
+
+  modifier withdrawEth(uint amount) {
+    contracts.vaultManager.withdraw(
+      DNFT_ID_1,
+      address(contracts.ethVault),
+      amount,
+      address(this)
+    );
+    _;
+  }
+
+  function test_Withdraw() 
+    public 
+      hasDNft 
+      hasEthVault 
+      depositEth(100 ether)
+      skip1Block
+      withdrawEth(100 ether)
+  {
+    assertEq(contracts.ethVault.id2asset(DNFT_ID_1), 0 ether);
+  }
+
+  function testFail_DepositAndWithdrawInSameBlock() 
+    public 
+      hasDNft 
+      hasEthVault 
+      depositEth(100 ether)
+      // skip1Block
+      withdrawEth(100 ether)
+  {
   }
 
   // --- RECEIVER ---
