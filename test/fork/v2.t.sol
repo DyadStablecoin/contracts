@@ -1,10 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity =0.8.17;
 
+import "forge-std/console.sol";
+
 import {BaseTestV2}          from "./BaseV2.sol";
 import {Licenser}            from "../../src/core/Licenser.sol";
 import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
 import {IVault}              from "../../src/interfaces/IVault.sol";
+import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract V2Test is BaseTestV2 {
 
@@ -75,8 +78,9 @@ contract V2Test is BaseTestV2 {
   }
 
   modifier deposit(IVault vault, uint amount) {
-    deal(MAINNET_WETH, address(this), amount);
-    weth.approve(address(contracts.vaultManager), amount);
+    ERC20 asset = vault.asset();
+    deal(address(asset), address(this), amount);
+    asset.approve(address(contracts.vaultManager), amount);
     contracts.vaultManager.deposit(DNFT_ID_1, address(vault), amount);
     _;
   }
@@ -172,5 +176,24 @@ contract V2Test is BaseTestV2 {
   {
     address firstVault = contracts.vaultManager.getVaultsKerosene(DNFT_ID_1)[0];
     assertEq(firstVault, address(contracts.unboundedKerosineVault));
+  }
+
+  function test_DepositKerosene() 
+    public 
+      mintDNft 
+      addVaultKerosene(contracts.unboundedKerosineVault) 
+      deposit(contracts.unboundedKerosineVault, 100e18)
+  {
+    assertEq(contracts.unboundedKerosineVault.id2asset(DNFT_ID_1), 100e18);
+  }
+
+  function test_KeroseneAssetPrice() 
+    public 
+      mintDNft 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 300 ether)
+  {
+    uint price = contracts.unboundedKerosineVault.assetPrice();
+    assertTrue(price > 0);
   }
 }
