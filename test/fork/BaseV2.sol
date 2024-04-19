@@ -15,6 +15,7 @@ contract BaseTestV2 is Modifiers, Parameters {
   Contracts contracts;
   ERC20 weth;
 
+  uint DNFT_ID_0;
   uint DNFT_ID_1;
 
   function setUp() public {
