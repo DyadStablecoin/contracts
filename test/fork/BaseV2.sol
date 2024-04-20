@@ -15,14 +15,36 @@ contract BaseTestV2 is Modifiers, Parameters {
   Contracts contracts;
   ERC20 weth;
 
-  uint DNFT_ID_0;
-  uint DNFT_ID_1;
+  uint DNFT_ID_0_OWNER_0;
+  uint DNFT_ID_1_OWNER_0;
+  uint DNFT_ID_0_OWNER_1;
+  uint DNFT_ID_1_OWNER_1;
+
+  address OWNER_0;
+  address OWNER_1 = address(0x42);
 
   function setUp() public {
     contracts = new DeployV2().run();
     weth      = ERC20(MAINNET_WETH);
+    OWNER_0   = address(this);
 
     licenseVauleManager();
+  }
+
+  // --- OWNER_0 ---
+  modifier mintDNft0Owner0() { DNFT_ID_0_OWNER_0 = mintDNft(address(this)); _; }
+  modifier mintDNft1Owner0() { DNFT_ID_1_OWNER_0 = mintDNft(address(this)); _; }
+  // --- OWNER_1 ---
+  modifier mintDNft0Owner1() { DNFT_ID_0_OWNER_1 = mintDNft(OWNER_1); _; }
+  modifier mintDNft1Owner1() { DNFT_ID_1_OWNER_1 = mintDNft(OWNER_1); _; }
+
+  function mintDNft(address owner) public returns(uint id) {
+    uint startPrice    = contracts.dNft.START_PRICE();
+    uint priceIncrease = contracts.dNft.PRICE_INCREASE();
+    uint publicMints   = contracts.dNft.publicMints();
+    uint price = startPrice + (priceIncrease * publicMints);
+    vm.deal(address(this), price);
+    id = contracts.dNft.mintNft{value: price}(owner);
   }
 
   function licenseVauleManager() public {
