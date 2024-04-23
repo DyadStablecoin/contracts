@@ -32,10 +32,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   mapping (uint => uint)                     public   idToBlockOfLastDeposit;
 
   modifier isDNftOwner(uint id) {
-    if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();         _;
+    if (dNft.ownerOf(id) != msg.sender) revert NotOwner();    _;
   }
   modifier isValidDNft(uint id) {
-    if (dNft.ownerOf(id) == address(0))   revert InvalidDNft();      _;
+    if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
 
   constructor(
@@ -56,9 +56,9 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     external
       isDNftOwner(id)
   {
-    if (vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
-    if (!vaultLicenser.isLicensed(vault))  revert VaultNotLicensed();
-    if (!vaults[id].add(vault))            revert VaultAlreadyAdded();
+    if (!vaultLicenser.isLicensed(vault))   revert VaultNotLicensed();
+    if ( vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
+    if (!vaults[id].add(vault))             revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 
