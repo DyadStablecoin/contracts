@@ -102,7 +102,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   {
     if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
     Vault _vault = Vault(vault);
-    _vault.withdraw(id, to, amount); // will change `exo` or `kero` value
+    _vault.withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
     uint value = amount * _vault.assetPrice() 
                   * 1e18 
@@ -123,10 +123,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     external 
       isDNftOwner(id)
   {
-    uint newDyadMinted = dyad.mintedDyad(address(this), id) + amount;
+    dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
+    uint mintedDyad = dyad.mintedDyad(address(this), id);
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    if (exoValue < newDyadMinted)       revert NotEnoughExoCollat();
-    dyad.mint(id, to, amount);
+    if (exoValue < mintedDyad)          revert NotEnoughExoCollat();
     uint cr = collatRatio(id, exoValue+keroValue);
     if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
     emit MintDyad(id, amount, to);
@@ -205,7 +205,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   ///      expensive. Sometimes we can cache that value and re-use it.
   function collatRatio(
     uint id, 
-    uint totalValue
+    uint totalValue // in USD
   )
     public 
     view
@@ -215,7 +215,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
 
   function _collatRatio(
     uint id,
-    uint totalValue
+    uint totalValue // in USD
   )
     internal 
     view
@@ -256,7 +256,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
           }
         }
       }
-      return (exoValue, keroValue);
   }
 
   // ----------------- MISC ----------------- //
