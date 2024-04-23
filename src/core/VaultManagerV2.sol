@@ -108,9 +108,9 @@ contract VaultManagerV2 is IVaultManager, Initializable {
                   * 1e18 
                   / 10**_vault.oracle().decimals() 
                   / 10**_vault.asset() .decimals();
-    uint dyadMinted = dyad.mintedDyad(address(this), id);
-    if (exoValue - value < dyadMinted)  revert NotEnoughExoCollat();
-    uint cr = collatRatio(id, exoValue+keroValue);
+    uint mintedDyad = dyad.mintedDyad(address(this), id);
+    if (exoValue - value < mintedDyad)  revert NotEnoughExoCollat();
+    uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
   }
 
@@ -127,7 +127,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     uint mintedDyad = dyad.mintedDyad(address(this), id);
     (uint exoValue, uint keroValue) = getVaultsValues(id);
     if (exoValue < mintedDyad)          revert NotEnoughExoCollat();
-    uint cr = collatRatio(id, exoValue+keroValue);
+    uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
     emit MintDyad(id, amount, to);
   }
@@ -197,32 +197,23 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     public 
     view
     returns (uint) {
-      return _collatRatio(id, getTotalValue(id));
+      uint mintedDyad = dyad.mintedDyad(address(this), id);
+      uint totalValue = getTotalValue(id);
+      return _collatRatio(mintedDyad, totalValue);
   }
 
   /// @dev Why do we have the same function with different arguments?
-  ///      Because the for-loop of getting the value over all vaults is 
-  ///      expensive. Sometimes we can cache that value and re-use it.
-  function collatRatio(
-    uint id, 
-    uint totalValue // in USD
-  )
-    public 
-    view
-    returns (uint) {
-      return _collatRatio(id, totalValue);
-  }
-
+  ///      Sometimes we can re-use the `mintedDyad` and `totalValue` values,
+  ///      Calculating them is expensive, so we can re-use the cached values.
   function _collatRatio(
-    uint id,
+    uint mintedDyad, 
     uint totalValue // in USD
   )
     internal 
-    view
+    pure
     returns (uint) {
-      uint _dyad = dyad.mintedDyad(address(this), id);
-      if (_dyad == 0) return type(uint).max;
-      return totalValue.divWadDown(_dyad);
+      if (mintedDyad == 0) return type(uint).max;
+      return totalValue.divWadDown(mintedDyad);
   }
 
   function getTotalValue( // in USD
