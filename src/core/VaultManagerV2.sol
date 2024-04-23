@@ -102,10 +102,11 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   {
     if (idToBlockOfLastDeposit[id] == block.number)    revert DepositedInSameBlock();
     uint dyadMinted = dyad.mintedDyad(address(this), id);
-    (uint vaultsKeroseneValue, uint vaultsNonKeroseneValue) = getValue(id);
-    if (vaultsNonKeroseneValue - amount < dyadMinted) revert NotEnoughExoCollat();
+    (uint exoValue, uint keroValue) = getVaultsValues(id);
+    if (exoValue - amount < dyadMinted) revert NotEnoughExoCollat();
     Vault(vault).withdraw(id, to, amount);
-    if (collatRatio(id, vaultsKeroseneValue+vaultsNonKeroseneValue) < MIN_COLLATERIZATION_RATIO)   revert CrTooLow(); 
+    uint cr = collatRatio(id, exoValue+keroValue);
+    if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
   }
 
   /// @inheritdoc IVaultManager
@@ -118,10 +119,11 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       isDNftOwner(id)
   {
     uint newDyadMinted = dyad.mintedDyad(address(this), id) + amount;
-    (uint vaultsKeroseneValue, uint vaultsNonKeroseneValue) = getValue(id);
-    if (vaultsNonKeroseneValue < newDyadMinted)     revert NotEnoughExoCollat();
+    (uint exoValue, uint keroValue) = getVaultsValues(id);
+    if (exoValue < newDyadMinted)       revert NotEnoughExoCollat();
     dyad.mint(id, to, amount);
-    if (collatRatio(id, vaultsKeroseneValue+vaultsNonKeroseneValue) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
+    uint cr = collatRatio(id, exoValue+keroValue);
+    if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
     emit MintDyad(id, amount, to);
   }
 
@@ -190,73 +192,66 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     public 
     view
     returns (uint) {
-      uint _dyad = dyad.mintedDyad(address(this), id);
-      if (_dyad == 0) return type(uint).max;
-      return getTotalUsdValue(id).divWadDown(_dyad);
+      return _collatRatio(id, getTotalValue(id));
   }
 
+  /// @dev Why do we have the same function with different arguments?
+  ///      Because the for-loop of getting the value over all vaults is 
+  ///      expensive. Sometimes we can cache that value and re-use it.
   function collatRatio(
     uint id, 
-    uint totalUsdValue
+    uint totalValue
   )
     public 
     view
     returns (uint) {
+      return _collatRatio(id, totalValue);
+  }
+
+  function _collatRatio(
+    uint id,
+    uint totalValue
+  )
+    internal 
+    view
+    returns (uint) {
       uint _dyad = dyad.mintedDyad(address(this), id);
       if (_dyad == 0) return type(uint).max;
-      return totalUsdValue.divWadDown(_dyad);
+      return totalValue.divWadDown(_dyad);
   }
 
-  function getTotalUsdValue(
+  function getTotalValue( // in USD
     uint id
   ) 
     public 
     view
     returns (uint) {
-      (uint vaultsKeroseneValue, uint vaultsNonKeroseneValue) = getValue(id);
-      return vaultsKeroseneValue + vaultsNonKeroseneValue;
+      (uint exoValue, uint keroValue) = getVaultsValues(id);
+      return exoValue + keroValue;
   }
 
-  function getNonKeroseneValue(
-    uint id
-  ) 
-    public 
-    view
-    returns (uint) {
-      uint totalUsdValue;
-      uint numberOfVaults = vaults[id].length(); 
-      for (uint i = 0; i < numberOfVaults; i++) {
-        Vault vault = Vault(vaults[id].at(i));
-        uint usdValue;
-        if (vaultLicenser.isLicensed(address(vault))) {
-          usdValue = vault.getUsdValue(id);        
-        }
-        totalUsdValue += usdValue;
-      }
-      return totalUsdValue;
-  }
-
-  function getValue(
+  function getVaultsValues(
     uint id
   ) 
     public 
     view
     returns (uint, uint) {
-      uint vaultsKeroseneValue;
-      uint vaultsNonKeroseneValue;
+      uint  exoValue; // exo := exogenous (non-kerosene)
+      uint keroValue;
 
       uint numberOfVaults = vaults[id].length(); 
+
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[id].at(i));
         if (vaultLicenser.isLicensed(address(vault))) {
           if (vaultLicenser.isKerosene(address(vault))) {
-            vaultsKeroseneValue    += vault.getUsdValue(id);
+            keroValue += vault.getUsdValue(id);
           } else {
-            vaultsNonKeroseneValue += vault.getUsdValue(id);
+            exoValue  += vault.getUsdValue(id);
           }
         }
       }
-      return (vaultsKeroseneValue, vaultsNonKeroseneValue);
+      return (exoValue, keroValue);
   }
 
   // ----------------- MISC ----------------- //
