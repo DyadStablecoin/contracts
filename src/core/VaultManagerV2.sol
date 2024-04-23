@@ -103,12 +103,12 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
     Vault _vault = Vault(vault);
     _vault.withdraw(id, to, amount); // will change `exo` or `kero` value
+    (uint exoValue, uint keroValue) = getVaultsValues(id);
     uint value = amount * _vault.assetPrice() 
                   * 1e18 
                   / 10**_vault.oracle().decimals() 
                   / 10**_vault.asset().decimals();
     uint dyadMinted = dyad.mintedDyad(address(this), id);
-    (uint exoValue, uint keroValue) = getVaultsValues(id);
     if (exoValue - value < dyadMinted)  revert NotEnoughExoCollat();
     uint cr = collatRatio(id, exoValue+keroValue);
     if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
@@ -235,15 +235,15 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       return exoValue + keroValue;
   }
 
-  function getVaultsValues(
+  function getVaultsValues( // in USD
     uint id
   ) 
     public 
     view
-    returns (uint, uint) {
-      uint  exoValue; // exo := exogenous (non-kerosene)
-      uint keroValue;
-
+    returns (
+      uint exoValue, // exo := exogenous (non-kerosene)
+      uint keroValue
+    ) {
       uint numberOfVaults = vaults[id].length(); 
 
       for (uint i = 0; i < numberOfVaults; i++) {
