@@ -29,8 +29,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   VaultLicenser public immutable vaultLicenser;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
-  mapping (uint => EnumerableSet.AddressSet) internal vaultsKerosene; 
-
   mapping (uint => uint)                     public   idToBlockOfLastDeposit;
 
   modifier isDNftOwner(uint id) {
@@ -38,13 +36,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   }
   modifier isValidDNft(uint id) {
     if (dNft.ownerOf(id) == address(0))   revert InvalidDNft();      _;
-  }
-  modifier isLicensed(address vault) {
-    if (!vaultLicenser.isLicensed(vault)) revert VaultNotLicensed(); _;
-  }
-  modifier isBelowMaxVaults(uint id) {
-    uint numberOfVaults = vaults[id].length() + vaultsKerosene[id].length();
-    if (numberOfVaults >= MAX_VAULTS)     revert TooManyVaults();    _;
   }
 
   constructor(
@@ -64,25 +55,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   ) 
     external
       isDNftOwner(id)
-      isLicensed(vault)
-      isBelowMaxVaults(id)
   {
-    if ( vaultLicenser.isKeroseneVault(vault)) revert VaultNotKerosene();
-    if (!vaults[id].add(vault))                revert VaultAlreadyAdded();
-    emit Added(id, vault);
-  }
-
-  function addKerosene(
-      uint    id,
-      address vault
-  ) 
-    external
-      isDNftOwner(id)
-      isLicensed(vault)
-      isBelowMaxVaults(id)
-  {
-    if (!vaultLicenser.isKeroseneVault(vault)) revert VaultNotKerosene();
-    if (!vaultsKerosene[id].add(vault))        revert VaultAlreadyAdded();
+    if (vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
+    if (!vaultLicenser.isLicensed(vault))  revert VaultNotLicensed();
+    if (!vaults[id].add(vault))            revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 
@@ -96,18 +72,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   {
     if (Vault(vault).id2asset(id) > 0) revert VaultHasAssets();
     if (!vaults[id].remove(vault))     revert VaultNotAdded();
-    emit Removed(id, vault);
-  }
-
-  function removeKerosene(
-      uint    id,
-      address vault
-  ) 
-    external
-      isDNftOwner(id)
-  {
-    if (Vault(vault).id2asset(id) > 0)     revert VaultHasAssets();
-    if (!vaultsKerosene[id].remove(vault)) revert VaultNotAdded();
     emit Removed(id, vault);
   }
 
@@ -138,9 +102,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   {
     if (idToBlockOfLastDeposit[id] == block.number)    revert DepositedInSameBlock();
     uint dyadMinted = dyad.mintedDyad(address(this), id);
-    if (getNonKeroseneValue(id) - amount < dyadMinted) revert NotEnoughExoCollat();
+    (uint vaultsKeroseneValue, uint vaultsNonKeroseneValue) = getValue(id);
+    if (vaultsNonKeroseneValue - amount < dyadMinted) revert NotEnoughExoCollat();
     Vault(vault).withdraw(id, to, amount);
-    if (collatRatio(id) < MIN_COLLATERIZATION_RATIO)   revert CrTooLow(); 
+    if (collatRatio(id, vaultsKeroseneValue+vaultsNonKeroseneValue) < MIN_COLLATERIZATION_RATIO)   revert CrTooLow(); 
   }
 
   /// @inheritdoc IVaultManager
@@ -153,9 +118,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       isDNftOwner(id)
   {
     uint newDyadMinted = dyad.mintedDyad(address(this), id) + amount;
-    if (getNonKeroseneValue(id) < newDyadMinted)     revert NotEnoughExoCollat();
+    (uint vaultsKeroseneValue, uint vaultsNonKeroseneValue) = getValue(id);
+    if (vaultsNonKeroseneValue < newDyadMinted)     revert NotEnoughExoCollat();
     dyad.mint(id, to, amount);
-    if (collatRatio(id) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
+    if (collatRatio(id, vaultsKeroseneValue+vaultsNonKeroseneValue) < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
     emit MintDyad(id, amount, to);
   }
 
@@ -229,13 +195,26 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       return getTotalUsdValue(id).divWadDown(_dyad);
   }
 
+  function collatRatio(
+    uint id, 
+    uint totalUsdValue
+  )
+    public 
+    view
+    returns (uint) {
+      uint _dyad = dyad.mintedDyad(address(this), id);
+      if (_dyad == 0) return type(uint).max;
+      return totalUsdValue.divWadDown(_dyad);
+  }
+
   function getTotalUsdValue(
     uint id
   ) 
     public 
     view
     returns (uint) {
-      return getNonKeroseneValue(id) + getKeroseneValue(id);
+      (uint vaultsKeroseneValue, uint vaultsNonKeroseneValue) = getValue(id);
+      return vaultsKeroseneValue + vaultsNonKeroseneValue;
   }
 
   function getNonKeroseneValue(
@@ -257,23 +236,27 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       return totalUsdValue;
   }
 
-  function getKeroseneValue(
+  function getValue(
     uint id
   ) 
     public 
     view
-    returns (uint) {
-      uint totalUsdValue;
-      uint numberOfVaults = vaultsKerosene[id].length(); 
+    returns (uint, uint) {
+      uint vaultsKeroseneValue;
+      uint vaultsNonKeroseneValue;
+
+      uint numberOfVaults = vaults[id].length(); 
       for (uint i = 0; i < numberOfVaults; i++) {
-        Vault vault = Vault(vaultsKerosene[id].at(i));
-        uint usdValue;
+        Vault vault = Vault(vaults[id].at(i));
         if (vaultLicenser.isLicensed(address(vault))) {
-          usdValue = vault.getUsdValue(id);        
+          if (vaultLicenser.isKerosene(address(vault))) {
+            vaultsKeroseneValue    += vault.getUsdValue(id);
+          } else {
+            vaultsNonKeroseneValue += vault.getUsdValue(id);
+          }
         }
-        totalUsdValue += usdValue;
       }
-      return totalUsdValue;
+      return (vaultsKeroseneValue, vaultsNonKeroseneValue);
   }
 
   // ----------------- MISC ----------------- //
@@ -295,24 +278,5 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     view 
     returns (bool) {
       return vaults[id].contains(vault);
-  }
-
-  function getVaultsKerosene(
-    uint id
-  ) 
-    external 
-    view 
-    returns (address[] memory) {
-      return vaultsKerosene[id].values();
-  }
-
-  function hasVaultKerosene(
-    uint    id,
-    address vault
-  ) 
-    external 
-    view 
-    returns (bool) {
-      return vaultsKerosene[id].contains(vault);
   }
 }

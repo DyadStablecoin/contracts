@@ -37,7 +37,7 @@ contract VaultLicenser is Owned(msg.sender) {
     return licenses[_vault].isLicensed;
   }
 
-  function isKeroseneVault(
+  function isKerosene(
       address _vault
   ) external 
     view 
