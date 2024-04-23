@@ -124,8 +124,8 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       isDNftOwner(id)
   {
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
-    uint mintedDyad = dyad.mintedDyad(address(this), id);
     (uint exoValue, uint keroValue) = getVaultsValues(id);
+    uint mintedDyad = dyad.mintedDyad(address(this), id);
     if (exoValue < mintedDyad)          revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
