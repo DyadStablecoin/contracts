@@ -3,6 +3,7 @@ pragma solidity =0.8.17;
 
 import {IVaultManager}   from "../interfaces/IVaultManager.sol";
 import {IVault}          from "../interfaces/IVault.sol";
+import {IAggregatorV3}   from "../interfaces/IAggregatorV3.sol";
 import {KerosineManager} from "./KerosineManager.sol";
 import {KeroseneOracle}  from "./KeroseneOracle.sol";
 
@@ -16,7 +17,7 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   IVaultManager   public immutable vaultManager;
   ERC20           public immutable asset;
   KerosineManager public immutable kerosineManager;
-  KeroseneOracle  public immutable oracle;
+  IAggregatorV3   public immutable oracle;
 
   mapping(uint => uint) public id2asset;
 
@@ -29,7 +30,7 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
     IVaultManager   _vaultManager,
     ERC20           _asset, 
     KerosineManager _kerosineManager, 
-    KeroseneOracle  _oracle
+    IAggregatorV3   _oracle
   ) {
     vaultManager    = _vaultManager;
     asset           = _asset;

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity = 0.8.17;
 
+import {IAggregatorV3} from "../interfaces/IAggregatorV3.sol";
+
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 interface IVault {
@@ -18,4 +20,5 @@ interface IVault {
   function withdraw   (uint id, address to, uint amount) external;
   function getUsdValue(uint id) external view returns (uint);
   function asset      () external view returns (ERC20);
+  function oracle     () external view returns (IAggregatorV3);
 }

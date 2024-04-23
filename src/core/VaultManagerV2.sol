@@ -107,7 +107,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     uint value = amount * _vault.assetPrice() 
                   * 1e18 
                   / 10**_vault.oracle().decimals() 
-                  / 10**_vault.asset().decimals();
+                  / 10**_vault.asset() .decimals();
     uint dyadMinted = dyad.mintedDyad(address(this), id);
     if (exoValue - value < dyadMinted)  revert NotEnoughExoCollat();
     uint cr = collatRatio(id, exoValue+keroValue);
