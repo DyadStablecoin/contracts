@@ -29,7 +29,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   VaultLicenser public immutable vaultLicenser;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
-  mapping (uint => uint)                     public   idToBlockOfLastDeposit;
+  mapping (uint/* id */ => uint/* block */)  public   lastDeposit;
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender) revert NotOwner();    _;
@@ -84,7 +84,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     external 
       isValidDNft(id)
   {
-    idToBlockOfLastDeposit[id] = block.number;
+    lastDeposit[id] = block.number;
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, address(vault), amount);
     _vault.deposit(id, amount);
@@ -100,11 +100,16 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     public
       isDNftOwner(id)
   {
-    if (idToBlockOfLastDeposit[id] == block.number)    revert DepositedInSameBlock();
+    if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
+    Vault _vault = Vault(vault);
+    _vault.withdraw(id, to, amount); // will change `exo` or `kero` value
+    uint value = amount * _vault.assetPrice() 
+                  * 1e18 
+                  / 10**_vault.oracle().decimals() 
+                  / 10**_vault.asset().decimals();
     uint dyadMinted = dyad.mintedDyad(address(this), id);
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    if (exoValue - amount < dyadMinted) revert NotEnoughExoCollat();
-    Vault(vault).withdraw(id, to, amount);
+    if (exoValue - value < dyadMinted)  revert NotEnoughExoCollat();
     uint cr = collatRatio(id, exoValue+keroValue);
     if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
   }

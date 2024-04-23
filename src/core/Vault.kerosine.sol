@@ -2,8 +2,9 @@
 pragma solidity =0.8.17;
 
 import {IVaultManager}   from "../interfaces/IVaultManager.sol";
-import {KerosineManager} from "./KerosineManager.sol";
 import {IVault}          from "../interfaces/IVault.sol";
+import {KerosineManager} from "./KerosineManager.sol";
+import {KeroseneOracle}  from "./KeroseneOracle.sol";
 
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
@@ -15,6 +16,7 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   IVaultManager   public immutable vaultManager;
   ERC20           public immutable asset;
   KerosineManager public immutable kerosineManager;
+  KeroseneOracle  public immutable oracle;
 
   mapping(uint => uint) public id2asset;
 
@@ -26,11 +28,13 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   constructor(
     IVaultManager   _vaultManager,
     ERC20           _asset, 
-    KerosineManager _kerosineManager 
+    KerosineManager _kerosineManager, 
+    KeroseneOracle  _oracle
   ) {
     vaultManager    = _vaultManager;
     asset           = _asset;
     kerosineManager = _kerosineManager;
+    oracle          = _oracle;
   }
 
   function deposit(

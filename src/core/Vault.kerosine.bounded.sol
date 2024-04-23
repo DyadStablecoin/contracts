@@ -6,6 +6,7 @@ import {IVaultManager}          from "../interfaces/IVaultManager.sol";
 import {Dyad}                   from "./Dyad.sol";
 import {KerosineManager}        from "./KerosineManager.sol";
 import {UnboundedKerosineVault} from "./Vault.kerosine.unbounded.sol";
+import {KeroseneOracle}         from "./KeroseneOracle.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
@@ -17,8 +18,9 @@ contract BoundedKerosineVault is KerosineVault {
   constructor(
     IVaultManager   _vaultManager,
     ERC20           _asset, 
-    KerosineManager _kerosineManager
-  ) KerosineVault(_vaultManager, _asset, _kerosineManager) {}
+    KerosineManager _kerosineManager, 
+    KeroseneOracle  _oracle
+  ) KerosineVault(_vaultManager, _asset, _kerosineManager, _oracle) {}
 
   function setUnboundedKerosineVault(
     UnboundedKerosineVault _unboundedKerosineVault

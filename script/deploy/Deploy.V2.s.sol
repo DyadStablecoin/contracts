@@ -15,6 +15,7 @@ import {IAggregatorV3}          from "../../src/interfaces/IAggregatorV3.sol";
 import {KerosineManager}        from "../../src/core/KerosineManager.sol";
 import {UnboundedKerosineVault} from "../../src/core/Vault.kerosine.unbounded.sol";
 import {BoundedKerosineVault}   from "../../src/core/Vault.kerosine.bounded.sol";
+import {KeroseneOracle}         from "../../src/core/KeroseneOracle.sol";
 import {Kerosine}               from "../../src/staking/Kerosine.sol";
 import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol";
 
@@ -68,17 +69,22 @@ contract DeployV2 is Script, Parameters {
 
     kerosineManager.transferOwnership(MAINNET_OWNER);
 
+    KeroseneOracle keroseneOracle = new KeroseneOracle();
+
     UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
       vaultManager,
       Kerosine(MAINNET_KEROSENE), 
       Dyad    (MAINNET_DYAD),
-      kerosineManager
+      kerosineManager, 
+      keroseneOracle
     );
+
 
     BoundedKerosineVault boundedKerosineVault     = new BoundedKerosineVault(
       vaultManager,
       Kerosine(MAINNET_KEROSENE), 
-      kerosineManager
+      kerosineManager, 
+      keroseneOracle
     );
 
     KerosineDenominator kerosineDenominator       = new KerosineDenominator(

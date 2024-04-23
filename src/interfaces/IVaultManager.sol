@@ -20,7 +20,7 @@ interface IVaultManager {
   error InvalidDNft();
   error CrTooLow();
   error CrTooHigh();
-  error DepositedInSameBlock();
+  error CanNotWithdrawInSameBlock();
   error NotEnoughExoCollat();   // Not enough exogenous collateral
   error VaultNotKerosene();   // Not enough exogenous collateral
 

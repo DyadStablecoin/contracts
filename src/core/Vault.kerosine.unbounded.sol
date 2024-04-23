@@ -8,6 +8,7 @@ import {Dyad}                 from "./Dyad.sol";
 import {KerosineManager}      from "./KerosineManager.sol";
 import {BoundedKerosineVault} from "./Vault.kerosine.bounded.sol";
 import {KerosineDenominator}  from "../staking/KerosineDenominator.sol";
+import {KeroseneOracle}       from "./KeroseneOracle.sol";
 
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
@@ -22,8 +23,9 @@ contract UnboundedKerosineVault is KerosineVault {
       IVaultManager   _vaultManager,
       ERC20           _asset, 
       Dyad            _dyad, 
-      KerosineManager _kerosineManager
-  ) KerosineVault(_vaultManager, _asset, _kerosineManager) {
+      KerosineManager _kerosineManager,
+      KeroseneOracle  _oracle
+  ) KerosineVault(_vaultManager, _asset, _kerosineManager, _oracle) {
       dyad = _dyad;
   }
 
