@@ -4,6 +4,7 @@ pragma solidity =0.8.17;
 import {DNft}            from "./DNft.sol";
 import {Dyad}            from "./Dyad.sol";
 import {Licenser}        from "./Licenser.sol";
+import {VaultLicenser}   from "./VaultLicenser.sol";
 import {Vault}           from "./Vault.sol";
 import {IVaultManager}   from "../interfaces/IVaultManager.sol";
 import {KerosineManager} from "../../src/core/KerosineManager.sol";
@@ -19,17 +20,13 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
 
-  uint public constant MAX_VAULTS          = 5;
-  uint public constant MAX_VAULTS_KEROSENE = 5;
-
+  uint public constant MAX_VAULTS                = 6;
   uint public constant MIN_COLLATERIZATION_RATIO = 1.5e18; // 150%
   uint public constant LIQUIDATION_REWARD        = 0.2e18; //  20%
 
-  DNft     public immutable dNft;
-  Dyad     public immutable dyad;
-  Licenser public immutable vaultLicenser;
-
-  KerosineManager public keroseneManager;
+  DNft          public immutable dNft;
+  Dyad          public immutable dyad;
+  VaultLicenser public immutable vaultLicenser;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
   mapping (uint => EnumerableSet.AddressSet) internal vaultsKerosene; 
@@ -37,27 +34,27 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   mapping (uint => uint)                     public   idToBlockOfLastDeposit;
 
   modifier isDNftOwner(uint id) {
-    if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();    _;
+    if (dNft.ownerOf(id) != msg.sender)   revert NotOwner();         _;
   }
   modifier isValidDNft(uint id) {
-    if (dNft.ownerOf(id) == address(0))   revert InvalidDNft(); _;
+    if (dNft.ownerOf(id) == address(0))   revert InvalidDNft();      _;
+  }
+  modifier isLicensed(address vault) {
+    if (!vaultLicenser.isLicensed(vault)) revert VaultNotLicensed(); _;
+  }
+  modifier isBelowMaxVaults(uint id) {
+    uint numberOfVaults = vaults[id].length() + vaultsKerosene[id].length();
+    if (numberOfVaults >= MAX_VAULTS)     revert TooManyVaults();    _;
   }
 
   constructor(
     DNft          _dNft,
     Dyad          _dyad,
-    Licenser      _licenser
+    VaultLicenser _vaultLicenser
   ) {
     dNft          = _dNft;
     dyad          = _dyad;
-    vaultLicenser = _licenser;
-  }
-
-  function setKeroseneManager(KerosineManager _keroseneManager) 
-    external
-      initializer 
-    {
-      keroseneManager = _keroseneManager;
+    vaultLicenser = _vaultLicenser;
   }
 
   /// @inheritdoc IVaultManager
@@ -67,10 +64,11 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   ) 
     external
       isDNftOwner(id)
+      isLicensed(vault)
+      isBelowMaxVaults(id)
   {
-    if (vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
-    if (!vaultLicenser.isLicensed(vault))  revert VaultNotLicensed();
-    if (!vaults[id].add(vault))            revert VaultAlreadyAdded();
+    if ( vaultLicenser.isKeroseneVault(vault)) revert VaultNotKerosene();
+    if (!vaults[id].add(vault))                revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 
@@ -80,10 +78,11 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   ) 
     external
       isDNftOwner(id)
+      isLicensed(vault)
+      isBelowMaxVaults(id)
   {
-    if (vaultsKerosene[id].length() >= MAX_VAULTS_KEROSENE) revert TooManyVaults();
-    if (!vaultLicenser.isLicensed(vault))                   revert VaultNotLicensed();
-    if (!vaultsKerosene[id].add(vault))                     revert VaultAlreadyAdded();
+    if (!vaultLicenser.isKeroseneVault(vault)) revert VaultNotKerosene();
+    if (!vaultsKerosene[id].add(vault))        revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 

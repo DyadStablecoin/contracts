@@ -7,7 +7,7 @@ import {Parameters}             from "../../src/params/Parameters.sol";
 import {VaultManagerV2}         from "../../src/core/VaultManagerV2.sol";
 import {DNft}                   from "../../src/core/DNft.sol";
 import {Dyad}                   from "../../src/core/Dyad.sol";
-import {Licenser}               from "../../src/core/Licenser.sol";
+import {VaultLicenser}          from "../../src/core/VaultLicenser.sol";
 import {Vault}                  from "../../src/core/Vault.sol";
 import {VaultWstEth}            from "../../src/core/Vault.wsteth.sol";
 import {IWETH}                  from "../../src/interfaces/IWETH.sol";
@@ -24,7 +24,7 @@ struct Contracts {
   DNft                   dNft;
   Dyad                   dyad;
   Kerosine               kerosene;
-  Licenser               vaultLicenser;
+  VaultLicenser          vaultLicenser;
   VaultManagerV2         vaultManager;
   Vault                  ethVault;
   VaultWstEth            wstEth;
@@ -38,7 +38,7 @@ contract DeployV2 is Script, Parameters {
   function run() public returns (Contracts memory) {
     vm.startBroadcast();  // ----------------------
 
-    Licenser vaultLicenser = new Licenser();
+    VaultLicenser vaultLicenser = new VaultLicenser();
 
     // Vault Manager needs to be licensed through the Vault Manager Licenser
     VaultManagerV2 vaultManager = new VaultManagerV2(
@@ -66,8 +66,6 @@ contract DeployV2 is Script, Parameters {
     kerosineManager.add(address(ethVault));
     kerosineManager.add(address(wstEth));
 
-    vaultManager.setKeroseneManager(kerosineManager);
-
     kerosineManager.transferOwnership(MAINNET_OWNER);
 
     UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
@@ -92,10 +90,10 @@ contract DeployV2 is Script, Parameters {
     unboundedKerosineVault.transferOwnership(MAINNET_OWNER);
     boundedKerosineVault.  transferOwnership(MAINNET_OWNER);
 
-    vaultLicenser.add(address(ethVault));
-    vaultLicenser.add(address(wstEth));
-    vaultLicenser.add(address(unboundedKerosineVault));
-    // vaultLicenser.add(address(boundedKerosineVault));
+    vaultLicenser.add(address(ethVault), false);
+    vaultLicenser.add(address(wstEth),   false);
+    vaultLicenser.add(address(unboundedKerosineVault), true);
+    // vaultLicenser.add(address(boundedKerosineVault), true);
 
     vaultLicenser.transferOwnership(MAINNET_OWNER);
 

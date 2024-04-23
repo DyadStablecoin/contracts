@@ -19,13 +19,13 @@ contract V2Test is BaseTestV2 {
 
   function test_LicenseVaults() public {
     vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.ethVault));
+    contracts.vaultLicenser.add(address(contracts.ethVault), false);
     vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.wstEth));
+    contracts.vaultLicenser.add(address(contracts.wstEth), false);
     vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.unboundedKerosineVault));
+    contracts.vaultLicenser.add(address(contracts.unboundedKerosineVault), true);
     vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.boundedKerosineVault));
+    contracts.vaultLicenser.add(address(contracts.boundedKerosineVault), true);
   }
 
   function test_KeroseneVaults() public {
