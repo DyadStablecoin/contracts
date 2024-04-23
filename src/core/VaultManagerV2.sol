@@ -3,19 +3,16 @@ pragma solidity =0.8.17;
 
 import {DNft}            from "./DNft.sol";
 import {Dyad}            from "./Dyad.sol";
-import {Licenser}        from "./Licenser.sol";
 import {VaultLicenser}   from "./VaultLicenser.sol";
 import {Vault}           from "./Vault.sol";
 import {IVaultManager}   from "../interfaces/IVaultManager.sol";
-import {KerosineManager} from "../../src/core/KerosineManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 import {EnumerableSet}     from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import {Initializable}     from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
 
-contract VaultManagerV2 is IVaultManager, Initializable {
+contract VaultManagerV2 is IVaultManager {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
