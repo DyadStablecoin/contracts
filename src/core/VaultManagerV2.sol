@@ -82,7 +82,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     uint    amount
   ) 
     external 
-      isValidDNft(id)
+      isDNftOwner(id)
   {
     lastDeposit[id] = block.number;
     Vault _vault = Vault(vault);
