@@ -17,9 +17,9 @@ contract VaultManagerV2 is IVaultManager {
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
 
-  uint public constant MAX_VAULTS                = 6;
-  uint public constant MIN_COLLATERIZATION_RATIO = 1.5e18; // 150%
-  uint public constant LIQUIDATION_REWARD        = 0.2e18; //  20%
+  uint public constant MAX_VAULTS         = 6;
+  uint public constant MIN_COLLAT_RATIO   = 1.5e18; // 150% // Collaterization
+  uint public constant LIQUIDATION_REWARD = 0.2e18; //  20%
 
   DNft          public immutable dNft;
   Dyad          public immutable dyad;
@@ -101,14 +101,10 @@ contract VaultManagerV2 is IVaultManager {
     Vault _vault = Vault(vault);
     _vault.withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    uint value = amount * _vault.assetPrice() 
-                  * 1e18 
-                  / 10**_vault.oracle().decimals() 
-                  / 10**_vault.asset() .decimals();
     uint mintedDyad = dyad.mintedDyad(address(this), id);
-    if (exoValue - value < mintedDyad)  revert NotEnoughExoCollat();
+    if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
-    if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
+    if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
   }
 
   /// @inheritdoc IVaultManager
@@ -123,9 +119,9 @@ contract VaultManagerV2 is IVaultManager {
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
     uint mintedDyad = dyad.mintedDyad(address(this), id);
-    if (exoValue < mintedDyad)          revert NotEnoughExoCollat();
+    if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
-    if (cr < MIN_COLLATERIZATION_RATIO) revert CrTooLow(); 
+    if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
     emit MintDyad(id, amount, to);
   }
 
@@ -172,7 +168,7 @@ contract VaultManagerV2 is IVaultManager {
       isValidDNft(to)
     {
       uint cr = collatRatio(id);
-      if (cr >= MIN_COLLATERIZATION_RATIO) revert CrTooHigh();
+      if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       dyad.burn(id, msg.sender, dyad.mintedDyad(address(this), id));
 
       uint cappedCr               = cr < 1e18 ? 1e18 : cr;
