@@ -15,6 +15,8 @@ contract BaseTestV2 is Modifiers, Parameters {
   Contracts contracts;
   ERC20 weth;
 
+  uint constant ETH_TO_USD = 3545;
+
   uint DNFT_ID_0_OWNER_0;
   uint DNFT_ID_1_OWNER_0;
   uint DNFT_ID_0_OWNER_1;
@@ -51,6 +53,10 @@ contract BaseTestV2 is Modifiers, Parameters {
     Licenser licenser = Licenser(MAINNET_VAULT_MANAGER_LICENSER);
     vm.prank(MAINNET_OWNER);
     licenser.add(address(contracts.vaultManager));
+  }
+
+  function _ethToUSD(uint eth) public pure returns (uint) {
+    return eth * ETH_TO_USD;
   }
 
   // --- RECEIVER ---

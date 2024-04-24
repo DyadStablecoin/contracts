@@ -9,6 +9,12 @@ import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
 import {IVault}              from "../../src/interfaces/IVault.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
+/**
+Notes: Fork test 
+  - block 19621640
+  - $3,545.56 / ETH
+*/
+
 contract V2Test is BaseTestV2 {
 
   function test_LicenseVaultManager() public {
@@ -132,6 +138,32 @@ contract V2Test is BaseTestV2 {
   {
     assertEq(contracts.ethVault.id2asset(DNFT_ID_0_OWNER_0), 0 ether);
   }
+
+  /// @dev Test fails because the withdarwl of 1 Ether will put it under the CR
+  ///      limit.
+  function test_FailWithdrawCrTooLow() 
+    public 
+      mintDNft0Owner0 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 10 ether)
+      skipBlock(1) // is not actually needed
+      mintDyad(_ethToUSD(6.55 ether)) 
+      skipBlock(1)
+      nextCallFails(IVaultManager.CrTooLow.selector)
+      withdraw(contracts.ethVault, 1 ether)
+  {}
+
+  function test_FailWithdrawNotEnoughExoCollateral() 
+    public 
+      mintDNft0Owner0 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 10 ether)
+      skipBlock(1) // is not actually needed
+      mintDyad(_ethToUSD(6.55 ether)) 
+      skipBlock(1)
+      nextCallFails(IVaultManager.NotEnoughExoCollat.selector)
+      withdraw(contracts.ethVault, 5 ether)
+  {}
 
   /// @dev Test fails because deposit and withdraw are in the same block
   ///      which is forbidden to prevent flash loan attacks.
