@@ -118,6 +118,27 @@ contract V2Test is BaseTestV2 {
     assertEq(contracts.ethVault.id2asset(DNFT_ID_0_OWNER_0), 100 ether);
   }
 
+  modifier burnDyad(uint id, uint amount) {
+    contracts.vaultManager.burnDyad(id, amount);
+    _;
+  }
+
+  function test_BurnAllDyad() 
+    public 
+      mintDNft0Owner0 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      mintDyad(_ethToUSD(10 ether))
+      burnDyad(DNFT_ID_0_OWNER_0, _ethToUSD(10 ether))
+  {
+    uint mintedDyad = contracts.dyad.mintedDyad(
+      address(contracts.vaultManager),
+      DNFT_ID_0_OWNER_0
+    );
+    assertEq(mintedDyad, 0);
+    assertEq(contracts.dyad.balanceOf(address(this)), 0);
+  }
+
   modifier withdraw(IVault vault, uint amount) {
     contracts.vaultManager.withdraw(
       DNFT_ID_0_OWNER_0,
@@ -128,6 +149,7 @@ contract V2Test is BaseTestV2 {
     _;
   }
 
+  /// @dev All collateral can be withdrawn if no DYAD was minted
   function test_WithdrawEverythingWithoutMintingDyad() 
     public 
       mintDNft0Owner0 
@@ -137,6 +159,19 @@ contract V2Test is BaseTestV2 {
       withdraw(contracts.ethVault, 100 ether)
   {
     assertEq(contracts.ethVault.id2asset(DNFT_ID_0_OWNER_0), 0 ether);
+  }
+
+  function test_WithdrawSomeEthAfterMintingDyad() 
+    public 
+      mintDNft0Owner0 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      skipBlock(1)
+      mintDyad(_ethToUSD(2 ether)) 
+      skipBlock(1)
+      withdraw(contracts.ethVault, 22 ether)
+  {
+    assertEq(contracts.ethVault.id2asset(DNFT_ID_0_OWNER_0), 100 ether - 22 ether);
   }
 
   /// @dev Test fails because the withdarwl of 1 Ether will put it under the CR
