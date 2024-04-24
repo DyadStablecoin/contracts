@@ -131,12 +131,55 @@ contract V2Test is BaseTestV2 {
       mintDyad(_ethToUSD(10 ether))
       burnDyad(DNFT_ID_0_OWNER_0, _ethToUSD(10 ether))
   {
-    uint mintedDyad = contracts.dyad.mintedDyad(
-      address(contracts.vaultManager),
-      DNFT_ID_0_OWNER_0
-    );
-    assertEq(mintedDyad, 0);
+    assertEq(getMintedDyad(DNFT_ID_0_OWNER_0), 0);
     assertEq(contracts.dyad.balanceOf(address(this)), 0);
+  }
+
+  function test_BurnSomeDyad() 
+    public 
+      mintDNft0Owner0 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      mintDyad(_ethToUSD(10 ether))
+      burnDyad(DNFT_ID_0_OWNER_0, _ethToUSD(1 ether))
+  {
+    assertEq(getMintedDyad(DNFT_ID_0_OWNER_0), _ethToUSD(10 ether - 1 ether));
+  }
+
+  function test_BurnSomeDyadAndMintSomeDyad() 
+    public 
+      mintDNft0Owner0 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      mintDyad(_ethToUSD(10 ether))
+      burnDyad(DNFT_ID_0_OWNER_0, _ethToUSD(1 ether))
+      mintDyad(_ethToUSD(1 ether))
+  {
+    assertEq(getMintedDyad(DNFT_ID_0_OWNER_0), _ethToUSD(
+      10 ether - 1 ether + 1 ether
+    ));
+  }
+
+  modifier redeemDyad(uint id, IVault vault, uint amount) {
+    contracts.vaultManager.redeemDyad(
+      id,
+      address(vault),
+      amount,
+      address(this)
+    );
+    _;
+  }
+
+  function test_RedeemDyad() 
+    public 
+      mintDNft0Owner0 
+      addVault(contracts.ethVault)
+      deposit(contracts.ethVault, 100 ether)
+      mintDyad(_ethToUSD(10 ether))
+      skipBlock(1)
+      redeemDyad(DNFT_ID_0_OWNER_0, contracts.ethVault, _ethToUSD(10 ether))
+  {
+    assertTrue(contracts.ethVault.id2asset(DNFT_ID_0_OWNER_0) < 100 ether);
   }
 
   modifier withdraw(IVault vault, uint amount) {

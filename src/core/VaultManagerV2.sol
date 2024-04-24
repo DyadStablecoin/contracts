@@ -103,11 +103,11 @@ contract VaultManagerV2 is IVaultManager {
     Vault _vault = Vault(vault);
     _vault.withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    console.log("exo (post withdraw): ", exoValue, "kero (post withdraw): ", keroValue);
     uint mintedDyad = dyad.mintedDyad(address(this), id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
+    console.log("post withdraw --- cr: ", cr/1e15, "exo: ", exoValue/1e18);
   }
 
   /// @inheritdoc IVaultManager
@@ -124,8 +124,8 @@ contract VaultManagerV2 is IVaultManager {
     uint mintedDyad = dyad.mintedDyad(address(this), id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
-    console.log("cr: ", cr, "MIN_COLLAT_RATIO: ", MIN_COLLAT_RATIO);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
+    console.log("post mint --- cr: ", cr/1e15, "exo: ", exoValue/1e18);
     emit MintDyad(id, amount, to);
   }
 

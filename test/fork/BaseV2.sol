@@ -55,8 +55,13 @@ contract BaseTestV2 is Modifiers, Parameters {
     licenser.add(address(contracts.vaultManager));
   }
 
+  // -- helpers --
   function _ethToUSD(uint eth) public pure returns (uint) {
     return eth * ETH_TO_USD;
+  }
+
+  function getMintedDyad(uint id) public view returns (uint) {
+    return contracts.dyad.mintedDyad(address(contracts.vaultManager), id);
   }
 
   // --- RECEIVER ---
