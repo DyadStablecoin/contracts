@@ -17,7 +17,7 @@ contract BaseTestV2 is Modifiers, Parameters {
   Contracts contracts;
   ERC20 weth;
 
-  uint constant ETH_TO_USD = 3545;
+  uint constant ETH_TO_USD = 350326000000; // 1e8
 
   uint alice0;
   uint alice1;
@@ -59,7 +59,7 @@ contract BaseTestV2 is Modifiers, Parameters {
 
   // -- helpers --
   function _ethToUSD(uint eth) public pure returns (uint) {
-    return eth * ETH_TO_USD;
+    return eth * ETH_TO_USD / 1e8;
   }
 
   function getMintedDyad(uint id) public view returns (uint) {
@@ -86,5 +86,4 @@ contract BaseTestV2 is Modifiers, Parameters {
   ) external pure returns (bytes4) {
     return 0x150b7a02;
   }
-
 }

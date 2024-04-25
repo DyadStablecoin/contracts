@@ -329,8 +329,9 @@ contract V2Test is BaseTestV2 {
     uint oldCr = contracts.vaultManager.collatRatio(alice0);
     console.log("oldCr", oldCr);
 
-    // magic
-    setAsset(alice0, address(contracts.ethVault), 2 ether);
+    /// @dev We manually set the asset `alice0` dNft has to 1 Ether to make
+    ///      its Collat Ratio 100% and thus liquidatable.
+    setAsset(alice0, address(contracts.ethVault), 1 ether);
 
     uint newAssets = contracts.ethVault.id2asset(alice0);
     console.log("newAssets", newAssets);
