@@ -4,7 +4,7 @@ ifdef FILE
   matchFile = --match-contract $(FILE)
 endif
 ifdef FUNC
-  matchFunction = --match $(FUNC)
+  matchFunction = --match-test $(FUNC)
 endif
 
 test = forge test $(matchFile) $(matchFunction)
@@ -85,4 +85,8 @@ mDeployV2:
 	forge script script/deploy/Deploy.V2.s.sol --rpc-url $(MAINNET_RPC) --sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A --broadcast --verify -i 1 -vvvv --via-ir --optimize
 
 forkTestV2:
-	forge test $(matchFile) $(matchFunction) --fork-url $(MAINNET_RPC) --fork-block-number 19621640 -vv
+	forge test $(matchFile) $(matchFunction) \
+		--fork-url $(MAINNET_RPC) \
+		--fork-block-number 19621640 \
+		--etherscan-api-key $(ETHERSCAN_API_KEY) \
+		-vv

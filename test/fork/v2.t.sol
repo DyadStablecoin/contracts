@@ -321,6 +321,14 @@ contract V2Test is BaseTestV2 {
       deposit (bob0, contracts.ethVault, 100 ether)
       mintDyad(bob0, _ethToUSD(50 ether))
   {
+    uint oldPrice = contracts.ethVault.getUsdValue(alice0);
+    console.log("oldPrice", oldPrice);
+
+    vm.rollFork(19721640);
+
+    uint newPrice = contracts.ethVault.getUsdValue(alice0);
+    console.log("newPrice", newPrice);
+
     // assertEq(contracts.dyad.balanceOf(address(this)), 1e18);
   }
 }
