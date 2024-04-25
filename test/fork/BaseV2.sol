@@ -17,7 +17,7 @@ contract BaseTestV2 is Modifiers, Parameters {
   Contracts contracts;
   ERC20 weth;
 
-  uint constant ETH_TO_USD = 350326000000; // 1e8
+  uint ETH_TO_USD; // 1e8
 
   uint alice0;
   uint alice1;
@@ -31,6 +31,8 @@ contract BaseTestV2 is Modifiers, Parameters {
     contracts = new DeployV2().run();
     weth      = ERC20(MAINNET_WETH);
     alice     = address(this);
+
+    ETH_TO_USD = contracts.ethVault.assetPrice();
 
     licenseVauleManager();
   }
@@ -58,7 +60,7 @@ contract BaseTestV2 is Modifiers, Parameters {
   }
 
   // -- helpers --
-  function _ethToUSD(uint eth) public pure returns (uint) {
+  function _ethToUSD(uint eth) public view returns (uint) {
     return eth * ETH_TO_USD / 1e8;
   }
 
