@@ -8,16 +8,20 @@ import {Parameters}          from "../../src/params/Parameters.sol";
 import {Licenser}            from "../../src/core/Licenser.sol";
 import {Modifiers}           from "../Modifiers.sol";
 import {DeployV2, Contracts} from "../../script/deploy/Deploy.V2.s.sol";
+import {IVault}              from "../../src/interfaces/IVault.sol";
 
-import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
+import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 
 contract BaseTestV2 is Modifiers, Parameters {
-  using stdStorage for StdStorage;
+  using stdStorage        for StdStorage;
+  using FixedPointMathLib for uint;
 
   Contracts contracts;
   ERC20 weth;
 
   uint ETH_TO_USD; // 1e8
+  uint MIN_COLLAT_RATIO;
 
   uint alice0;
   uint alice1;
@@ -32,7 +36,8 @@ contract BaseTestV2 is Modifiers, Parameters {
     weth      = ERC20(MAINNET_WETH);
     alice     = address(this);
 
-    ETH_TO_USD = contracts.ethVault.assetPrice();
+    ETH_TO_USD       = contracts.ethVault.assetPrice();
+    MIN_COLLAT_RATIO = contracts.vaultManager.MIN_COLLAT_RATIO();
 
     licenseVauleManager();
   }
@@ -68,8 +73,12 @@ contract BaseTestV2 is Modifiers, Parameters {
     return contracts.dyad.mintedDyad(address(contracts.vaultManager), id);
   }
 
+  function getCR(uint id) public view returns (uint) {
+    return contracts.vaultManager.collatRatio(id);
+  }
+
   // -- storage manipulation --
-  function setAsset(uint id, address vault, uint amount) public {
+  function changeCollat(uint id, address vault, uint amount) public {
     stdstore
       .target(vault)
       .sig("id2asset(uint256)")
@@ -81,11 +90,11 @@ contract BaseTestV2 is Modifiers, Parameters {
   receive() external payable {}
 
   function onERC721Received(
-    address,
-    address,
-    uint256,
-    bytes calldata
+      address,
+      address,
+      uint256,
+      bytes calldata
   ) external pure returns (bytes4) {
-    return 0x150b7a02;
+      return 0x150b7a02;
   }
 }

@@ -321,22 +321,7 @@ contract V2Test is BaseTestV2 {
       deposit (bob0, contracts.ethVault, 100 ether)
       mintDyad(bob0, _ethToUSD(50 ether))
   {
-    console.log("MIN_COLLATERIZATION_RATIO", 1.5e18);
-
-    uint oldAssets = contracts.ethVault.id2asset(alice0);
-    console.log("oldAssets", oldAssets);
-
-    uint oldCr = contracts.vaultManager.collatRatio(alice0);
-    console.log("oldCr", oldCr);
-
-    /// @dev We manually set the asset `alice0` dNft has to 1 Ether to make
-    ///      its Collat Ratio 100% and thus liquidatable.
-    setAsset(alice0, address(contracts.ethVault), 1 ether);
-
-    uint newAssets = contracts.ethVault.id2asset(alice0);
-    console.log("newAssets", newAssets);
-
-    uint newCr = contracts.vaultManager.collatRatio(alice0);
-    console.log("newCr", newCr);
+    changeCollat(alice0, address(contracts.ethVault), 1.2 ether);
+    require(getCR(alice0) < MIN_COLLAT_RATIO, "CR is too high");
   }
 }
