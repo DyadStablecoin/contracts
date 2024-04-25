@@ -17,28 +17,28 @@ contract BaseTestV2 is Modifiers, Parameters {
 
   uint constant ETH_TO_USD = 3545;
 
-  uint DNFT_ID_0_OWNER_0;
-  uint DNFT_ID_1_OWNER_0;
-  uint DNFT_ID_0_OWNER_1;
-  uint DNFT_ID_1_OWNER_1;
+  uint alice0;
+  uint alice1;
+  uint bob0;
+  uint bob1;
 
-  address OWNER_0;
-  address OWNER_1 = address(0x42);
+  address alice;
+  address bob = address(0x42);
 
   function setUp() public {
     contracts = new DeployV2().run();
     weth      = ERC20(MAINNET_WETH);
-    OWNER_0   = address(this);
+    alice     = address(this);
 
     licenseVauleManager();
   }
 
-  // --- OWNER_0 ---
-  modifier mintDNft0Owner0() { DNFT_ID_0_OWNER_0 = mintDNft(address(this)); _; }
-  modifier mintDNft1Owner0() { DNFT_ID_1_OWNER_0 = mintDNft(address(this)); _; }
-  // --- OWNER_1 ---
-  modifier mintDNft0Owner1() { DNFT_ID_0_OWNER_1 = mintDNft(OWNER_1); _; }
-  modifier mintDNft1Owner1() { DNFT_ID_1_OWNER_1 = mintDNft(OWNER_1); _; }
+  // --- alice ---
+  modifier mintAlice0() { alice0 = mintDNft(address(this)); _; }
+  modifier mintAlice1() { alice1 = mintDNft(address(this)); _; }
+  // --- bob ---
+  modifier mintBob0() { bob0 = mintDNft(bob); _; }
+  modifier mintBob1() { bob1 = mintDNft(bob); _; }
 
   function mintDNft(address owner) public returns(uint id) {
     uint startPrice    = contracts.dNft.START_PRICE();
