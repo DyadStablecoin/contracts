@@ -315,13 +315,37 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.ethVault)
       deposit (alice0, contracts.ethVault, 100 ether)
       mintDyad(alice0, _ethToUSD(1 ether))
+
       // Bob Position
       mintBob0 
       addVault(bob0, contracts.ethVault)
       deposit (bob0, contracts.ethVault, 100 ether)
       mintDyad(bob0, _ethToUSD(50 ether))
   {
+    // puts dNft under the CR limit
     changeCollat(alice0, address(contracts.ethVault), 1.2 ether);
-    require(getCR(alice0) < MIN_COLLAT_RATIO, "CR is too high");
+
+    uint ethBefore_Liquidatee = contracts.ethVault.id2asset(alice0);
+    uint ethBefore_Liquidator = contracts.ethVault.id2asset(bob0);
+    uint dyadBefore_Liquidatee = contracts.dyad.mintedDyad(
+                                  address(contracts.vaultManager), alice0);
+
+    assertTrue(dyadBefore_Liquidatee > 0);
+
+    deal(address(contracts.dyad), bob, _ethToUSD(1 ether));
+    vm.prank(bob);
+
+    contracts.vaultManager.liquidate(alice0, bob0);
+
+    uint ethAfter_Liquidatee  = contracts.ethVault.id2asset(alice0);
+    uint ethAfter_Liquidator  = contracts.ethVault.id2asset(bob0);
+    uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(
+                                  address(contracts.vaultManager), alice0);
+
+    assertTrue(ethAfter_Liquidatee < ethBefore_Liquidatee);
+    assertTrue(ethAfter_Liquidator > ethBefore_Liquidator);
+
+    assertEq(getCR(alice0), type(uint256).max);
+    assertEq(dyadAfter_Liquidatee, 0);
   }
 }
