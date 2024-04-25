@@ -321,14 +321,21 @@ contract V2Test is BaseTestV2 {
       deposit (bob0, contracts.ethVault, 100 ether)
       mintDyad(bob0, _ethToUSD(50 ether))
   {
-    uint oldPrice = contracts.ethVault.getUsdValue(alice0);
-    console.log("oldPrice", oldPrice);
+    console.log("MIN_COLLATERIZATION_RATIO", 1.5e18);
 
-    vm.rollFork(19721640);
+    uint oldAssets = contracts.ethVault.id2asset(alice0);
+    console.log("oldAssets", oldAssets);
 
-    uint newPrice = contracts.ethVault.getUsdValue(alice0);
-    console.log("newPrice", newPrice);
+    uint oldCr = contracts.vaultManager.collatRatio(alice0);
+    console.log("oldCr", oldCr);
 
-    // assertEq(contracts.dyad.balanceOf(address(this)), 1e18);
+    // magic
+    setAsset(alice0, address(contracts.ethVault), 2 ether);
+
+    uint newAssets = contracts.ethVault.id2asset(alice0);
+    console.log("newAssets", newAssets);
+
+    uint newCr = contracts.vaultManager.collatRatio(alice0);
+    console.log("newCr", newCr);
   }
 }

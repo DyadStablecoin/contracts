@@ -12,6 +12,8 @@ import {DeployV2, Contracts} from "../../script/deploy/Deploy.V2.s.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract BaseTestV2 is Modifiers, Parameters {
+  using stdStorage for StdStorage;
+
   Contracts contracts;
   ERC20 weth;
 
@@ -62,6 +64,15 @@ contract BaseTestV2 is Modifiers, Parameters {
 
   function getMintedDyad(uint id) public view returns (uint) {
     return contracts.dyad.mintedDyad(address(contracts.vaultManager), id);
+  }
+
+  // -- storage manipulation --
+  function setAsset(uint id, address vault, uint amount) public {
+    stdstore
+      .target(vault)
+      .sig("id2asset(uint256)")
+      .with_key(id)
+      .checked_write(amount);
   }
 
   // --- RECEIVER ---
