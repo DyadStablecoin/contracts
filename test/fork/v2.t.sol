@@ -77,6 +77,7 @@ contract V2Test is BaseTestV2 {
   }
 
   modifier addVault(uint id, IVault vault) {
+    vm.prank(contracts.dNft.ownerOf(id));
     contracts.vaultManager.add(id, address(vault));
     _;
   }
@@ -102,10 +103,15 @@ contract V2Test is BaseTestV2 {
   }
 
   modifier deposit(uint id, IVault vault, uint amount) {
+    address owner = contracts.dNft.ownerOf(id);
+    vm.startPrank(owner);
+
     ERC20 asset = vault.asset();
-    deal(address(asset), address(this), amount);
+    deal(address(asset), owner, amount);
     asset.approve(address(contracts.vaultManager), amount);
-    contracts.vaultManager.deposit(alice0, address(vault), amount);
+    contracts.vaultManager.deposit(id, address(vault), amount);
+
+    vm.stopPrank();
     _;
   }
 
@@ -118,6 +124,15 @@ contract V2Test is BaseTestV2 {
     assertEq(contracts.ethVault.id2asset(alice0), 100 ether);
   }
 
+  function test_DepositBob() 
+    public 
+      mintBob0 
+      addVault(bob0, contracts.ethVault)
+      deposit (bob0, contracts.ethVault, 100 ether)
+  {
+    assertEq(contracts.ethVault.id2asset(bob0), 100 ether);
+  }
+
   modifier burnDyad(uint id, uint amount) {
     contracts.vaultManager.burnDyad(id, amount);
     _;
@@ -128,7 +143,7 @@ contract V2Test is BaseTestV2 {
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 100 ether)
-      mintDyad(_ethToUSD(10 ether))
+      mintDyad(alice0, _ethToUSD(10 ether))
       burnDyad(alice0, _ethToUSD(10 ether))
   {
     assertEq(getMintedDyad(alice0), 0);
@@ -140,7 +155,7 @@ contract V2Test is BaseTestV2 {
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 100 ether)
-      mintDyad(_ethToUSD(10 ether))
+      mintDyad(alice0, _ethToUSD(10 ether))
       burnDyad(alice0, _ethToUSD(1 ether))
   {
     assertEq(getMintedDyad(alice0), _ethToUSD(10 ether - 1 ether));
@@ -151,9 +166,9 @@ contract V2Test is BaseTestV2 {
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 100 ether)
-      mintDyad(_ethToUSD(10 ether))
+      mintDyad(alice0, _ethToUSD(10 ether))
       burnDyad(alice0, _ethToUSD(1 ether))
-      mintDyad(_ethToUSD(1 ether))
+      mintDyad(alice0, _ethToUSD(1 ether))
   {
     assertEq(getMintedDyad(alice0), _ethToUSD(
       10 ether - 1 ether + 1 ether
@@ -175,7 +190,7 @@ contract V2Test is BaseTestV2 {
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 100 ether)
-      mintDyad(_ethToUSD(10 ether))
+      mintDyad(alice0, _ethToUSD(10 ether))
       skipBlock(1)
       redeemDyad(alice0, contracts.ethVault, _ethToUSD(10 ether))
   {
@@ -210,7 +225,7 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 100 ether)
       skipBlock(1)
-      mintDyad(_ethToUSD(2 ether)) 
+      mintDyad(alice0, _ethToUSD(2 ether)) 
       skipBlock(1)
       withdraw(contracts.ethVault, 22 ether)
   {
@@ -225,7 +240,7 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 10 ether)
       skipBlock(1) // is not actually needed
-      mintDyad(_ethToUSD(6.55 ether)) 
+      mintDyad(alice0, _ethToUSD(6.55 ether)) 
       skipBlock(1)
       nextCallFails(IVaultManager.CrTooLow.selector)
       withdraw(contracts.ethVault, 1 ether)
@@ -237,7 +252,7 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 10 ether)
       skipBlock(1) // is not actually needed
-      mintDyad(_ethToUSD(6.55 ether)) 
+      mintDyad(alice0, _ethToUSD(6.55 ether)) 
       skipBlock(1)
       nextCallFails(IVaultManager.NotEnoughExoCollat.selector)
       withdraw(contracts.ethVault, 5 ether)
@@ -255,8 +270,9 @@ contract V2Test is BaseTestV2 {
       withdraw(contracts.ethVault, 100 ether)
   {}
 
-  modifier mintDyad(uint amount) {
-    contracts.vaultManager.mintDyad(alice0, amount, address(this));
+  modifier mintDyad(uint id, uint amount) {
+    vm.prank(contracts.dNft.ownerOf(id));
+    contracts.vaultManager.mintDyad(id, amount, address(this));
     _;
   }
 
@@ -265,7 +281,7 @@ contract V2Test is BaseTestV2 {
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 100 ether)
-      mintDyad(1e18)
+      mintDyad(alice0, 1e18)
   {
     assertEq(contracts.dyad.balanceOf(address(this)), 1e18);
   }
@@ -284,7 +300,7 @@ contract V2Test is BaseTestV2 {
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit (alice0, contracts.ethVault, 100 ether)
-      mintDyad(1e18)
+      mintDyad(alice0, _ethToUSD(1 ether))
   {
     /// @dev Before minting DYAD every DNft has the highest possible CR which 
     ///      is equal to type(uint).max. After minting DYAD the CR should be
@@ -298,9 +314,12 @@ contract V2Test is BaseTestV2 {
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit (alice0, contracts.ethVault, 100 ether)
-      mintDyad(1e18)
+      mintDyad(alice0, _ethToUSD(1 ether))
       // Bob Position
       mintBob0 
+      addVault(bob0, contracts.ethVault)
+      deposit (bob0, contracts.ethVault, 100 ether)
+      mintDyad(bob0, _ethToUSD(50 ether))
   {
     // assertEq(contracts.dyad.balanceOf(address(this)), 1e18);
   }
