@@ -225,6 +225,8 @@ contract V2Test is BaseTestV2 {
   function test_WithdrawAllKerosene() 
     public 
       mintAlice0 
+      addVault(alice0, contracts.ethVault)
+      deposit (alice0, contracts.ethVault, 100 ether)
       addVault(alice0, contracts.unboundedKerosineVault)
       deposit (alice0, contracts.unboundedKerosineVault, 200e18)
       skipBlock(1)
@@ -323,7 +325,7 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.ethVault)
       deposit (alice0, contracts.ethVault, 100 ether)
       mintDyad(alice0, _ethToUSD(1 ether))
-      changeCollat(alice0, contracts.ethVault, 1.2 ether)
+      changeAsset(alice0, contracts.ethVault, 1.2 ether)
 
       // bob
       mintBob0 
@@ -349,7 +351,7 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.ethVault)
       deposit (alice0, contracts.ethVault, 100 ether)
       mintDyad(alice0, _ethToUSD(1 ether))
-      changeCollat(alice0, contracts.ethVault, 1.2 ether)
+      changeAsset(alice0, contracts.ethVault, 1.2 ether)
 
       liquidate(alice0, RANDOM_NUMBER_0, bob)
   {}
@@ -361,7 +363,7 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.ethVault)
       deposit (alice0, contracts.ethVault, 100 ether)
       mintDyad(alice0, _ethToUSD(1 ether))
-      changeCollat(alice0, contracts.ethVault, 1.2 ether)
+      changeAsset(alice0, contracts.ethVault, 1.2 ether)
 
       liquidate(RANDOM_NUMBER_0, alice0, alice)
   {}

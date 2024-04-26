@@ -8,6 +8,7 @@ import {VaultManagerV2}         from "../../src/core/VaultManagerV2.sol";
 import {DNft}                   from "../../src/core/DNft.sol";
 import {Dyad}                   from "../../src/core/Dyad.sol";
 import {VaultLicenser}          from "../../src/core/VaultLicenser.sol";
+import {Licenser}               from "../../src/core/Licenser.sol";
 import {Vault}                  from "../../src/core/Vault.sol";
 import {VaultWstEth}            from "../../src/core/Vault.wsteth.sol";
 import {IWETH}                  from "../../src/interfaces/IWETH.sol";
@@ -39,14 +40,20 @@ contract DeployV2 is Script, Parameters {
   function run() public returns (Contracts memory) {
     vm.startBroadcast();  // ----------------------
 
+    Licenser vaultManagerLicenser = new Licenser();
+
+    Dyad dyad = new Dyad(vaultManagerLicenser);
+
     VaultLicenser vaultLicenser = new VaultLicenser();
 
     // Vault Manager needs to be licensed through the Vault Manager Licenser
     VaultManagerV2 vaultManager = new VaultManagerV2(
       DNft(MAINNET_DNFT),
-      Dyad(MAINNET_DYAD),
+      dyad,
       vaultLicenser
     );
+
+    vaultManagerLicenser.add(address(vaultManager));
 
     // weth vault
     Vault ethVault = new Vault(
@@ -74,7 +81,7 @@ contract DeployV2 is Script, Parameters {
     UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
       vaultManager,
       Kerosine(MAINNET_KEROSENE), 
-      Dyad    (MAINNET_DYAD),
+      dyad,
       kerosineManager, 
       keroseneOracle
     );
@@ -107,7 +114,7 @@ contract DeployV2 is Script, Parameters {
 
     return Contracts(
       DNft(MAINNET_DNFT),
-      Dyad(MAINNET_DYAD),
+      dyad,
       Kerosine(MAINNET_KEROSENE),
       vaultLicenser,
       vaultManager,

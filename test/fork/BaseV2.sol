@@ -80,16 +80,16 @@ contract BaseTestV2 is Modifiers, Parameters {
   }
 
   // -- storage manipulation --
-  function _changeCollat(uint id, IVault vault, uint amount) public {
+  function _changeAsset(uint id, IVault vault, uint amount) public {
     stdstore
       .target(address(vault))
       .sig("id2asset(uint256)")
       .with_key(id)
       .checked_write(amount);
   }
-  modifier changeCollat(uint id, IVault vault, uint amount) {
-    _changeCollat(id, vault, amount); _; }
 
+  // Manually set the Collaterization Ratio of a dNft by changing the the asset
+  // of the vault.
   function changeCollatRatio(uint id, IVault vault, uint newCr) public {
     uint debt  = getMintedDyad(id);
     uint value = newCr.mulWadDown(debt);
@@ -98,10 +98,15 @@ contract BaseTestV2 is Modifiers, Parameters {
                   / vault.assetPrice() 
                   / 1e18;
 
-    _changeCollat(id, vault, asset);
+    _changeAsset(id, vault, asset);
   }
 
   // --- modifiers ---
+  modifier changeAsset(uint id, IVault vault, uint amount) {
+    _changeAsset(id, vault, amount); 
+    _;
+  }
+
   modifier deposit(uint id, IVault vault, uint amount) {
     address owner = contracts.dNft.ownerOf(id);
     vm.startPrank(owner);
