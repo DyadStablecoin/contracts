@@ -76,12 +76,6 @@ contract V2Test is BaseTestV2 {
     assertEq(contracts.dNft.balanceOf(alice), 2);
   }
 
-  modifier addVault(uint id, IVault vault) {
-    vm.prank(contracts.dNft.ownerOf(id));
-    contracts.vaultManager.add(id, address(vault));
-    _;
-  }
-
   function test_AddVault() 
     public 
       mintAlice0 
@@ -100,19 +94,6 @@ contract V2Test is BaseTestV2 {
     address[] memory vaults = contracts.vaultManager.getVaults(alice0);
     assertEq(vaults[0], address(contracts.ethVault));
     assertEq(vaults[1], address(contracts.wstEth));
-  }
-
-  modifier deposit(uint id, IVault vault, uint amount) {
-    address owner = contracts.dNft.ownerOf(id);
-    vm.startPrank(owner);
-
-    ERC20 asset = vault.asset();
-    deal(address(asset), owner, amount);
-    asset.approve(address(contracts.vaultManager), amount);
-    contracts.vaultManager.deposit(id, address(vault), amount);
-
-    vm.stopPrank();
-    _;
   }
 
   function test_Deposit() 

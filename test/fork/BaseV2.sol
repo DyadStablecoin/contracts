@@ -89,6 +89,26 @@ contract BaseTestV2 is Modifiers, Parameters {
   modifier changeCollat(uint id, IVault vault, uint amount) {
     _changeCollat(id, vault, amount); _; }
 
+  // --- modifiers ---
+  modifier deposit(uint id, IVault vault, uint amount) {
+    address owner = contracts.dNft.ownerOf(id);
+    vm.startPrank(owner);
+
+    ERC20 asset = vault.asset();
+    deal(address(asset), owner, amount);
+    asset.approve(address(contracts.vaultManager), amount);
+    contracts.vaultManager.deposit(id, address(vault), amount);
+
+    vm.stopPrank();
+    _;
+  }
+
+  modifier addVault(uint id, IVault vault) {
+    vm.prank(contracts.dNft.ownerOf(id));
+    contracts.vaultManager.add(id, address(vault));
+    _;
+  }
+
   // --- RECEIVER ---
   receive() external payable {}
 
