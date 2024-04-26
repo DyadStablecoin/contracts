@@ -88,5 +88,4 @@ forkTestV2:
 	forge test $(matchFile) $(matchFunction) \
 		--fork-url $(MAINNET_RPC) \
 		--fork-block-number 19621640 \
-		--etherscan-api-key $(ETHERSCAN_API_KEY) \
 		-vv

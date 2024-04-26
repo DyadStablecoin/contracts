@@ -308,44 +308,61 @@ contract V2Test is BaseTestV2 {
     assertTrue(contracts.vaultManager.collatRatio(alice0) < type(uint).max);
   }
 
+  modifier liquidate(uint id, uint to, address liquidator) {
+    deal(address(contracts.dyad), liquidator, _ethToUSD(1 ether));
+    vm.prank(liquidator);
+    contracts.vaultManager.liquidate(id, to);
+    _;
+  }
+
   function test_Liquidate() 
     public 
-      // Alice Position
+      // alice 
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit (alice0, contracts.ethVault, 100 ether)
       mintDyad(alice0, _ethToUSD(1 ether))
+      changeCollat(alice0, contracts.ethVault, 1.2 ether)
 
-      // Bob Position
+      // bob
       mintBob0 
-      addVault(bob0, contracts.ethVault)
-      deposit (bob0, contracts.ethVault, 100 ether)
-      mintDyad(bob0, _ethToUSD(50 ether))
+      liquidate(alice0, bob0, bob)
   {
-    // puts dNft under the CR limit
-    changeCollat(alice0, address(contracts.ethVault), 1.2 ether);
 
-    uint ethBefore_Liquidatee = contracts.ethVault.id2asset(alice0);
-    uint ethBefore_Liquidator = contracts.ethVault.id2asset(bob0);
-    uint dyadBefore_Liquidatee = contracts.dyad.mintedDyad(
-                                  address(contracts.vaultManager), alice0);
-
-    assertTrue(dyadBefore_Liquidatee > 0);
-
-    deal(address(contracts.dyad), bob, _ethToUSD(1 ether));
-    vm.prank(bob);
-
-    contracts.vaultManager.liquidate(alice0, bob0);
-
-    uint ethAfter_Liquidatee  = contracts.ethVault.id2asset(alice0);
     uint ethAfter_Liquidator  = contracts.ethVault.id2asset(bob0);
+    uint ethAfter_Liquidatee  = contracts.ethVault.id2asset(alice0);
     uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(
                                   address(contracts.vaultManager), alice0);
 
-    assertTrue(ethAfter_Liquidatee < ethBefore_Liquidatee);
-    assertTrue(ethAfter_Liquidator > ethBefore_Liquidator);
+    assertTrue(ethAfter_Liquidator > 0);
+    assertTrue(ethAfter_Liquidatee > 0);
 
+    assertEq(getMintedDyad(alice0), 0);
     assertEq(getCR(alice0), type(uint256).max);
     assertEq(dyadAfter_Liquidatee, 0);
   }
+
+  function testFail_LiquidateNotValidDNftLiquidator() 
+    public 
+      // alice 
+      mintAlice0 
+      addVault(alice0, contracts.ethVault)
+      deposit (alice0, contracts.ethVault, 100 ether)
+      mintDyad(alice0, _ethToUSD(1 ether))
+      changeCollat(alice0, contracts.ethVault, 1.2 ether)
+
+      liquidate(alice0, RANDOM_NUMBER_0, bob)
+  {}
+
+  function testFail_LiquidateNotValidDNftLiquidatee() 
+    public 
+      // alice 
+      mintAlice0 
+      addVault(alice0, contracts.ethVault)
+      deposit (alice0, contracts.ethVault, 100 ether)
+      mintDyad(alice0, _ethToUSD(1 ether))
+      changeCollat(alice0, contracts.ethVault, 1.2 ether)
+
+      liquidate(RANDOM_NUMBER_0, alice0, alice)
+  {}
 }

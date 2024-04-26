@@ -22,6 +22,7 @@ contract BaseTestV2 is Modifiers, Parameters {
 
   uint ETH_TO_USD; // 1e8
   uint MIN_COLLAT_RATIO;
+  uint RANDOM_NUMBER_0 = 471966444;
 
   uint alice0;
   uint alice1;
@@ -78,13 +79,15 @@ contract BaseTestV2 is Modifiers, Parameters {
   }
 
   // -- storage manipulation --
-  function changeCollat(uint id, address vault, uint amount) public {
+  function _changeCollat(uint id, IVault vault, uint amount) public {
     stdstore
-      .target(vault)
+      .target(address(vault))
       .sig("id2asset(uint256)")
       .with_key(id)
       .checked_write(amount);
   }
+  modifier changeCollat(uint id, IVault vault, uint amount) {
+    _changeCollat(id, vault, amount); _; }
 
   // --- RECEIVER ---
   receive() external payable {}
