@@ -187,9 +187,9 @@ contract V2Test is BaseTestV2 {
     assertTrue(contracts.ethVault.id2asset(alice0) < 100 ether);
   }
 
-  modifier withdraw(IVault vault, uint amount) {
+  modifier withdraw(uint id, IVault vault, uint amount) {
     contracts.vaultManager.withdraw(
-      alice0,
+      id,
       address(vault),
       amount,
       address(this)
@@ -204,7 +204,7 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.ethVault)
       deposit(alice0, contracts.ethVault, 100 ether)
       skipBlock(1)
-      withdraw(contracts.ethVault, 100 ether)
+      withdraw(alice0, contracts.ethVault, 100 ether)
   {
     assertEq(contracts.ethVault.id2asset(alice0), 0 ether);
   }
@@ -217,7 +217,7 @@ contract V2Test is BaseTestV2 {
       skipBlock(1)
       mintDyad(alice0, _ethToUSD(2 ether)) 
       skipBlock(1)
-      withdraw(contracts.ethVault, 22 ether)
+      withdraw(alice0, contracts.ethVault, 22 ether)
   {
     assertEq(contracts.ethVault.id2asset(alice0), 100 ether - 22 ether);
   }
@@ -228,7 +228,7 @@ contract V2Test is BaseTestV2 {
       addVault(alice0, contracts.unboundedKerosineVault)
       deposit (alice0, contracts.unboundedKerosineVault, 200e18)
       skipBlock(1)
-      withdraw(contracts.unboundedKerosineVault, 200e18)
+      withdraw(alice0, contracts.unboundedKerosineVault, 200e18)
   {
     assertEq(contracts.unboundedKerosineVault.id2asset(alice0), 0);
   }
@@ -244,7 +244,7 @@ contract V2Test is BaseTestV2 {
       mintDyad(alice0, _ethToUSD(6.55 ether)) 
       skipBlock(1)
       nextCallFails(IVaultManager.CrTooLow.selector)
-      withdraw(contracts.ethVault, 1 ether)
+      withdraw(alice0, contracts.ethVault, 1 ether)
   {}
 
   function test_FailWithdrawNotEnoughExoCollateral() 
@@ -256,7 +256,7 @@ contract V2Test is BaseTestV2 {
       mintDyad(alice0, _ethToUSD(6.55 ether)) 
       skipBlock(1)
       nextCallFails(IVaultManager.NotEnoughExoCollat.selector)
-      withdraw(contracts.ethVault, 5 ether)
+      withdraw(alice0, contracts.ethVault, 5 ether)
   {}
 
   /// @dev Test fails because deposit and withdraw are in the same block
@@ -268,7 +268,7 @@ contract V2Test is BaseTestV2 {
       deposit(alice0, contracts.ethVault, 100 ether)
       // skipBlock(1)
       nextCallFails(IVaultManager.CanNotWithdrawInSameBlock.selector)
-      withdraw(contracts.ethVault, 100 ether)
+      withdraw(alice0, contracts.ethVault, 100 ether)
   {}
 
   modifier mintDyad(uint id, uint amount) {
