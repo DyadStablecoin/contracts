@@ -119,9 +119,18 @@ contract V2Test is BaseTestV2 {
     public 
       mintAlice0 
       addVault(alice0, contracts.ethVault)
-      deposit(alice0, contracts.ethVault, 100 ether)
+      deposit (alice0, contracts.ethVault, 100 ether)
   {
     assertEq(contracts.ethVault.id2asset(alice0), 100 ether);
+  }
+
+  function test_DepositKerosene() 
+    public 
+      mintAlice0 
+      addVault(alice0, contracts.unboundedKerosineVault)
+      deposit (alice0, contracts.unboundedKerosineVault, 200e18)
+  {
+    assertEq(contracts.unboundedKerosineVault.id2asset(alice0), 200e18);
   }
 
   function test_DepositBob() 
@@ -230,6 +239,17 @@ contract V2Test is BaseTestV2 {
       withdraw(contracts.ethVault, 22 ether)
   {
     assertEq(contracts.ethVault.id2asset(alice0), 100 ether - 22 ether);
+  }
+
+  function test_WithdrawAllKerosene() 
+    public 
+      mintAlice0 
+      addVault(alice0, contracts.unboundedKerosineVault)
+      deposit (alice0, contracts.unboundedKerosineVault, 200e18)
+      skipBlock(1)
+      withdraw(contracts.unboundedKerosineVault, 200e18)
+  {
+    assertEq(contracts.unboundedKerosineVault.id2asset(alice0), 0);
   }
 
   /// @dev Test fails because the withdarwl of 1 Ether will put it under the CR
