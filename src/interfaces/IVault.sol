@@ -22,4 +22,5 @@ interface IVault {
   function getUsdValue(uint id) external view returns (uint);
   function asset      () external view returns (ERC20);
   function oracle     () external view returns (IAggregatorV3);
+  function assetPrice () external view returns (uint);
 }

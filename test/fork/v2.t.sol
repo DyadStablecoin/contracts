@@ -329,7 +329,6 @@ contract V2Test is BaseTestV2 {
       mintBob0 
       liquidate(alice0, bob0, bob)
   {
-
     uint ethAfter_Liquidator  = contracts.ethVault.id2asset(bob0);
     uint ethAfter_Liquidatee  = contracts.ethVault.id2asset(alice0);
     uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(

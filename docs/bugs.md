@@ -7,3 +7,7 @@
 7) in `deposit` only by dnft owner because ddos
 8) `withdraw` + `deposit` in same block seems to be a problem
 9) in `withdraw` we need to check `getNonKeroseneValue` after withdrawing
+
+## Findings
+
+1) 

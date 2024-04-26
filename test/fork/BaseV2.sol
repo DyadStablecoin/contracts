@@ -22,6 +22,7 @@ contract BaseTestV2 is Modifiers, Parameters {
 
   uint ETH_TO_USD; // 1e8
   uint MIN_COLLAT_RATIO;
+
   uint RANDOM_NUMBER_0 = 471966444;
 
   uint alice0;
@@ -88,6 +89,17 @@ contract BaseTestV2 is Modifiers, Parameters {
   }
   modifier changeCollat(uint id, IVault vault, uint amount) {
     _changeCollat(id, vault, amount); _; }
+
+  function changeCollatRatio(uint id, IVault vault, uint newCr) public {
+    uint debt  = getMintedDyad(id);
+    uint value = newCr.mulWadDown(debt);
+    uint asset = value 
+                  * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
+                  / vault.assetPrice() 
+                  / 1e18;
+
+    _changeCollat(id, vault, asset);
+  }
 
   // --- modifiers ---
   modifier deposit(uint id, IVault vault, uint amount) {
