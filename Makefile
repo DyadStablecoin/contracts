@@ -89,3 +89,11 @@ forkTestV2:
 		--fork-url $(MAINNET_RPC) \
 		--fork-block-number 19621640 \
 		-vv
+
+testV2:
+	forge clean
+	forge test \
+		--match-contract V2 \
+		--fork-url $(MAINNET_RPC) \
+		--fork-block-number 19621640 \
+		-vv
