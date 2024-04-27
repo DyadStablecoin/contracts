@@ -48,8 +48,6 @@ contract DeployV2 is Script, Parameters {
 
     VaultLicenser vaultLicenser = new VaultLicenser();
 
-    // Vault Manager needs to be licensed through the Vault Manager Licenser
-    VaultManagerV2 vaultManager = VaultManagerV2(address(0));
 
     address proxy = Upgrades.deployUUPSProxy(
       "VaultManagerV2.sol",
@@ -58,6 +56,8 @@ contract DeployV2 is Script, Parameters {
         (DNft(MAINNET_DNFT), dyad, vaultLicenser)
       )
     );
+
+    VaultManagerV2 vaultManager = VaultManagerV2(address(proxy));
 
     vaultManagerLicenser.add(address(vaultManager));
 
