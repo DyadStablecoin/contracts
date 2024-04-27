@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 
@@ -20,7 +20,8 @@ import {KeroseneOracle}         from "../../src/core/KeroseneOracle.sol";
 import {Kerosine}               from "../../src/staking/Kerosine.sol";
 import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol";
 
-import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
+import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 struct Contracts {
   DNft                   dNft;
@@ -44,14 +45,19 @@ contract DeployV2 is Script, Parameters {
 
     Dyad dyad = new Dyad(vaultManagerLicenser);
 
+
     VaultLicenser vaultLicenser = new VaultLicenser();
 
-    // Vault Manager needs to be licensed through the Vault Manager Licenser
-    VaultManagerV2 vaultManager = new VaultManagerV2(
-      DNft(MAINNET_DNFT),
-      dyad,
-      vaultLicenser
+
+    address proxy = Upgrades.deployUUPSProxy(
+      "VaultManagerV2.sol",
+      abi.encodeCall(
+        VaultManagerV2.initialize,
+        (DNft(MAINNET_DNFT), dyad, vaultLicenser)
+      )
     );
+
+    VaultManagerV2 vaultManager = VaultManagerV2(address(proxy));
 
     vaultManagerLicenser.add(address(vaultManager));
 
