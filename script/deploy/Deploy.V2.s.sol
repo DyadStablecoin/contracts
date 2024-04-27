@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 
@@ -20,7 +20,8 @@ import {KeroseneOracle}         from "../../src/core/KeroseneOracle.sol";
 import {Kerosine}               from "../../src/staking/Kerosine.sol";
 import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol";
 
-import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
+import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 struct Contracts {
   DNft                   dNft;
