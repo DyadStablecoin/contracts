@@ -14,7 +14,9 @@ import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 import {EnumerableSet}     from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-contract VaultManagerV2 is IVaultManager {
+import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+
+contract VaultManagerV2 is IVaultManager, Initializable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
@@ -23,9 +25,9 @@ contract VaultManagerV2 is IVaultManager {
   uint public constant MIN_COLLAT_RATIO   = 1.5e18; // 150% // Collaterization
   uint public constant LIQUIDATION_REWARD = 0.2e18; //  20%
 
-  DNft          public immutable dNft;
-  Dyad          public immutable dyad;
-  VaultLicenser public immutable vaultLicenser;
+  DNft          public dNft;
+  Dyad          public dyad;
+  VaultLicenser public vaultLicenser;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
   mapping (uint/* id */ => uint/* block */)  public   lastDeposit;
@@ -37,11 +39,14 @@ contract VaultManagerV2 is IVaultManager {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
 
-  constructor(
+  function initialize(
     DNft          _dNft,
     Dyad          _dyad,
     VaultLicenser _vaultLicenser
-  ) {
+  ) 
+    public 
+      initializer 
+  {
     dNft          = _dNft;
     dyad          = _dyad;
     vaultLicenser = _vaultLicenser;
