@@ -388,6 +388,18 @@ contract V2Test is BaseTestV2 {
       mintBob0 
       // liquidate(alice0, bob0, bob)
   {
+    uint crBefore = getCR(alice0);
+    console.log("crBefore: ", crBefore/1e15);
+
+    uint debtBefore = getMintedDyad(alice0);
+    console.log("debtBefore: ", debtBefore/1e18);
+
     contracts.vaultManager.partialLiquidate(alice0, bob0, _ethToUSD(10 ether));
+
+    uint crAfter = getCR(alice0);
+    console.log("crAfter: ", crAfter/1e15);
+
+    uint debtAfter = getMintedDyad(alice0);
+    console.log("debtAfter: ", debtAfter/1e18);
   }
 }

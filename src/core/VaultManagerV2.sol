@@ -206,10 +206,41 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     {
       uint cr = collatRatio(id);
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
+
+      uint debt = dyad.mintedDyad(address(this), id);
+
       dyad.burn(id, msg.sender, amount);
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
+      uint collatSum;
+      uint numberOfVaults = vaults[id].length();
+      for (uint i = 0; i < numberOfVaults; i++) {
+          Vault vault = Vault(vaults[id].at(i));
+          uint collat = vault.getUsdValue(id);
+          console.log("collat: ", collat);
+          collatSum += collat;
+      }
+      console.log("collatSum: ", collatSum);
+
+      uint reward_rate = amount.divWadDown(debt);
+      reward_rate      = reward_rate.mulWadDown(LIQUIDATION_REWARD);
+      console.log("reward_rate: ", reward_rate);
+
+      for (uint i = 0; i < numberOfVaults; i++) {
+          Vault vault = Vault(vaults[id].at(i));
+          uint p = vault.getUsdValue(id).divWadDown(collatSum);
+          console.log("p: ", p);
+
+          uint d = p.mulWadDown(amount);
+          console.log("d: ", d);
+          
+          uint reward = d.mulWadDown(reward_rate);
+          console.log("reward: ", reward);
+
+          uint collat_to_move = d + reward;
+          console.log("collat_to_move: ", collat_to_move);
+      }
       emit Liquidate(id, msg.sender, to);
   }
 
