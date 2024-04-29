@@ -180,6 +180,8 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       dyad.burn(id, msg.sender, dyad.mintedDyad(address(this), id));
 
+      lastDeposit[to] = block.number; // `move` acts like a deposit
+
       uint cappedCr               = cr < 1e18 ? 1e18 : cr;
       uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
       uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
