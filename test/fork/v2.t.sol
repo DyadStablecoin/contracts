@@ -386,10 +386,8 @@ contract V2Test is BaseTestV2 {
 
       // bob
       mintBob0 
-      liquidate(alice0, bob0, bob)
+      // liquidate(alice0, bob0, bob)
   {
-    uint cr = getCR(alice0);
-    console.log("CR: ", cr);
-
+    contracts.vaultManager.partialLiquidate(alice0, bob0, _ethToUSD(10 ether));
   }
 }

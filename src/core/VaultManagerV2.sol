@@ -195,6 +195,24 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       emit Liquidate(id, msg.sender, to);
   }
 
+  function partialLiquidate(
+    uint id,
+    uint to,
+    uint amount
+  ) 
+    external 
+      isValidDNft(id)
+      isValidDNft(to)
+    {
+      uint cr = collatRatio(id);
+      if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
+      dyad.burn(id, msg.sender, amount);
+
+      lastDeposit[to] = block.number; // `move` acts like a deposit
+
+      emit Liquidate(id, msg.sender, to);
+  }
+
   function collatRatio(
     uint id
   )
