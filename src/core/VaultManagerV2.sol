@@ -39,6 +39,8 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
 
+  constructor() { _disableInitializers(); }
+
   function initialize(
     DNft          _dNft,
     Dyad          _dyad,
