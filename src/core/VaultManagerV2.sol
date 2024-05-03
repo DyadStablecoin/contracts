@@ -159,9 +159,8 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       dyad.burn(id, msg.sender, amount);
       Vault _vault = Vault(vault);
       uint asset = amount 
-                    * (10**(_vault.oracle().decimals() + _vault.asset().decimals())) 
-                    / _vault.assetPrice() 
-                    / 1e18;
+                    * 1e18
+                    / _vault.assetPrice();
       withdraw(id, vault, asset, to);
       emit RedeemDyad(id, vault, amount, to);
       return asset;
