@@ -228,7 +228,8 @@ contract VaultManagerV2 is IVaultManager, Initializable {
                          * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
                          / vault.assetPrice() 
                          / 1e18;
-          uint cappedAsset = value < asset ? value : asset;
+          uint availableAsset = vault.id2asset(id);
+          uint cappedAsset    = asset > availableAsset ? availableAsset : asset;
 
           vault.move(id, to, cappedAsset);
       }
