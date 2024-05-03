@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/console.sol";
-
 import {DNft}            from "./DNft.sol";
 import {Dyad}            from "./Dyad.sol";
 import {VaultLicenser}   from "./VaultLicenser.sol";
@@ -114,7 +112,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
-    console.log("post withdraw --- cr: ", cr/1e15, "exo: ", exoValue/1e18);
   }
 
   /// @inheritdoc IVaultManager
@@ -132,7 +129,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
-    console.log("post mint --- cr: ", cr/1e15, "exo: ", exoValue/1e18);
     emit MintDyad(id, amount, to);
   }
 

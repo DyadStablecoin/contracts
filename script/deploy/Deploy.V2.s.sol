@@ -49,16 +49,12 @@ contract DeployV2 is Script, Parameters {
 
     VaultLicenser vaultLicenser = new VaultLicenser();
 
-    Options memory opts;
-    opts.unsafeSkipAllChecks = true;
-
     address proxy = Upgrades.deployUUPSProxy(
       "VaultManagerV2.sol",
       abi.encodeCall(
         VaultManagerV2.initialize,
         (DNft(MAINNET_DNFT), dyad, vaultLicenser)
-      ),
-      opts
+      )
     );
 
     VaultManagerV2 vaultManager = VaultManagerV2(address(proxy));
