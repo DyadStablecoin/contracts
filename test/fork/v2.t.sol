@@ -333,8 +333,7 @@ contract V2Test is BaseTestV2 {
   {
     uint ethAfter_Liquidator  = contracts.ethVault.id2asset(bob0);
     uint ethAfter_Liquidatee  = contracts.ethVault.id2asset(alice0);
-    uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(
-                                  address(contracts.vaultManager), alice0);
+    uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(alice0);
 
     assertTrue(ethAfter_Liquidator > 0);
     assertTrue(ethAfter_Liquidatee > 0);

@@ -108,7 +108,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     Vault _vault = Vault(vault);
     _vault.withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    uint mintedDyad = dyad.mintedDyad(address(this), id);
+    uint mintedDyad = dyad.mintedDyad(id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
@@ -125,7 +125,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   {
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    uint mintedDyad = dyad.mintedDyad(address(this), id);
+    uint mintedDyad = dyad.mintedDyad(id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
@@ -176,7 +176,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     {
       uint cr = collatRatio(id);
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
-      dyad.burn(id, msg.sender, dyad.mintedDyad(address(this), id));
+      dyad.burn(id, msg.sender, dyad.mintedDyad(id));
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
@@ -203,7 +203,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       isValidDNft(to)
     {
       if (collatRatio(id) >= MIN_COLLAT_RATIO) revert CrTooHigh();
-      uint debt = dyad.mintedDyad(address(this), id);
+      uint debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
@@ -238,7 +238,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     public 
     view
     returns (uint) {
-      uint mintedDyad = dyad.mintedDyad(address(this), id);
+      uint mintedDyad = dyad.mintedDyad(id);
       uint totalValue = getTotalValue(id);
       return _collatRatio(mintedDyad, totalValue);
   }
