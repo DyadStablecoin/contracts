@@ -8,8 +8,8 @@ import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
 contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
   Licenser public immutable licenser;  
 
-  // vault manager => (dNFT ID => dyad)
-  mapping (address => mapping (uint => uint)) public mintedDyad; 
+  // dNFT ID => dyad
+  mapping (uint => uint) public mintedDyad; 
 
   constructor(
     Licenser _licenser
@@ -31,7 +31,7 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
       licensedVaultManager 
     {
       _mint(to, amount);
-      mintedDyad[msg.sender][id] += amount;
+      mintedDyad[id] += amount;
   }
 
   /// @inheritdoc IDyad
@@ -43,6 +43,6 @@ contract Dyad is ERC20("DYAD Stable", "DYAD", 18), IDyad {
       licensedVaultManager 
     {
       _burn(from, amount);
-      mintedDyad[msg.sender][id] -= amount;
+      mintedDyad[id] -= amount;
   }
 }
