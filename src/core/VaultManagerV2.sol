@@ -7,16 +7,17 @@ import {VaultLicenser}   from "./VaultLicenser.sol";
 import {Vault}           from "./Vault.sol";
 import {IVaultManager}   from "../interfaces/IVaultManager.sol";
 
-import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
-import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
-import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
-import {Owned}             from "@solmate/src/auth/Owned.sol";
-import {EnumerableSet}     from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {FixedPointMathLib}  from "@solmate/src/utils/FixedPointMathLib.sol";
+import {ERC20}              from "@solmate/src/tokens/ERC20.sol";
+import {SafeTransferLib}    from "@solmate/src/utils/SafeTransferLib.sol";
 
-import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {EnumerableSet}      from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
-contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, Owned(msg.sender) {
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Initializable}      from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
+contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
@@ -39,6 +40,13 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, Owned(msg.sender) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
 
+  /**
+   * @notice Prevents implementation contract from being initialized 
+   * @dev See: https://docs.openzeppelin.com/contracts/4.x/api/proxy#Initializable-_disableInitializers--
+   * @custom:oz-upgrades-unsafe-allow constructor
+   */
+  constructor() { _disableInitializers(); }
+
   function initialize(
     DNft          _dNft,
     Dyad          _dyad,
@@ -47,6 +55,8 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, Owned(msg.sender) {
     public 
       initializer 
   {
+     __UUPSUpgradeable_init();
+
     dNft          = _dNft;
     dyad          = _dyad;
     vaultLicenser = _vaultLicenser;
@@ -286,6 +296,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, Owned(msg.sender) {
     internal 
     override 
   {
-    require(msg.sender == owner, "VaultManagerV2: not owner");
+    require(msg.sender == owner(), "VaultManagerV2: not owner");
   }
 }
