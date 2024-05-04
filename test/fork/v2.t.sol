@@ -5,6 +5,7 @@ import "forge-std/console.sol";
 
 import {BaseTestV2}          from "./BaseV2.sol";
 import {Licenser}            from "../../src/core/Licenser.sol";
+import {VaultManagerV2}      from "../../src/core/VaultManagerV2.sol";
 import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
 import {IVault}              from "../../src/interfaces/IVault.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -400,5 +401,24 @@ contract V2Test is BaseTestV2 {
 
     uint debtAfter = getMintedDyad(alice0);
     console.log("debtAfter: ", debtAfter/1e18);
+  }
+
+  function test_UpgradeVaultManager() 
+    public 
+  {
+    VaultManagerV2 newVaultManager = new VaultManagerV2();
+
+    vm.prank(MAINNET_OWNER);
+    contracts.vaultManager.upgradeToAndCall(
+      address(newVaultManager),
+      abi.encodeCall(
+        VaultManagerV2.initialize,
+        (
+          contracts.dNft,
+          contracts.dyad,
+          contracts.vaultLicenser
+        )
+      )
+    );
   }
 }
