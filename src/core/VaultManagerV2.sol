@@ -10,11 +10,13 @@ import {IVaultManager}   from "../interfaces/IVaultManager.sol";
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
+import {Owned}             from "@solmate/src/auth/Owned.sol";
 import {EnumerableSet}     from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import {Initializable} from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract VaultManagerV2 is IVaultManager, Initializable {
+contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, Owned(msg.sender) {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
@@ -36,8 +38,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   modifier isValidDNft(uint id) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
-
-  constructor() { _disableInitializers(); }
 
   function initialize(
     DNft          _dNft,
@@ -262,7 +262,6 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   }
 
   // ----------------- MISC ----------------- //
-
   function getVaults(
     uint id
   ) 
@@ -280,5 +279,13 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     view 
     returns (bool) {
       return vaults[id].contains(vault);
+  }
+
+  // ----------------- UPGRADABILITY ----------------- //
+  function _authorizeUpgrade(address newImplementation) 
+    internal 
+    override 
+  {
+    require(msg.sender == owner, "VaultManagerV2: not owner");
   }
 }
