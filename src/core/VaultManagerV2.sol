@@ -224,13 +224,13 @@ contract VaultManagerV2 is IVaultManager, Initializable {
           uint share       = value.divWadDown(totalValue);
           uint amountShare = share.mulWadDown(amount);
           uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
-          uint asset = valueToMove 
+          uint cappedValue = valueToMove > value ? value : valueToMove;
+          uint asset = cappedValue 
                          * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
                          / vault.assetPrice() 
                          / 1e18;
-          uint cappedAsset = value < asset ? value : asset;
 
-          vault.move(id, to, cappedAsset);
+          vault.move(id, to, asset);
       }
 
       emit Liquidate(id, msg.sender, to);
