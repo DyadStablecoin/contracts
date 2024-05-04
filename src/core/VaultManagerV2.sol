@@ -14,7 +14,6 @@ import {SafeTransferLib}    from "@solmate/src/utils/SafeTransferLib.sol";
 import {EnumerableSet}      from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import {Initializable}      from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
@@ -55,7 +54,8 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     public 
       initializer 
   {
-     __UUPSUpgradeable_init();
+    __Ownable_init(msg.sender);
+    __UUPSUpgradeable_init();
 
     dNft          = _dNft;
     dyad          = _dyad;
