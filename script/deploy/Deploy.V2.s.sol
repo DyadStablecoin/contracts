@@ -46,7 +46,6 @@ contract DeployV2 is Script, Parameters {
 
     Dyad dyad = new Dyad(vaultManagerLicenser);
 
-
     VaultLicenser vaultLicenser = new VaultLicenser();
 
     address proxy = Upgrades.deployUUPSProxy(
@@ -57,7 +56,7 @@ contract DeployV2 is Script, Parameters {
       )
     );
 
-    VaultManagerV2 vaultManager = VaultManagerV2(address(proxy));
+    VaultManagerV2 vaultManager = VaultManagerV2(proxy);
 
     vaultManagerLicenser.add(address(vaultManager));
 

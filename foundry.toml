@@ -6,10 +6,10 @@ out = 'out'
 libs = ['lib']
 
 # copy/pasta from https://docs.openzeppelin.com/upgrades-plugins/1.x/foundry-upgrades
-# ffi = true
-# ast = true
-# build_info = true
-# extra_output = ["storageLayout"]
+ffi = true
+ast = true
+build_info = true
+extra_output = ["storageLayout"]
 
 viaIR = true 
 # optimizer_runs = 1_000_000

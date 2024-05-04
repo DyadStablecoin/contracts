@@ -10,6 +10,9 @@
 10) `setUnboundedKerosineVault` needs to be called in the deployment script
 11) Protocol assumes 1 Dyad = 1 USD
 
+!!!! deployUUPSProxy is wrong!
+
+
 ## Findings
 
 1) 
