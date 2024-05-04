@@ -312,9 +312,9 @@ contract V2Test is BaseTestV2 {
   }
 
   modifier liquidate(uint id, uint to, address liquidator) {
-    deal(address(contracts.dyad), liquidator, _ethToUSD(1 ether));
+    deal(address(contracts.dyad), liquidator, _ethToUSD(getMintedDyad(id)));
     vm.prank(liquidator);
-    contracts.vaultManager.liquidate(id, to);
+    contracts.vaultManager.liquidate(id, to, getMintedDyad(id));
     _;
   }
 
@@ -333,8 +333,7 @@ contract V2Test is BaseTestV2 {
   {
     uint ethAfter_Liquidator  = contracts.ethVault.id2asset(bob0);
     uint ethAfter_Liquidatee  = contracts.ethVault.id2asset(alice0);
-    uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(
-                                  address(contracts.vaultManager), alice0);
+    uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(alice0);
 
     assertTrue(ethAfter_Liquidator > 0);
     assertTrue(ethAfter_Liquidatee > 0);
@@ -367,4 +366,39 @@ contract V2Test is BaseTestV2 {
 
       liquidate(RANDOM_NUMBER_0, alice0, alice)
   {}
+
+  function test_LiquidatePartial() 
+    public 
+      // alice 
+      mintAlice0 
+      
+      addVault(alice0, contracts.ethVault)
+      deposit (alice0, contracts.ethVault, 100 ether)
+
+      addVault(alice0, contracts.wstEth)
+      deposit (alice0, contracts.wstEth, 100 ether)
+
+      mintDyad(alice0, _ethToUSD(50 ether))
+
+      changeAsset(alice0, contracts.ethVault, 50 ether)
+      changeAsset(alice0, contracts.wstEth,   10 ether)
+
+      // bob
+      mintBob0 
+      // liquidate(alice0, bob0, bob)
+  {
+    uint crBefore = getCR(alice0);
+    console.log("crBefore: ", crBefore/1e15);
+
+    uint debtBefore = getMintedDyad(alice0);
+    console.log("debtBefore: ", debtBefore/1e18);
+
+    contracts.vaultManager.liquidate(alice0, bob0, _ethToUSD(10 ether));
+
+    uint crAfter = getCR(alice0);
+    console.log("crAfter: ", crAfter/1e15);
+
+    uint debtAfter = getMintedDyad(alice0);
+    console.log("debtAfter: ", debtAfter/1e18);
+  }
 }

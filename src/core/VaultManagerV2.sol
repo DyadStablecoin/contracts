@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/console.sol";
-
 import {DNft}            from "./DNft.sol";
 import {Dyad}            from "./Dyad.sol";
 import {VaultLicenser}   from "./VaultLicenser.sol";
@@ -38,6 +36,8 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   modifier isValidDNft(uint id) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
+
+  constructor() { _disableInitializers(); }
 
   function initialize(
     DNft          _dNft,
@@ -108,11 +108,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     Vault _vault = Vault(vault);
     _vault.withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    uint mintedDyad = dyad.mintedDyad(address(this), id);
+    uint mintedDyad = dyad.mintedDyad(id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
-    console.log("post withdraw --- cr: ", cr/1e15, "exo: ", exoValue/1e18);
   }
 
   /// @inheritdoc IVaultManager
@@ -126,11 +125,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   {
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    uint mintedDyad = dyad.mintedDyad(address(this), id);
+    uint mintedDyad = dyad.mintedDyad(id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
-    console.log("post mint --- cr: ", cr/1e15, "exo: ", exoValue/1e18);
     emit MintDyad(id, amount, to);
   }
 
@@ -167,31 +165,42 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       return asset;
   }
 
-  /// @inheritdoc IVaultManager
   function liquidate(
     uint id,
-    uint to
+    uint to,
+    uint amount
   ) 
     external 
       isValidDNft(id)
       isValidDNft(to)
     {
-      uint cr = collatRatio(id);
-      if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
-      dyad.burn(id, msg.sender, dyad.mintedDyad(address(this), id));
+      if (collatRatio(id) >= MIN_COLLAT_RATIO) revert CrTooHigh();
+      uint debt = dyad.mintedDyad(id);
+      dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
-      uint cappedCr               = cr < 1e18 ? 1e18 : cr;
-      uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
-      uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
+      uint totalValue  = getTotalValue(id);
+      uint reward_rate = amount
+                          .divWadDown(debt)
+                          .mulWadDown(LIQUIDATION_REWARD);
 
       uint numberOfVaults = vaults[id].length();
       for (uint i = 0; i < numberOfVaults; i++) {
-          Vault vault      = Vault(vaults[id].at(i));
-          uint  collateral = vault.id2asset(id).mulWadUp(liquidationAssetShare);
-          vault.move(id, to, collateral);
+          Vault vault = Vault(vaults[id].at(i));
+          uint value       = vault.getUsdValue(id);
+          uint share       = value.divWadDown(totalValue);
+          uint amountShare = share.mulWadDown(amount);
+          uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
+          uint cappedValue = valueToMove > value ? value : valueToMove;
+          uint asset = cappedValue 
+                         * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
+                         / vault.assetPrice() 
+                         / 1e18;
+
+          vault.move(id, to, asset);
       }
+
       emit Liquidate(id, msg.sender, to);
   }
 
@@ -201,7 +210,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     public 
     view
     returns (uint) {
-      uint mintedDyad = dyad.mintedDyad(address(this), id);
+      uint mintedDyad = dyad.mintedDyad(id);
       uint totalValue = getTotalValue(id);
       return _collatRatio(mintedDyad, totalValue);
   }

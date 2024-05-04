@@ -22,6 +22,7 @@ import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol"
 
 import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
+import {Options}  from "openzeppelin-foundry-upgrades/Options.sol";
 
 struct Contracts {
   DNft                   dNft;
@@ -47,7 +48,6 @@ contract DeployV2 is Script, Parameters {
 
 
     VaultLicenser vaultLicenser = new VaultLicenser();
-
 
     address proxy = Upgrades.deployUUPSProxy(
       "VaultManagerV2.sol",

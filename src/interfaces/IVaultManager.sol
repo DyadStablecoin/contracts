@@ -86,5 +86,5 @@ interface IVaultManager {
    * @param id The ID of the dNFT to be liquidated.
    * @param to The address where the collateral will be sent.
    */
-  function liquidate(uint id, uint to) external;
+  // function liquidate(uint id, uint to, uint amount) external;
 }

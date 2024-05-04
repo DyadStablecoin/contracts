@@ -7,6 +7,8 @@
 7) in `deposit` only by dnft owner because ddos
 8) `withdraw` + `deposit` in same block seems to be a problem
 9) in `withdraw` we need to check `getNonKeroseneValue` after withdrawing
+10) `setUnboundedKerosineVault` needs to be called in the deployment script
+11) Protocol assumes 1 Dyad = 1 USD
 
 ## Findings
 
