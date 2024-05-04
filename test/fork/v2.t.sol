@@ -314,7 +314,7 @@ contract V2Test is BaseTestV2 {
   modifier liquidate(uint id, uint to, address liquidator) {
     deal(address(contracts.dyad), liquidator, _ethToUSD(getMintedDyad(id)));
     vm.prank(liquidator);
-    contracts.vaultManager.liquidate(id, to);
+    contracts.vaultManager.liquidate(id, to, getMintedDyad(id));
     _;
   }
 
@@ -394,7 +394,7 @@ contract V2Test is BaseTestV2 {
     uint debtBefore = getMintedDyad(alice0);
     console.log("debtBefore: ", debtBefore/1e18);
 
-    contracts.vaultManager.partialLiquidate(alice0, bob0, _ethToUSD(10 ether));
+    contracts.vaultManager.liquidate(alice0, bob0, _ethToUSD(10 ether));
 
     uint crAfter = getCR(alice0);
     console.log("crAfter: ", crAfter/1e15);
