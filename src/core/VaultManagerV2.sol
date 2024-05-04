@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/console.sol";
-
 import {DNft}            from "./DNft.sol";
 import {Dyad}            from "./Dyad.sol";
 import {VaultLicenser}   from "./VaultLicenser.sol";
@@ -110,11 +108,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     Vault _vault = Vault(vault);
     _vault.withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    uint mintedDyad = dyad.mintedDyad(address(this), id);
+    uint mintedDyad = dyad.mintedDyad(id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
-    console.log("post withdraw --- cr: ", cr/1e15, "exo: ", exoValue/1e18);
   }
 
   /// @inheritdoc IVaultManager
@@ -128,11 +125,10 @@ contract VaultManagerV2 is IVaultManager, Initializable {
   {
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
     (uint exoValue, uint keroValue) = getVaultsValues(id);
-    uint mintedDyad = dyad.mintedDyad(address(this), id);
+    uint mintedDyad = dyad.mintedDyad(id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
-    console.log("post mint --- cr: ", cr/1e15, "exo: ", exoValue/1e18);
     emit MintDyad(id, amount, to);
   }
 
@@ -179,7 +175,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
       isValidDNft(to)
     {
       if (collatRatio(id) >= MIN_COLLAT_RATIO) revert CrTooHigh();
-      uint debt = dyad.mintedDyad(address(this), id);
+      uint debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
@@ -196,13 +192,13 @@ contract VaultManagerV2 is IVaultManager, Initializable {
           uint share       = value.divWadDown(totalValue);
           uint amountShare = share.mulWadDown(amount);
           uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
-          uint asset = valueToMove 
+          uint cappedValue = valueToMove > value ? value : valueToMove;
+          uint asset = cappedValue 
                          * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
                          / vault.assetPrice() 
                          / 1e18;
-          uint cappedAsset = value < asset ? value : asset;
 
-          vault.move(id, to, cappedAsset);
+          vault.move(id, to, asset);
       }
 
       emit Liquidate(id, msg.sender, to);
@@ -214,7 +210,7 @@ contract VaultManagerV2 is IVaultManager, Initializable {
     public 
     view
     returns (uint) {
-      uint mintedDyad = dyad.mintedDyad(address(this), id);
+      uint mintedDyad = dyad.mintedDyad(id);
       uint totalValue = getTotalValue(id);
       return _collatRatio(mintedDyad, totalValue);
   }

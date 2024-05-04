@@ -72,7 +72,7 @@ contract BaseTestV2 is Modifiers, Parameters {
   }
 
   function getMintedDyad(uint id) public view returns (uint) {
-    return contracts.dyad.mintedDyad(address(contracts.vaultManager), id);
+    return contracts.dyad.mintedDyad(id);
   }
 
   function getCR(uint id) public view returns (uint) {
