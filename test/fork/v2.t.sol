@@ -9,6 +9,9 @@ import {VaultManagerV2}      from "../../src/core/VaultManagerV2.sol";
 import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
 import {IVault}              from "../../src/interfaces/IVault.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
+
+import {VaultManagerV2Upgradable} from "../../src/core/VaultManagerV2Upgradable.sol";
 
 /**
 Notes: Fork test 
@@ -406,11 +409,13 @@ contract V2Test is BaseTestV2 {
   function test_UpgradeVaultManager() 
     public 
   {
-    VaultManagerV2 newVaultManager = new VaultManagerV2();
+    // VaultManagerV2 newV = new VaultManagerV2();
 
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultManager.upgradeToAndCall(
-      address(newVaultManager),
+    vm.startPrank(MAINNET_OWNER);
+
+    Upgrades.upgradeProxy(
+      address(contracts.vaultManager),
+      "VaultManagerV2Upgradable.sol",
       abi.encodeCall(
         VaultManagerV2.initialize,
         (

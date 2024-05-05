@@ -16,7 +16,10 @@ import {EnumerableSet}      from "@openzeppelin/contracts/utils/structs/Enumerab
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
+/**
+ * @custom:oz-upgrades-from src/core/VaultManagerV2.sol:VaultManagerV2
+ */ 
+contract VaultManagerV2Upgradable is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
@@ -54,8 +57,8 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     public 
       initializer 
   {
-    __Ownable_init(msg.sender);
-    __UUPSUpgradeable_init();
+    // __Ownable_init(msg.sender);
+    // __UUPSUpgradeable_init();
 
     dNft          = _dNft;
     dyad          = _dyad;
