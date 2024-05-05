@@ -416,14 +416,37 @@ contract V2Test is BaseTestV2 {
     Upgrades.upgradeProxy(
       address(contracts.vaultManager),
       "VaultManagerV2Upgradable.sol",
-      abi.encodeCall(
-        VaultManagerV2.initialize,
-        (
-          contracts.dNft,
-          contracts.dyad,
-          contracts.vaultLicenser
-        )
-      )
+      ""
     );
+
+    console.log(address(contracts.vaultManager.dNft()));
+
+    Upgrades.upgradeProxy(
+      address(contracts.vaultManager),
+      "VaultManagerV2Upgradable.sol",
+      ""
+    );
+
+    contracts.vaultManager.add(
+      0,
+      address(0)
+    );
+
+    // contracts.vaultManager.initialize(
+    //   contracts.dNft,
+    //   contracts.dyad,
+    //   contracts.vaultLicenser
+    // );
+
+    // contracts.vaultManager.initialize(
+    //   contracts.dNft,
+    //   contracts.dyad,
+    //   contracts.vaultLicenser
+    // );
+    // contracts.vaultManager.initialize(
+    //   contracts.dNft,
+    //   contracts.dyad,
+    //   contracts.vaultLicenser
+    // );
   }
 }

@@ -49,21 +49,21 @@ contract VaultManagerV2Upgradable is IVaultManager, UUPSUpgradeable, OwnableUpgr
    */
   constructor() { _disableInitializers(); }
 
-  function initialize(
-    DNft          _dNft,
-    Dyad          _dyad,
-    VaultLicenser _vaultLicenser
-  ) 
-    public 
-      initializer 
-  {
-    // __Ownable_init(msg.sender);
-    // __UUPSUpgradeable_init();
+  // function initialize(
+  //   DNft          _dNft,
+  //   Dyad          _dyad,
+  //   VaultLicenser _vaultLicenser
+  // ) 
+  //   public 
+  //     initializer 
+  // {
+  //   dNft          = _dNft;
+  //   dyad          = _dyad;
+  //   vaultLicenser = _vaultLicenser;
 
-    dNft          = _dNft;
-    dyad          = _dyad;
-    vaultLicenser = _vaultLicenser;
-  }
+  //   __Ownable_init(msg.sender);
+  //   __UUPSUpgradeable_init();
+  // }
 
   /// @inheritdoc IVaultManager
   function add(
@@ -71,11 +71,11 @@ contract VaultManagerV2Upgradable is IVaultManager, UUPSUpgradeable, OwnableUpgr
       address vault
   ) 
     external
-      isDNftOwner(id)
+      // isDNftOwner(id)
   {
-    if (!vaultLicenser.isLicensed(vault))   revert VaultNotLicensed();
-    if ( vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
-    if (!vaults[id].add(vault))             revert VaultAlreadyAdded();
+    // if (!vaultLicenser.isLicensed(vault))   revert VaultNotLicensed();
+    // if ( vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
+    // if (!vaults[id].add(vault))             revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 
