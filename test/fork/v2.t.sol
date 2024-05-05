@@ -424,8 +424,13 @@ contract V2Test is BaseTestV2 {
     Upgrades.upgradeProxy(
       address(contracts.vaultManager),
       "VaultManagerV2Upgradable.sol",
-      ""
+      abi.encodeCall(
+        VaultManagerV2Upgradable.initialize,
+        (address(1))
+      )
     );
+
+    console.log(address(contracts.vaultManager.dNft()));
 
     contracts.vaultManager.add(
       0,

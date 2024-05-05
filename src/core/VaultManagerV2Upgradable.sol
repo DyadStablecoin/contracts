@@ -49,21 +49,21 @@ contract VaultManagerV2Upgradable is IVaultManager, UUPSUpgradeable, OwnableUpgr
    */
   constructor() { _disableInitializers(); }
 
-  // function initialize(
-  //   DNft          _dNft,
-  //   Dyad          _dyad,
-  //   VaultLicenser _vaultLicenser
-  // ) 
-  //   public 
-  //     initializer 
-  // {
-  //   dNft          = _dNft;
-  //   dyad          = _dyad;
-  //   vaultLicenser = _vaultLicenser;
+  function initialize(
+    address          _dNft
+    // Dyad          _dyad,
+    // VaultLicenser _vaultLicenser
+  ) 
+    public 
+      onlyOwner
+  {
+    dNft          = DNft(_dNft);
+    // dyad          = _dyad;
+    // vaultLicenser = _vaultLicenser;
 
-  //   __Ownable_init(msg.sender);
-  //   __UUPSUpgradeable_init();
-  // }
+    // __Ownable_init(msg.sender);
+    // __UUPSUpgradeable_init();
+  }
 
   /// @inheritdoc IVaultManager
   function add(
