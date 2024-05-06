@@ -36,6 +36,10 @@ struct Contracts {
   KerosineDenominator    kerosineDenominator;
 }
 
+/**
+ * Notice:
+ * V2 deploys all contracts except for the DNft contract.
+ */
 contract DeployV2 is Script, Parameters {
   function run() public returns (Contracts memory) {
     vm.startBroadcast();  // ----------------------
