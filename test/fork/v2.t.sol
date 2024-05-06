@@ -34,8 +34,6 @@ contract V2Test is BaseTestV2 {
     contracts.vaultLicenser.add(address(contracts.wstEth), false);
     vm.prank(MAINNET_OWNER);
     contracts.vaultLicenser.add(address(contracts.unboundedKerosineVault), true);
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.boundedKerosineVault), true);
   }
 
   function test_KeroseneVaults() public {
@@ -50,7 +48,6 @@ contract V2Test is BaseTestV2 {
     assertEq(contracts.vaultLicenser.owner(),          MAINNET_OWNER);
     assertEq(contracts.kerosineManager.owner(),        MAINNET_OWNER);
     assertEq(contracts.unboundedKerosineVault.owner(), MAINNET_OWNER);
-    assertEq(contracts.boundedKerosineVault.owner(),   MAINNET_OWNER);
   }
 
   function test_Denominator() public {

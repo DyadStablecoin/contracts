@@ -15,7 +15,6 @@ import {IWETH}                  from "../../src/interfaces/IWETH.sol";
 import {IAggregatorV3}          from "../../src/interfaces/IAggregatorV3.sol";
 import {KerosineManager}        from "../../src/core/KerosineManager.sol";
 import {UnboundedKerosineVault} from "../../src/core/Vault.kerosine.unbounded.sol";
-import {BoundedKerosineVault}   from "../../src/core/Vault.kerosine.bounded.sol";
 import {KeroseneOracle}         from "../../src/core/KeroseneOracle.sol";
 import {Kerosine}               from "../../src/staking/Kerosine.sol";
 import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol";
@@ -34,7 +33,6 @@ struct Contracts {
   VaultWstEth            wstEth;
   KerosineManager        kerosineManager;
   UnboundedKerosineVault unboundedKerosineVault;
-  BoundedKerosineVault   boundedKerosineVault;
   KerosineDenominator    kerosineDenominator;
 }
 
@@ -42,17 +40,20 @@ contract DeployV2 is Script, Parameters {
   function run() public returns (Contracts memory) {
     vm.startBroadcast();  // ----------------------
 
-    Licenser vaultManagerLicenser = new Licenser();
+    Licenser      vaultManagerLicenser = new Licenser();
+    Dyad          dyad                 = new Dyad(vaultManagerLicenser);
+    VaultLicenser vaultLicenser        = new VaultLicenser();
 
-    Dyad dyad = new Dyad(vaultManagerLicenser);
-
-    VaultLicenser vaultLicenser = new VaultLicenser();
-
+    // this deploys the Vault Manager behind a proxy
     address proxy = Upgrades.deployUUPSProxy(
       "VaultManagerV2.sol",
       abi.encodeCall(
         VaultManagerV2.initialize,
-        (DNft(MAINNET_DNFT), dyad, vaultLicenser)
+        (
+          DNft(MAINNET_DNFT),
+          dyad,
+          vaultLicenser
+        )
       )
     );
 
@@ -60,6 +61,7 @@ contract DeployV2 is Script, Parameters {
     vaultManager.transferOwnership(MAINNET_OWNER);
 
     vaultManagerLicenser.add(address(vaultManager));
+    vaultManagerLicenser.transferOwnership(MAINNET_OWNER);
 
     // weth vault
     Vault ethVault = new Vault(
@@ -92,27 +94,17 @@ contract DeployV2 is Script, Parameters {
       keroseneOracle
     );
 
-
-    BoundedKerosineVault boundedKerosineVault     = new BoundedKerosineVault(
-      vaultManager,
-      Kerosine(MAINNET_KEROSENE), 
-      kerosineManager, 
-      keroseneOracle
-    );
-
-    KerosineDenominator kerosineDenominator       = new KerosineDenominator(
+    KerosineDenominator kerosineDenominator = new KerosineDenominator(
       Kerosine(MAINNET_KEROSENE)
     );
 
     unboundedKerosineVault.setDenominator(kerosineDenominator);
 
     unboundedKerosineVault.transferOwnership(MAINNET_OWNER);
-    boundedKerosineVault.  transferOwnership(MAINNET_OWNER);
 
     vaultLicenser.add(address(ethVault), false);
     vaultLicenser.add(address(wstEth),   false);
     vaultLicenser.add(address(unboundedKerosineVault), true);
-    // vaultLicenser.add(address(boundedKerosineVault), true);
 
     vaultLicenser.transferOwnership(MAINNET_OWNER);
 
@@ -128,7 +120,6 @@ contract DeployV2 is Script, Parameters {
       wstEth,
       kerosineManager,
       unboundedKerosineVault,
-      boundedKerosineVault,
       kerosineDenominator
     );
   }
