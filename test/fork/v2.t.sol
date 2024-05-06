@@ -8,10 +8,10 @@ import {Licenser}            from "../../src/core/Licenser.sol";
 import {VaultManagerV2}      from "../../src/core/VaultManagerV2.sol";
 import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
 import {IVault}              from "../../src/interfaces/IVault.sol";
-import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
-import {VaultManagerV2UpgradableMock} from "../VaultManagerV2UpgradeMock.sol";
+import {VaultManagerV2UpgradeMock} from "../VaultManagerV2UpgradeMock.sol";
 
 /**
 Notes: Fork test 
@@ -413,7 +413,7 @@ contract V2Test is BaseTestV2 {
 
     Upgrades.upgradeProxy(
       address(contracts.vaultManager),
-      "VaultManagerV2Upgradable.sol",
+      "VaultManagerV2UpgradeMock.sol",
       ""
     );
 
@@ -421,9 +421,9 @@ contract V2Test is BaseTestV2 {
 
     Upgrades.upgradeProxy(
       address(contracts.vaultManager),
-      "VaultManagerV2Upgradable.sol",
+      "VaultManagerV2UpgradeMock.sol",
       abi.encodeCall(
-        VaultManagerV2UpgradableMock.initialize,
+        VaultManagerV2UpgradeMock.initialize,
         (address(1))
       )
     );

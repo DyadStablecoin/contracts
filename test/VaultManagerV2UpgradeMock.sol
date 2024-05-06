@@ -19,7 +19,7 @@ import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/util
 /**
  * @custom:oz-upgrades-from src/core/VaultManagerV2.sol:VaultManagerV2
  */ 
-contract VaultManagerV2UpgradableMock is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
+contract VaultManagerV2UpgradeMock is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
