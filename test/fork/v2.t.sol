@@ -409,8 +409,6 @@ contract V2Test is BaseTestV2 {
   function test_UpgradeVaultManager() 
     public 
   {
-    // VaultManagerV2 newV = new VaultManagerV2();
-
     vm.startPrank(MAINNET_OWNER);
 
     Upgrades.upgradeProxy(
@@ -437,21 +435,13 @@ contract V2Test is BaseTestV2 {
       address(0)
     );
 
+    // This should fail!
     // contracts.vaultManager.initialize(
     //   contracts.dNft,
     //   contracts.dyad,
     //   contracts.vaultLicenser
     // );
 
-    // contracts.vaultManager.initialize(
-    //   contracts.dNft,
-    //   contracts.dyad,
-    //   contracts.vaultLicenser
-    // );
-    // contracts.vaultManager.initialize(
-    //   contracts.dNft,
-    //   contracts.dyad,
-    //   contracts.vaultLicenser
-    // );
+    vm.stopPrank();
   }
 }
