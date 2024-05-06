@@ -39,11 +39,7 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
 
-  /**
-   * @notice Prevents implementation contract from being initialized 
-   * @dev See: https://docs.openzeppelin.com/contracts/4.x/api/proxy#Initializable-_disableInitializers--
-   * @custom:oz-upgrades-unsafe-allow constructor
-   */
+  /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
   function initialize(

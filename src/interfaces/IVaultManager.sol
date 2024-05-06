@@ -21,8 +21,8 @@ interface IVaultManager {
   error CrTooLow();
   error CrTooHigh();
   error CanNotWithdrawInSameBlock();
-  error NotEnoughExoCollat();   // Not enough exogenous collateral
-  error VaultNotKerosene();   // Not enough exogenous collateral
+  error NotEnoughExoCollat();
+  error VaultNotKerosene();
 
   /**
    * @notice Adds a vault to the dNFT position
