@@ -285,6 +285,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     internal 
     override 
   {
-    require(msg.sender == owner(), "VaultManagerV2: not owner");
+    if (msg.sender != owner()) revert NotOwner();
   }
 }
