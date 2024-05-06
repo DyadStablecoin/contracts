@@ -5,9 +5,13 @@ import "forge-std/console.sol";
 
 import {BaseTestV2}          from "./BaseV2.sol";
 import {Licenser}            from "../../src/core/Licenser.sol";
+import {VaultManagerV2}      from "../../src/core/VaultManagerV2.sol";
 import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
 import {IVault}              from "../../src/interfaces/IVault.sol";
-import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
+import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
+
+import {VaultManagerV2UpgradeMock} from "../VaultManagerV2UpgradeMock.sol";
 
 /**
 Notes: Fork test 
@@ -400,5 +404,45 @@ contract V2Test is BaseTestV2 {
 
     uint debtAfter = getMintedDyad(alice0);
     console.log("debtAfter: ", debtAfter/1e18);
+  }
+
+  function test_UpgradeVaultManager() 
+    public 
+  {
+    vm.startPrank(MAINNET_OWNER);
+
+    Upgrades.upgradeProxy(
+      address(contracts.vaultManager),
+      "VaultManagerV2UpgradeMock.sol",
+      ""
+    );
+
+    console.log(address(contracts.vaultManager.dNft()));
+
+    Upgrades.upgradeProxy(
+      address(contracts.vaultManager),
+      "VaultManagerV2UpgradeMock.sol",
+      abi.encodeCall(
+        VaultManagerV2UpgradeMock.initialize,
+        (address(1))
+      )
+    );
+
+    // dnft address should be different now
+    console.log(address(contracts.vaultManager.dNft()));
+
+    contracts.vaultManager.add(
+      0,
+      address(0)
+    );
+
+    // This should fail!
+    // contracts.vaultManager.initialize(
+    //   contracts.dNft,
+    //   contracts.dyad,
+    //   contracts.vaultLicenser
+    // );
+
+    vm.stopPrank();
   }
 }

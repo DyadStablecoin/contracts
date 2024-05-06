@@ -57,6 +57,7 @@ contract DeployV2 is Script, Parameters {
     );
 
     VaultManagerV2 vaultManager = VaultManagerV2(proxy);
+    vaultManager.transferOwnership(MAINNET_OWNER);
 
     vaultManagerLicenser.add(address(vaultManager));
 
