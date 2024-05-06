@@ -9,6 +9,9 @@ import {VaultManagerV2}      from "../../src/core/VaultManagerV2.sol";
 import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
 import {IVault}              from "../../src/interfaces/IVault.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
+
+import {VaultManagerV2UpgradableMock} from "../VaultManagerV2UpgradeMock.sol";
 
 /**
 Notes: Fork test 
@@ -406,19 +409,40 @@ contract V2Test is BaseTestV2 {
   function test_UpgradeVaultManager() 
     public 
   {
-    VaultManagerV2 newVaultManager = new VaultManagerV2();
+    vm.startPrank(MAINNET_OWNER);
 
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultManager.upgradeToAndCall(
-      address(newVaultManager),
+    Upgrades.upgradeProxy(
+      address(contracts.vaultManager),
+      "VaultManagerV2Upgradable.sol",
+      ""
+    );
+
+    console.log(address(contracts.vaultManager.dNft()));
+
+    Upgrades.upgradeProxy(
+      address(contracts.vaultManager),
+      "VaultManagerV2Upgradable.sol",
       abi.encodeCall(
-        VaultManagerV2.initialize,
-        (
-          contracts.dNft,
-          contracts.dyad,
-          contracts.vaultLicenser
-        )
+        VaultManagerV2UpgradableMock.initialize,
+        (address(1))
       )
     );
+
+    // dnft address should be different now
+    console.log(address(contracts.vaultManager.dNft()));
+
+    contracts.vaultManager.add(
+      0,
+      address(0)
+    );
+
+    // This should fail!
+    // contracts.vaultManager.initialize(
+    //   contracts.dNft,
+    //   contracts.dyad,
+    //   contracts.vaultLicenser
+    // );
+
+    vm.stopPrank();
   }
 }
