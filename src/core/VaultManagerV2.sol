@@ -58,7 +58,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     vaultLicenser = _vaultLicenser;
   }
 
-  /// @inheritdoc IVaultManager
   function add(
       uint    id,
       address vault
@@ -72,7 +71,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     emit Added(id, vault);
   }
 
-  /// @inheritdoc IVaultManager
   function remove(
       uint    id,
       address vault
@@ -85,7 +83,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     emit Removed(id, vault);
   }
 
-  /// @inheritdoc IVaultManager
   function deposit(
     uint    id,
     address vault,
@@ -100,7 +97,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     _vault.deposit(id, amount);
   }
 
-  /// @inheritdoc IVaultManager
   function withdraw(
     uint    id,
     address vault,
@@ -120,7 +116,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
   }
 
-  /// @inheritdoc IVaultManager
   function mintDyad(
     uint    id,
     uint    amount,
@@ -138,7 +133,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     emit MintDyad(id, amount, to);
   }
 
-  /// @inheritdoc IVaultManager
   function burnDyad(
     uint id,
     uint amount
@@ -150,7 +144,6 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     emit BurnDyad(id, amount, msg.sender);
   }
 
-  /// @inheritdoc IVaultManager
   function redeemDyad(
     uint    id,
     address vault,
