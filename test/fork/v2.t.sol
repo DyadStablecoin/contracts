@@ -11,7 +11,7 @@ import {IVault}              from "../../src/interfaces/IVault.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
-import {VaultManagerV2Upgradable} from "../../src/core/VaultManagerV2Upgradable.sol";
+import {VaultManagerV2UpgradableMock} from "../VaultManagerV2UpgradeMock.sol";
 
 /**
 Notes: Fork test 
@@ -423,7 +423,7 @@ contract V2Test is BaseTestV2 {
       address(contracts.vaultManager),
       "VaultManagerV2Upgradable.sol",
       abi.encodeCall(
-        VaultManagerV2Upgradable.initialize,
+        VaultManagerV2UpgradableMock.initialize,
         (address(1))
       )
     );
