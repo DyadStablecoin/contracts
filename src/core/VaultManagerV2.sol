@@ -50,8 +50,8 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     public 
       initializer 
   {
-    __Ownable_init(msg.sender);
     __UUPSUpgradeable_init();
+    __Ownable_init(msg.sender);
 
     dNft          = _dNft;
     dyad          = _dyad;
