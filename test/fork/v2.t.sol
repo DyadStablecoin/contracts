@@ -428,6 +428,7 @@ contract V2Test is BaseTestV2 {
       )
     );
 
+    // dnft address should be different now
     console.log(address(contracts.vaultManager.dNft()));
 
     contracts.vaultManager.add(
