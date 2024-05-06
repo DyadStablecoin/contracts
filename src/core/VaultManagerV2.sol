@@ -1,17 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {DNft}            from "./DNft.sol";
-import {Dyad}            from "./Dyad.sol";
-import {VaultLicenser}   from "./VaultLicenser.sol";
-import {Vault}           from "./Vault.sol";
-import {IVaultManager}   from "../interfaces/IVaultManager.sol";
+import {DNft}          from "./DNft.sol";
+import {Dyad}          from "./Dyad.sol";
+import {VaultLicenser} from "./VaultLicenser.sol";
+import {Vault}         from "./Vault.sol";
+import {IVaultManager} from "../interfaces/IVaultManager.sol";
 
-import {FixedPointMathLib}  from "@solmate/src/utils/FixedPointMathLib.sol";
-import {ERC20}              from "@solmate/src/tokens/ERC20.sol";
-import {SafeTransferLib}    from "@solmate/src/utils/SafeTransferLib.sol";
+import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
+import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
+import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 
-import {EnumerableSet}      from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
