@@ -4,7 +4,6 @@ pragma solidity ^0.8.20;
 interface IDyad {
 
   error NotLicensed();
-  error DNftDoesNotExist();
 
  /**
   * @notice Mints amount of DYAD through a dNFT and licensed vault manager 
