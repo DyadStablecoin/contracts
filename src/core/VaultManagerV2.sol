@@ -138,7 +138,7 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     uint amount
   ) 
     external 
-      isValidDNft(id)
+      isDNftOwner(id)
   {
     dyad.burn(id, msg.sender, amount);
     emit BurnDyad(id, amount, msg.sender);
