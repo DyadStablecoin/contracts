@@ -58,7 +58,7 @@ transfer:
 	forge script script/mock/transfer.wsteth.s.sol \
 		--rpc-url http://127.0.0.1:8545 \
 		--broadcast \
-		--sender 0xDeD796De6a14E255487191963dEe436c45995813 \
+		--sender $(IMPERSONATOR) \
 		--unlocked
 	
 # deploy staking contracts on goerli
