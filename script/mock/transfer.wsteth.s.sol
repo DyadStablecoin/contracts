@@ -5,17 +5,18 @@ import "forge-std/Script.sol";
 import "forge-std/console.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {Parameters} from "../../src/params/Parameters.sol";
 
+contract Transfer is Script, Parameters {
 
-contract Transfer is Script {
-
-  address TOKEN     = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
+  address TOKEN     = MAINNET_KEROSENE;
   address RECIPIENT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-  uint    AMOUNT    = 200e18;
+  uint    AMOUNT    = 1;
 
   function run() public {
 
     vm.startBroadcast();  // ----------------------
+    console.log(msg.sender);
 
     ERC20 token = ERC20(TOKEN);
     token.transfer(RECIPIENT, AMOUNT);

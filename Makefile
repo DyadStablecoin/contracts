@@ -54,8 +54,12 @@ gdeployVault:
 mdeployVault:
 	forge script script/deploy/Deploy.Vault.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender 0x4794d0E92E4C01AF3473839749826394a7FB770A --broadcast --verify -i 1 -vvvv
 
-transferWsteth:
-	forge script script/mock/transfer.wsteth.s.sol   --rpc-url http://127.0.0.1:8545 --broadcast --sender 0x176F3DAb24a159341c0509bB36B833E7fdd0a132 --unlocked
+transfer:
+	forge script script/mock/transfer.wsteth.s.sol \
+		--rpc-url http://127.0.0.1:8545 \
+		--broadcast \
+		--sender 0xDeD796De6a14E255487191963dEe436c45995813 \
+		--unlocked
 	
 # deploy staking contracts on goerli
 gdeployStaking:
