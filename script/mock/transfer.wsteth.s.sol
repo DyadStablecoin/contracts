@@ -17,18 +17,22 @@ import {Parameters} from "../../src/params/Parameters.sol";
 contract Transfer is Script, Parameters {
   address TOKEN     = MAINNET_KEROSENE;
   address RECIPIENT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
-  uint    AMOUNT    = 1e18;
 
   function run() public {
+    ERC20 token = ERC20(TOKEN);
 
     vm.startBroadcast();  // ----------------------
     console.log(msg.sender);
 
-    ERC20 token = ERC20(TOKEN);
-    token.transfer(RECIPIENT, AMOUNT);
+    // we transfer all the tokens to the recipient
+    uint balanceOfSender = token.balanceOf(msg.sender);
+
+    token.transfer(RECIPIENT, balanceOfSender);
 
     vm.stopBroadcast();  // ----------------------------
 
-    console.log("balance of recipient", token.balanceOf(RECIPIENT));
+    uint balanceOfRecipient = token.balanceOf(RECIPIENT);
+    require(balanceOfRecipient > 0);
+    console.log("balance of recipient", balanceOfRecipient);
   }
 }
