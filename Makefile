@@ -131,3 +131,12 @@ deployStakingAnvil:
 		--broadcast \
 		-i 1 \
 		-vvvv 
+
+deployAllSepolia:
+	forge clean
+	forge script script/deploy/DeployAll.s.sol \
+		--rpc-url $(SEPOLIA_RPC) \
+		--sender $(SEPOLIA_ADDRESS_WITH_SOME_ETH) \
+		--broadcast \
+		-i 1 \
+		-vvvv 
