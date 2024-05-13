@@ -119,7 +119,15 @@ deployV2Anvil:
 	forge clean
 	forge script script/deploy/Deploy.V2.s.sol \
 		--rpc-url 127.0.0.1:8545 \
-		--sender 0x90F79bf6EB2c4f870365E785982E1f101E93b906 \
+		--sender $(ANVIL_PUBLIC_KEY) \
+		--broadcast \
+		-i 1 \
+		-vvvv 
+
+deployStakingAnvil:
+	forge script script/deploy/Deploy.Staking.sol \
+		--rpc-url 127.0.0.1:8545 \
+		--sender $(ANVIL_PUBLIC_KEY) \
 		--broadcast \
 		-i 1 \
 		-vvvv 
