@@ -25,14 +25,47 @@ import {OracleMock} from "../../test/OracleMock.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
 
+import {IUniswapV3Factory} from '@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol';
+import {IUniswapV3Pool} from '@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol';
+import {IUniswapV3Staker, UniswapV3Staker} from "../src/UniswapV3Staker.sol";
+import '@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol';
+import '@uniswap/v3-core/contracts/interfaces/IERC20Minimal.sol';
+
+struct IncentiveKey {
+    address rewardToken;
+    address pool;
+    uint256 startTime;
+    uint256 endTime;
+    address refundee;
+}
+
+interface IUniswapV3Staker {
+  function stakeToken(IncentiveKey memory key, uint256 tokenId) external;
+}
 
 // READ THIS FIRST PLEASE!
 // !!!NOTE: We will never use this for prod!
 // This is only for deploying the whole DYAD system to a non-forked testnet
 // We are going to mock all Oracles!
 contract DeployAll is Script, Parameters {
+  // -------- STAKING CONTRACT UNI V3 --------
+  uint MAX_INCENTIVE_START_LEAD_TIME = 7   days;  
+  uint MAX_INCENTIVE_DURATION        = 365 days; // REVIEW!
+
+  address UNI_FACTORY      = 0x1F98431c8aD98523631AE4a59f267346ea31F984;
+  address POSITION_MANAGER = 0xC36442b4a4522E871399CD717aBDD847Ab11FE88;
+
+  address KEROSENE   = 0xf3768D6e78E65FC64b8F12ffc824452130BD5394;
+  address POOL       = 0x680B3eC4BE81d19772B7295a3BaBe00dA2471c16; // DYAD/USDC
+  uint    START_TIME = block.timestamp + 1 hours; // REVIEW!
+  uint    END_TIME   = START_TIME + 60 days;      // REVIEW!
+  address REFUNDEE   = 0xDeD796De6a14E255487191963dEe436c45995813;
+  // -------- STAKING CONTRACT --------
+
+  // -------- STAKING CONTRACT UNI V2 --------
   uint ONE_MILLION     = 1_000_000;
   uint STAKING_REWARDS = ONE_MILLION * 10**18;
+  // -------- STAKING CONTRACT UNI V2 --------
 
   function run() public {
     vm.startBroadcast();  // ----------------------
@@ -128,6 +161,34 @@ contract DeployAll is Script, Parameters {
 
     vaultLicenser.transferOwnership(SEPOLIA_OWNER);
 
+    IUniswapV3Factory uniswapV3Factory = IUniswapV3Factory(0x1F98431c8aD98523631AE4a59f267346ea31F984);
+
+    address dyadPool = uniswapV3Factory.createPool(
+      address(dyad),
+      address(weth),
+      500
+    );
+
+    IUniswapV3Pool pool = IUniswapV3Pool(dyadPool);
+    pool.initialize(1e18);
+
+    pool.mint(
+      address(this),
+      1e18, // tickLower
+      1e18, // tickUpper
+      1e18, // amount of DYAD
+      ""
+    );
+
     vm.stopBroadcast();  // ----------------------------
+  }
+
+  function onERC721Received(
+      address,
+      address,
+      uint256,
+      bytes calldata
+  ) external pure returns (bytes4) {
+      return 0x150b7a02;
   }
 }
