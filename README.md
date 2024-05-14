@@ -46,3 +46,7 @@ In order to run unit tests, run:
 ```sh
 forge test
 ```
+
+### Deploy Everything on Sepolia
+1) run `make deployAllSepolia` 
+2) in dyad-uniswap-staking repo run `make deploy`
