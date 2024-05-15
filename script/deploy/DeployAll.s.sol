@@ -37,14 +37,38 @@ contract DeployAll is Script, Parameters {
   uint ONE_MILLION     = 1_000_000;
   uint STAKING_REWARDS = ONE_MILLION * 10**18;
 
+  DNft                   dNft;                         
+  Licenser               vaultManagerLicenser;
+  Dyad                   dyad;                
+  VaultLicenser          vaultLicenser;
+  VaultManagerV2         vaultManager;
+  Vault                  ethVault;
+  VaultWstEth            wstEthVault;
+  Kerosine               kerosene;
+  UnboundedKerosineVault unboundedKerosineVault;
+
   function run() public {
     vm.startBroadcast();  // ----------------------
 
-    DNft dNft                          = new DNft();
-    Licenser      vaultManagerLicenser = new Licenser();
-    Dyad          dyad                 = new Dyad(vaultManagerLicenser);
-    VaultLicenser vaultLicenser        = new VaultLicenser();
+    deployBase();
+    initVaultManager();
+    initVaults();
+    licenseVaults();
+    initKeroseneAndStaking();
+    initKeroseneManager();
+    initStakingUniV3();
 
+    vm.stopBroadcast();  // ----------------------------
+  }
+
+  function deployBase() public {
+    dNft                 = new DNft();
+    vaultManagerLicenser = new Licenser();
+    dyad                 = new Dyad(vaultManagerLicenser);
+    vaultLicenser        = new VaultLicenser();
+  }
+
+  function initVaultManager() public {
     address proxy = Upgrades.deployUUPSProxy(
       "VaultManagerV2.sol",
       abi.encodeCall(
@@ -57,16 +81,18 @@ contract DeployAll is Script, Parameters {
       )
     );
 
-    VaultManagerV2 vaultManager = VaultManagerV2(proxy);
+    vaultManager = VaultManagerV2(proxy);
     vaultManager.transferOwnership(SEPOLIA_OWNER);
 
     vaultManagerLicenser.add(address(vaultManager));
     vaultManagerLicenser.transferOwnership(SEPOLIA_OWNER);
+  }
 
+  function initVaults() public {
     ERC20Mock  weth       = new ERC20Mock("Wrapped Ether", "WETH");
     OracleMock wethOracle = new OracleMock(2000e8); // 2000 USD
 
-    Vault ethVault = new Vault(
+    ethVault = new Vault(
       vaultManager,
       weth,
       IAggregatorV3(address(wethOracle))
@@ -75,13 +101,15 @@ contract DeployAll is Script, Parameters {
     ERC20Mock  wstEth       = new ERC20Mock("Wrapped liquid staked Ether 2.0", "wstETH");
     OracleMock wstEthOracle = new OracleMock(2200e8); // 2000 USD
 
-    VaultWstEth wstEthVault = new VaultWstEth(
+    wstEthVault = new VaultWstEth(
       vaultManager, 
       wstEth, 
       IAggregatorV3(address(wstEthOracle))
     );
+  }
 
-    Kerosine kerosene = new Kerosine();
+  function initKeroseneAndStaking() public {
+    kerosene = new Kerosine();
 
     ERC20Mock uniV2Lp = new ERC20Mock("Uni V2 Lp Token", "UNI-V2-LP");
     Staking  staking  = new Staking(uniV2Lp, kerosene);
@@ -100,26 +128,22 @@ contract DeployAll is Script, Parameters {
     );
 
     staking.transferOwnership(SEPOLIA_OWNER);
+  }
 
-    UnboundedKerosineVault unboundedKerosineVault = deployKerosene(
-      address(ethVault),
-      address(wstEthVault),
-      vaultManager, 
-      kerosene, 
-      dyad
-    );
-
+  function licenseVaults() public {
     vaultLicenser.add(address(ethVault), false);
     vaultLicenser.add(address(wstEthVault),   false);
     vaultLicenser.add(address(unboundedKerosineVault), true);
 
     vaultLicenser.transferOwnership(SEPOLIA_OWNER);
+  }
 
+  function initStakingUniV3() public {
     IUniswapV3Factory uniswapV3Factory = IUniswapV3Factory(0x1F98431c8aD98523631AE4a59f267346ea31F984);
 
     address dyadPool = uniswapV3Factory.createPool(
       address(dyad),
-      address(weth),
+      address(SEPOLIA_WETH),
       500
     );
 
@@ -133,26 +157,18 @@ contract DeployAll is Script, Parameters {
       1e18, // amount of DYAD
       ""
     );
-
-    vm.stopBroadcast();  // ----------------------------
   }
 
-  function deployKerosene(
-    address ethVault,
-    address wstEthVault,
-    VaultManagerV2 vaultManager,
-    Kerosine kerosene,
-    Dyad dyad
-  ) public returns (UnboundedKerosineVault) {
+  function initKeroseneManager() public {
     KerosineManager kerosineManager = new KerosineManager();
-    kerosineManager.add(ethVault);
-    kerosineManager.add(wstEthVault);
+    kerosineManager.add(address(ethVault));
+    kerosineManager.add(address(wstEthVault));
 
     kerosineManager.transferOwnership(SEPOLIA_OWNER);
 
     KeroseneOracle keroseneOracle = new KeroseneOracle();
 
-    UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
+    unboundedKerosineVault = new UnboundedKerosineVault(
       vaultManager,
       kerosene, 
       dyad,
@@ -167,8 +183,6 @@ contract DeployAll is Script, Parameters {
     unboundedKerosineVault.setDenominator(kerosineDenominator);
 
     unboundedKerosineVault.transferOwnership(SEPOLIA_OWNER);
-
-    return unboundedKerosineVault;
   }
 
   function onERC721Received(

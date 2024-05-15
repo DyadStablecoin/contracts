@@ -11,5 +11,5 @@ libs = ['lib']
 # build_info = true
 # extra_output = ["storageLayout"]
 
-viaIR = true 
+# viaIR = true 
 # optimizer_runs = 1_000_000
