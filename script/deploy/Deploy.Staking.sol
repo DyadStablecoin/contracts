@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 
@@ -9,6 +9,7 @@ import {Parameters} from "../../src/params/Parameters.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
+// !!!!NOTE!!!!! We need to re-write the script because kerosene is already deployed
 contract DeployStaking is Script, Parameters {
   function run() public {
 
@@ -17,7 +18,7 @@ contract DeployStaking is Script, Parameters {
 
     vm.startBroadcast();  // ----------------------
 
-    Kerosine kerosine = new Kerosine();
+    Kerosine kerosine = Kerosine(MAINNET_KEROSENE);
     Staking  staking  = new Staking(ERC20(MAINNET_WETH_DYAD_UNI), kerosine);
 
     kerosine.transfer(

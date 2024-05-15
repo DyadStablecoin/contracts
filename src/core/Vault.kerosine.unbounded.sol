@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
 import {KerosineVault}        from "./Vault.kerosine.sol";
-import {VaultManager}         from "./VaultManager.sol";
+import {IVaultManager}        from "../interfaces/IVaultManager.sol";
 import {Vault}                from "./Vault.sol";
 import {Dyad}                 from "./Dyad.sol";
 import {KerosineManager}      from "./KerosineManager.sol";
 import {BoundedKerosineVault} from "./Vault.kerosine.bounded.sol";
 import {KerosineDenominator}  from "../staking/KerosineDenominator.sol";
+import {KeroseneOracle}       from "./KeroseneOracle.sol";
 
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
@@ -15,14 +16,18 @@ import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 contract UnboundedKerosineVault is KerosineVault {
   using SafeTransferLib for ERC20;
 
+  Dyad                 public immutable dyad;
   KerosineDenominator  public kerosineDenominator;
 
   constructor(
-    VaultManager    _vaultManager,
-    ERC20           _asset, 
-    Dyad            _dyad, 
-    KerosineManager _kerosineManager
-  ) KerosineVault(_vaultManager, _asset, _dyad, _kerosineManager) {}
+      IVaultManager   _vaultManager,
+      ERC20           _asset, 
+      Dyad            _dyad, 
+      KerosineManager _kerosineManager,
+      KeroseneOracle  _oracle
+  ) KerosineVault(_vaultManager, _asset, _kerosineManager, _oracle) {
+      dyad = _dyad;
+  }
 
   function withdraw(
     uint    id,
@@ -39,7 +44,7 @@ contract UnboundedKerosineVault is KerosineVault {
 
   function setDenominator(KerosineDenominator _kerosineDenominator) 
     external 
-    onlyOwner
+      onlyOwner
   {
     kerosineDenominator = _kerosineDenominator;
   }
@@ -55,10 +60,10 @@ contract UnboundedKerosineVault is KerosineVault {
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[i]);
         tvl += vault.asset().balanceOf(address(vault)) 
-                * vault.assetPrice() * 1e18
-                / (10**vault.asset().decimals()) 
-                / (10**vault.oracle().decimals());
+                        * vault.assetPrice()
+                        / (10**vault.oracle().decimals());
       }
+      require(tvl > dyad.totalSupply(), "Not enough TVL");
       uint numerator   = tvl - dyad.totalSupply();
       uint denominator = kerosineDenominator.denominator();
       return numerator * 1e8 / denominator;

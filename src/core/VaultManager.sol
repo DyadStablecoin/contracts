@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
 import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
@@ -152,7 +152,7 @@ contract VaultManager is IVaultManager {
     {
       uint cr = collatRatio(id);
       if (cr >= MIN_COLLATERIZATION_RATIO) revert CrTooHigh();
-      dyad.burn(id, msg.sender, dyad.mintedDyad(address(this), id));
+      dyad.burn(id, msg.sender, dyad.mintedDyad(id));
 
       uint cappedCr               = cr < 1e18 ? 1e18 : cr;
       uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
@@ -173,7 +173,7 @@ contract VaultManager is IVaultManager {
     public 
     view
     returns (uint) {
-      uint _dyad = dyad.mintedDyad(address(this), id);
+      uint _dyad = dyad.mintedDyad(id);
       if (_dyad == 0) return type(uint).max;
       return getTotalUsdValue(id).divWadDown(_dyad);
   }

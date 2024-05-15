@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
 import {KerosineVault}          from "./Vault.kerosine.sol";
-import {VaultManager}           from "./VaultManager.sol";
+import {IVaultManager}          from "../interfaces/IVaultManager.sol";
 import {Dyad}                   from "./Dyad.sol";
 import {KerosineManager}        from "./KerosineManager.sol";
 import {UnboundedKerosineVault} from "./Vault.kerosine.unbounded.sol";
+import {KeroseneOracle}         from "./KeroseneOracle.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
@@ -13,14 +14,13 @@ contract BoundedKerosineVault is KerosineVault {
   error NotWithdrawable(uint id, address to, uint amount);
 
   UnboundedKerosineVault public unboundedKerosineVault;
-  uint                   public deposits;
 
   constructor(
-    VaultManager    _vaultManager,
+    IVaultManager   _vaultManager,
     ERC20           _asset, 
-    Dyad            _dyad, 
-    KerosineManager _kerosineManager
-  ) KerosineVault(_vaultManager, _asset, _dyad, _kerosineManager) {}
+    KerosineManager _kerosineManager, 
+    KeroseneOracle  _oracle
+  ) KerosineVault(_vaultManager, _asset, _kerosineManager, _oracle) {}
 
   function setUnboundedKerosineVault(
     UnboundedKerosineVault _unboundedKerosineVault
@@ -29,18 +29,6 @@ contract BoundedKerosineVault is KerosineVault {
     onlyOwner
   {
     unboundedKerosineVault = _unboundedKerosineVault;
-  }
-
-  function deposit(
-    uint id,
-    uint amount
-  )
-    override
-    public 
-      onlyVaultManager
-  {
-    deposits += amount;
-    super.deposit(id, amount);
   }
 
   function withdraw(

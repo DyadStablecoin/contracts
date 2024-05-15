@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
-import {VaultManager}    from "./VaultManager.sol";
-import {Dyad}            from "./Dyad.sol";
-import {KerosineManager} from "./KerosineManager.sol";
-import {IDNft}           from "../interfaces/IDNft.sol";
+import {IVaultManager}   from "../interfaces/IVaultManager.sol";
 import {IVault}          from "../interfaces/IVault.sol";
+import {IAggregatorV3}   from "../interfaces/IAggregatorV3.sol";
+import {KerosineManager} from "./KerosineManager.sol";
+import {KeroseneOracle}  from "./KeroseneOracle.sol";
 
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
@@ -14,10 +14,10 @@ import {Owned}           from "@solmate/src/auth/Owned.sol";
 abstract contract KerosineVault is IVault, Owned(msg.sender) {
   using SafeTransferLib for ERC20;
 
-  VaultManager    public immutable vaultManager;
+  IVaultManager   public immutable vaultManager;
   ERC20           public immutable asset;
-  Dyad            public immutable dyad;
   KerosineManager public immutable kerosineManager;
+  IAggregatorV3   public immutable oracle;
 
   mapping(uint => uint) public id2asset;
 
@@ -27,22 +27,21 @@ abstract contract KerosineVault is IVault, Owned(msg.sender) {
   }
 
   constructor(
-    VaultManager    _vaultManager,
+    IVaultManager   _vaultManager,
     ERC20           _asset, 
-    Dyad            _dyad,
-    KerosineManager _kerosineManager 
+    KerosineManager _kerosineManager, 
+    IAggregatorV3   _oracle
   ) {
     vaultManager    = _vaultManager;
     asset           = _asset;
-    dyad            = _dyad;
     kerosineManager = _kerosineManager;
+    oracle          = _oracle;
   }
 
   function deposit(
     uint id,
     uint amount
   )
-    virtual
     public 
       onlyVaultManager
   {
