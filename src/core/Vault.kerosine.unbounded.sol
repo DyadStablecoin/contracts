@@ -63,7 +63,6 @@ contract UnboundedKerosineVault is KerosineVault {
                         * vault.assetPrice()
                         / (10**vault.oracle().decimals());
       }
-      require(tvl > dyad.totalSupply(), "Not enough TVL");
       uint numerator   = tvl - dyad.totalSupply();
       uint denominator = kerosineDenominator.denominator();
       return numerator * 1e8 / denominator;
