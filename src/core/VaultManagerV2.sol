@@ -67,7 +67,7 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   {
     if (!vaultLicenser.isLicensed(vault))   revert VaultNotLicensed();
     if ( vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
-    if (!vaults[id].add(vault))             revert VaultAlreadyAdded();
+    if (!vaults[id].add(vault))            revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 
@@ -93,7 +93,7 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   {
     lastDeposit[id] = block.number;
     Vault _vault = Vault(vault);
-    _vault.asset().safeTransferFrom(msg.sender, address(vault), amount);
+    _vault.asset().safeTransferFrom(msg.sender, vault, amount);
     _vault.deposit(id, amount);
   }
 
