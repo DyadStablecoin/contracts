@@ -141,7 +141,7 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     uint id,
     uint amount
   ) 
-    external 
+    public 
       isDNftOwner(id)
   {
     dyad.burn(id, msg.sender, amount);
@@ -157,7 +157,7 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     external 
       isDNftOwner(id)
     returns (uint) { 
-      dyad.burn(id, msg.sender, amount);
+      burnDyad(id, amount);
       Vault _vault = Vault(vault);
       uint asset = amount 
                     * 10**_vault.oracle().decimals() 
