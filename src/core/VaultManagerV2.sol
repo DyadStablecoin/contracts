@@ -107,13 +107,8 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isDNftOwner(id)
   {
     if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
-    Vault _vault = Vault(vault);
-    _vault.withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
-    (uint exoValue, uint keroValue) = getVaultsValues(id);
-    uint mintedDyad = dyad.mintedDyad(id);
-    if (exoValue < mintedDyad) revert NotEnoughExoCollat();
-    uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
-    if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
+    Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
+    _checkExoValueAndCollatRatio(id);
   }
 
   function mintDyad(
@@ -125,12 +120,21 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isDNftOwner(id)
   {
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
+    _checkExoValueAndCollatRatio(id);
+    emit MintDyad(id, amount, to);
+  }
+
+  function _checkExoValueAndCollatRatio(
+    uint    id
+  ) 
+    internal
+      isDNftOwner(id)
+  {
     (uint exoValue, uint keroValue) = getVaultsValues(id);
     uint mintedDyad = dyad.mintedDyad(id);
     if (exoValue < mintedDyad) revert NotEnoughExoCollat();
     uint cr = _collatRatio(mintedDyad, exoValue+keroValue);
-    if (cr < MIN_COLLAT_RATIO) revert CrTooLow(); 
-    emit MintDyad(id, amount, to);
+    if (cr < MIN_COLLAT_RATIO) revert CrTooLow();
   }
 
   function burnDyad(
