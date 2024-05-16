@@ -125,10 +125,10 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   }
 
   function _checkExoValueAndCollatRatio(
-    uint    id
+    uint id
   ) 
     internal
-      isDNftOwner(id)
+    view
   {
     (uint exoValue, uint keroValue) = getVaultsValues(id);
     uint mintedDyad = dyad.mintedDyad(id);
