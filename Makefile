@@ -108,5 +108,6 @@ deployV2:
 		--verify \
 		-i 1 \
 		-vvvv \
+		--legacy \
 		--via-ir \
 		--optimize
