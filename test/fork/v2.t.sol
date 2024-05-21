@@ -408,12 +408,6 @@ contract V2Test is BaseTestV2 {
   {
     vm.startPrank(MAINNET_OWNER);
 
-    Upgrades.upgradeProxy(
-      address(contracts.vaultManager),
-      "VaultManagerV2UpgradeMock.sol",
-      ""
-    );
-
     console.log(address(contracts.vaultManager.dNft()));
 
     Upgrades.upgradeProxy(
@@ -427,18 +421,6 @@ contract V2Test is BaseTestV2 {
 
     // dnft address should be different now
     console.log(address(contracts.vaultManager.dNft()));
-
-    contracts.vaultManager.add(
-      0,
-      address(0)
-    );
-
-    // This should fail!
-    // contracts.vaultManager.initialize(
-    //   contracts.dNft,
-    //   contracts.dyad,
-    //   contracts.vaultLicenser
-    // );
 
     vm.stopPrank();
   }
