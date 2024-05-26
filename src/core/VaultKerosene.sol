@@ -8,7 +8,6 @@ import {IVaultManager}   from "../interfaces/IVaultManager.sol";
 import {IVault}          from "../interfaces/IVault.sol";
 import {IAggregatorV3}   from "../interfaces/IAggregatorV3.sol";
 import {KerosineManager} from "./KerosineManager.sol";
-import {KeroseneOracle}  from "./KeroseneOracle.sol";
 
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
@@ -23,7 +22,7 @@ contract KeroseneVault is IVault, Owned(msg.sender) {
   IAggregatorV3   public immutable oracle;
   Dyad            public immutable dyad;
 
-  KerosineDenominator  public kerosineDenominator;
+  KerosineDenominator public kerosineDenominator;
 
   mapping(uint => uint) public id2asset;
 
