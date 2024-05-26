@@ -33,7 +33,7 @@ contract V2Test is BaseTestV2 {
     vm.prank(MAINNET_OWNER);
     contracts.vaultLicenser.add(address(contracts.wstEth), false);
     vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.unboundedKerosineVault), true);
+    contracts.vaultLicenser.add(address(contracts.keroseneVault), true);
   }
 
   function test_KeroseneVaults() public {
@@ -44,10 +44,10 @@ contract V2Test is BaseTestV2 {
   }
 
   function test_Ownership() public {
-    assertEq(contracts.kerosineManager.owner(),        MAINNET_OWNER);
-    assertEq(contracts.vaultLicenser.owner(),          MAINNET_OWNER);
-    assertEq(contracts.kerosineManager.owner(),        MAINNET_OWNER);
-    assertEq(contracts.unboundedKerosineVault.owner(), MAINNET_OWNER);
+    assertEq(contracts.kerosineManager.owner(), MAINNET_OWNER);
+    assertEq(contracts.vaultLicenser.owner(),   MAINNET_OWNER);
+    assertEq(contracts.kerosineManager.owner(), MAINNET_OWNER);
+    assertEq(contracts.keroseneVault.owner(),   MAINNET_OWNER);
   }
 
   function test_Denominator() public {
@@ -109,10 +109,10 @@ contract V2Test is BaseTestV2 {
   function test_DepositKerosene() 
     public 
       mintAlice0 
-      addVault(alice0, contracts.unboundedKerosineVault)
-      deposit (alice0, contracts.unboundedKerosineVault, 200e18)
+      addVault(alice0, contracts.keroseneVault)
+      deposit (alice0, contracts.keroseneVault, 200e18)
   {
-    assertEq(contracts.unboundedKerosineVault.id2asset(alice0), 200e18);
+    assertEq(contracts.keroseneVault.id2asset(alice0), 200e18);
   }
 
   function test_DepositBob() 
@@ -228,12 +228,12 @@ contract V2Test is BaseTestV2 {
       mintAlice0 
       addVault(alice0, contracts.ethVault)
       deposit (alice0, contracts.ethVault, 100 ether)
-      addVault(alice0, contracts.unboundedKerosineVault)
-      deposit (alice0, contracts.unboundedKerosineVault, 200e18)
+      addVault(alice0, contracts.keroseneVault)
+      deposit (alice0, contracts.keroseneVault, 200e18)
       skipBlock(1)
-      withdraw(alice0, contracts.unboundedKerosineVault, 200e18)
+      withdraw(alice0, contracts.keroseneVault, 200e18)
   {
-    assertEq(contracts.unboundedKerosineVault.id2asset(alice0), 0);
+    assertEq(contracts.keroseneVault.id2asset(alice0), 0);
   }
 
   /// @dev Test fails because the withdarwl of 1 Ether will put it under the CR

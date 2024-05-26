@@ -14,7 +14,7 @@ import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
 import {Owned}           from "@solmate/src/auth/Owned.sol";
 
-contract KerosineVault is IVault, Owned(msg.sender) {
+contract KeroseneVault is IVault, Owned(msg.sender) {
   using SafeTransferLib for ERC20;
 
   IVaultManager   public immutable vaultManager;
@@ -33,15 +33,19 @@ contract KerosineVault is IVault, Owned(msg.sender) {
   }
 
   constructor(
-    IVaultManager   _vaultManager,
-    ERC20           _asset, 
-    KerosineManager _kerosineManager, 
-    IAggregatorV3   _oracle
+    IVaultManager       _vaultManager,
+    ERC20               _asset, 
+    Dyad                _dyad,
+    KerosineManager     _kerosineManager, 
+    IAggregatorV3       _oracle, 
+    KerosineDenominator _kerosineDenominator
   ) {
-    vaultManager    = _vaultManager;
-    asset           = _asset;
-    kerosineManager = _kerosineManager;
-    oracle          = _oracle;
+    vaultManager        = _vaultManager;
+    asset               = _asset;
+    dyad                = _dyad;
+    kerosineManager     = _kerosineManager;
+    oracle              = _oracle;
+    kerosineDenominator = _kerosineDenominator;
   }
 
   function setDenominator(KerosineDenominator _kerosineDenominator) 
