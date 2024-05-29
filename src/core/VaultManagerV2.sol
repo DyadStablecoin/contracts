@@ -67,7 +67,7 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   {
     if (!vaultLicenser.isLicensed(vault))   revert VaultNotLicensed();
     if ( vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
-    if (!vaults[id].add(vault))            revert VaultAlreadyAdded();
+    if (!vaults[id].add(vault))             revert VaultAlreadyAdded();
     emit Added(id, vault);
   }
 
