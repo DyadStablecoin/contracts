@@ -160,8 +160,9 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       burnDyad(id, amount);
       Vault _vault = Vault(vault);
       uint asset = amount 
-                    * 10**_vault.oracle().decimals() 
-                    / _vault.assetPrice();
+                    * (10**(_vault.oracle().decimals() + _vault.asset().decimals())) 
+                    / _vault.assetPrice() 
+                    / 1e18;
       withdraw(id, vault, asset, to);
       emit RedeemDyad(id, vault, amount, to);
       return asset;
