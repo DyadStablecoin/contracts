@@ -54,8 +54,12 @@ gdeployVault:
 mdeployVault:
 	forge script script/deploy/Deploy.Vault.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender 0x4794d0E92E4C01AF3473839749826394a7FB770A --broadcast --verify -i 1 -vvvv
 
-transferWsteth:
-	forge script script/mock/transfer.wsteth.s.sol   --rpc-url http://127.0.0.1:8545 --broadcast --sender 0x176F3DAb24a159341c0509bB36B833E7fdd0a132 --unlocked
+transfer:
+	forge script script/mock/transfer.wsteth.s.sol \
+		--rpc-url http://127.0.0.1:8545 \
+		--broadcast \
+		--sender $(TOKEN_HOLDER) \
+		--unlocked
 	
 # deploy staking contracts on goerli
 gdeployStaking:
@@ -111,3 +115,29 @@ deployV2:
 		--legacy \
 		--via-ir \
 		--optimize
+
+deployV2Anvil:
+	forge clean
+	forge script script/deploy/Deploy.V2.s.sol \
+		--rpc-url 127.0.0.1:8545 \
+		--sender $(ANVIL_PUBLIC_KEY) \
+		--broadcast \
+		-i 1 \
+		-vvvv 
+
+deployStakingAnvil:
+	forge script script/deploy/Deploy.Staking.sol \
+		--rpc-url 127.0.0.1:8545 \
+		--sender $(ANVIL_PUBLIC_KEY) \
+		--broadcast \
+		-i 1 \
+		-vvvv 
+
+deployAllSepolia:
+	forge clean
+	forge script script/deploy/DeployAll.s.sol \
+		--rpc-url $(SEPOLIA_RPC) \
+		--sender $(SEPOLIA_ADDRESS_WITH_SOME_ETH) \
+		--broadcast \
+		-i 1 \
+		-vvvv 

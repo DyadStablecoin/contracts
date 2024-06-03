@@ -1,3 +1,5 @@
 @openzeppelin/contracts/=lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/contracts/
 @openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
 @solmate/=lib/solmate/
+@uniswap/v3-core/=lib/v3-core/
+@uniswap/v3-periphery/=lib/v3-periphery/
