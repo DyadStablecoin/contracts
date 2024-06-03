@@ -111,8 +111,9 @@ contract KeroseneVault is IVault, Owned(msg.sender) {
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[i]);
         tvl += vault.asset().balanceOf(address(vault)) 
-                        * vault.assetPrice()
-                        / (10**vault.oracle().decimals());
+                * vault.assetPrice() * 1e18
+                / (10**vault.asset().decimals()) 
+                / (10**vault.oracle().decimals());
       }
       if (tvl < dyad.totalSupply()) return 0;
       uint numerator   = tvl - dyad.totalSupply();
