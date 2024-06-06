@@ -110,3 +110,6 @@ deployV2:
 		-vvvv \
 		--via-ir \
 		--optimize
+
+anvilFork:
+	anvil --fork-url $(MAINNET_RPC)
