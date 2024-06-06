@@ -9,17 +9,17 @@ import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract Transfer is Script {
 
-  address TOKEN     = 0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0;
-  address RECIPIENT = 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266;
+  address TOKEN     = 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2;
+  address RECIPIENT = 0x70997970C51812dc3A010C7d01b50e0d17dc79C8;
   uint    AMOUNT    = 200e18;
 
   function run() public {
+    ERC20 token = ERC20(TOKEN);
+    console.log("sender", msg.sender);
+    console.log("balance of sender", token.balanceOf(msg.sender));
 
     vm.startBroadcast();  // ----------------------
-
-    ERC20 token = ERC20(TOKEN);
     token.transfer(RECIPIENT, AMOUNT);
-
     vm.stopBroadcast();  // ----------------------------
 
     console.log("balance of recipient", token.balanceOf(RECIPIENT));
