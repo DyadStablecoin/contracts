@@ -112,4 +112,4 @@ deployV2:
 		--optimize
 
 anvilFork:
-	anvil --fork-url $(MAINNET_RPC)
+	anvil --chain-id 31337 --fork-url $(MAINNET_RPC) --auto-impersonate
