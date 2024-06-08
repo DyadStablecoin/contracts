@@ -116,5 +116,17 @@ deployV2:
 		--via-ir \
 		--optimize
 
+deployKeroseneVaultV2:
+	forge clean
+	forge script script/deploy/Deploy.KeroseneVaultV2.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A \
+		--broadcast \
+		--verify \
+		-i 1 \
+		-vvvv \
+		--via-ir \
+		--optimize
+
 anvilFork:
 	anvil --chain-id 31337 --fork-url $(MAINNET_RPC) --auto-impersonate --gas-price 0
