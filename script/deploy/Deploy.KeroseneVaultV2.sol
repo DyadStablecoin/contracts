@@ -26,7 +26,7 @@ contract DeployVault is Script, Parameters {
       Kerosine(MAINNET_KEROSENE)
     );
 
-    new KeroseneVault(
+    KeroseneVault keroseneVault = new KeroseneVault(
       VaultManager   (0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7), 
       ERC20          (0xf3768D6e78E65FC64b8F12ffc824452130BD5394), 
       Dyad           (0xFd03723a9A3AbE0562451496a9a394D2C4bad4ab), 
@@ -34,6 +34,8 @@ contract DeployVault is Script, Parameters {
       oracle, 
       kerosineDenominator
     );
+
+    keroseneVault.transferOwnership(MAINNET_OWNER);
 
     vm.stopBroadcast();  // ----------------------------
   }
