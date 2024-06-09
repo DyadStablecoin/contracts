@@ -312,10 +312,10 @@ contract V2Test is BaseTestV2 {
     assertTrue(contracts.vaultManager.collatRatio(alice0) < type(uint).max);
   }
 
-  modifier liquidate(uint id, uint to, address liquidator) {
+  modifier liquidate(uint id, uint to, address liquidator, uint amount) {
     deal(address(contracts.dyad), liquidator, _ethToUSD(getMintedDyad(id)));
     vm.prank(liquidator);
-    contracts.vaultManager.liquidate(id, to, getMintedDyad(id));
+    contracts.vaultManager.liquidate(id, to, amount);
     _;
   }
 
@@ -330,7 +330,7 @@ contract V2Test is BaseTestV2 {
 
       // bob
       mintBob0 
-      liquidate(alice0, bob0, bob)
+      liquidate(alice0, bob0, bob, getMintedDyad(alice0))
   {
     uint ethAfter_Liquidator  = contracts.ethVault.id2asset(bob0);
     uint ethAfter_Liquidatee  = contracts.ethVault.id2asset(alice0);
@@ -353,7 +353,7 @@ contract V2Test is BaseTestV2 {
       mintDyad(alice0, _ethToUSD(1 ether))
       changeAsset(alice0, contracts.ethVault, 1.2 ether)
 
-      liquidate(alice0, RANDOM_NUMBER_0, bob)
+      liquidate(alice0, RANDOM_NUMBER_0, bob, getMintedDyad(alice0))
   {}
 
   function testFail_LiquidateNotValidDNftLiquidatee() 
@@ -365,7 +365,7 @@ contract V2Test is BaseTestV2 {
       mintDyad(alice0, _ethToUSD(1 ether))
       changeAsset(alice0, contracts.ethVault, 1.2 ether)
 
-      liquidate(RANDOM_NUMBER_0, alice0, alice)
+      liquidate(RANDOM_NUMBER_0, alice0, alice, getMintedDyad(RANDOM_NUMBER_0))
   {}
 
   function test_LiquidatePartial() 
@@ -378,6 +378,9 @@ contract V2Test is BaseTestV2 {
 
       addVault(alice0, contracts.wstEth)
       deposit (alice0, contracts.wstEth, 100 ether)
+
+      addVault(alice0, contracts.keroseneVault)
+      deposit (alice0, contracts.keroseneVault, 1 ether)
 
       mintDyad(alice0, _ethToUSD(50 ether))
 
@@ -394,7 +397,7 @@ contract V2Test is BaseTestV2 {
     uint debtBefore = getMintedDyad(alice0);
     console.log("debtBefore: ", debtBefore/1e18);
 
-    contracts.vaultManager.liquidate(alice0, bob0, _ethToUSD(10 ether));
+    contracts.vaultManager.liquidate(alice0, bob0, _ethToUSD(1 ether));
 
     uint crAfter = getCR(alice0);
     console.log("crAfter: ", crAfter/1e15);

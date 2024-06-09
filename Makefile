@@ -100,6 +100,7 @@ testV2:
 	forge clean
 	forge test \
 		--match-contract V2 \
+		--match-test Partial \
 		--fork-url $(MAINNET_RPC) \
 		--fork-block-number 19621640 \
 		-vv

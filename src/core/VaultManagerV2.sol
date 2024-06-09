@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import "forge-std/console.sol";
+
 import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
@@ -177,30 +179,41 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isValidDNft(id)
       isValidDNft(to)
     {
+      console.log("liquidate", id, to, amount);
       if (collatRatio(id) >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint debt = dyad.mintedDyad(id);
+      console.log("debt", debt);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
       uint totalValue  = getTotalValue(id);
+      console.log("totalValue", totalValue);
       uint reward_rate = amount
                           .divWadDown(debt)
                           .mulWadDown(LIQUIDATION_REWARD);
+      console.log("reward_rate", reward_rate);
 
       uint numberOfVaults = vaults[id].length();
       for (uint i = 0; i < numberOfVaults; i++) {
           Vault vault = Vault(vaults[id].at(i));
+          console.log("balanceOf", vault.id2asset(id));
           uint value       = vault.getUsdValue(id);
+          console.log("value", value);
           uint share       = value.divWadDown(totalValue);
+          console.log("share", share);
           uint amountShare = share.mulWadDown(amount);
+          console.log("amountShare", amountShare);
           uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
+          console.log("valueToMove", valueToMove);
           uint cappedValue = valueToMove > value ? value : valueToMove;
+          console.log("cappedValue", cappedValue);
           uint asset = cappedValue 
                          * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
                          / vault.assetPrice() 
                          / 1e18;
 
+          console.log("asset", asset);
           vault.move(id, to, asset);
       }
 

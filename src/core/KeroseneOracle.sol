@@ -4,7 +4,7 @@ pragma solidity ^0.8.20;
 import {IAggregatorV3} from "../interfaces/IAggregatorV3.sol";
 
 contract KeroseneOracle is IAggregatorV3 {
-  function decimals() external pure returns (uint8) { return 18; }
+  function decimals() external pure returns (uint8) { return 8; }
 
   function description() external pure override returns (string memory) {
     return "Kerosene Oracle"; 
