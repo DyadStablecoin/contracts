@@ -41,7 +41,7 @@ pdeploy:
 	forge script script/deploy/Deploy.Payments.s.sol --rpc-url $(MAINNET_RPC) --sender 0x7FCeD590Ae09843F32F6118382f67cC01CFcf511 --broadcast --verify -i 1 -vvvv
 
 read:
-	forge script script/Read.s.sol --rpc-url $(GOERLI_RPC) --fork-block-number 8416091
+	forge script script/Read.s.sol --rpc-url $(MAINNET_RPC) 
 
 ldeploy:
 	forge script script/deploy/Deploy.Mainnet.s.sol --fork-url http://localhost:8545 --sender 0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 --broadcast --verify -i 1 -vvvv
@@ -61,6 +61,15 @@ transferWsteth:
 		--sender 0x2fEb1512183545f48f6b9C5b4EbfCaF49CfCa6F3 \
 		--unlocked \
 		--legacy
+
+liquidate:
+	forge script script/mock/liquidate.s.sol \
+		--rpc-url http://127.0.0.1:8545 \
+		--broadcast \
+		--sender 0x9953DA7f2161866afAAD3c844CaaeE35A262a001 \
+		--unlocked \
+		--legacy \
+		-vvvv
 	
 # deploy staking contracts on goerli
 gdeployStaking:
