@@ -7,21 +7,23 @@ import {VaultManagerV3} from "../../src/core/VaultManagerV3.sol";
 import {DNft}           from "../../src/core/DNft.sol";
 import {Dyad}           from "../../src/core/Dyad.sol";
 import {VaultLicenser}  from "../../src/core/VaultLicenser.sol";
+import {Parameters}     from "../../src/params/Parameters.sol";
+
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
-contract DeployVaultManagerV3 is Script {
+contract DeployVaultManagerV3 is Script, Parameters {
   function run() public {
     vm.startBroadcast();  // ----------------------
 
     Upgrades.upgradeProxy(
-      0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7,
+      MAINNET_V2_VAULT_MANAGER,
       "VaultManagerV3.sol",
       abi.encodeCall(
         VaultManagerV3.initialize,
         (
-          DNft(0xDc400bBe0B8B79C07A962EA99a642F5819e3b712),
-          Dyad(0xFd03723a9A3AbE0562451496a9a394D2C4bad4ab),
-          VaultLicenser(0xFe81952A0a2c6ab603ef1B3cC69E1B6Bffa92697)
+          DNft         (MAINNET_DNFT),
+          Dyad         (MAINNET_V2_DYAD),
+          VaultLicenser(MAINNET_V2_VAULT_LICENSER)
         )
       )
     );
