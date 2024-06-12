@@ -14,14 +14,14 @@ contract DeployVaultManagerV3 is Script {
     vm.startBroadcast();  // ----------------------
 
     Upgrades.upgradeProxy(
-      0xb62bdb1a6ac97a9b70957dd35357311e8859f0d7,
+      0xB62bdb1A6AC97A9B70957DD35357311e8859f0d7,
       "VaultManagerV3.sol",
       abi.encodeCall(
         VaultManagerV3.initialize,
         (
           DNft(0xDc400bBe0B8B79C07A962EA99a642F5819e3b712),
-          Dyad(0xfd03723a9a3abe0562451496a9a394d2c4bad4ab),
-          VaultLicenser(0xfe81952a0a2c6ab603ef1b3cc69e1b6bffa92697)
+          Dyad(0xFd03723a9A3AbE0562451496a9a394D2C4bad4ab),
+          VaultLicenser(0xFe81952A0a2c6ab603ef1B3cC69E1B6Bffa92697)
         )
       )
     );
