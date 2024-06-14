@@ -15,10 +15,12 @@ contract Transfer is Script {
 
   function run() public {
 
+    ERC20 token = ERC20(0xf3768D6e78E65FC64b8F12ffc824452130BD5394);
+
     vm.startBroadcast();  // ----------------------
 
-    ERC20 token = ERC20(TOKEN);
-    token.transfer(RECIPIENT, AMOUNT);
+    token.approve(0x987Aa6E80e995d6A76C4d061eE324fc760Ea9F61, 100000e18);
+    // token.transfer(RECIPIENT, AMOUNT);
 
     vm.stopBroadcast();  // ----------------------------
 

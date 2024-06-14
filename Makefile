@@ -58,7 +58,7 @@ transferWsteth:
 	forge script script/mock/transfer.wsteth.s.sol \
 		--rpc-url http://127.0.0.1:8545 \
 		--broadcast \
-		--sender 0x2fEb1512183545f48f6b9C5b4EbfCaF49CfCa6F3 \
+		--sender 0xDeD796De6a14E255487191963dEe436c45995813 \
 		--unlocked \
 		--legacy
 	
@@ -129,4 +129,4 @@ deployKeroseneVaultV2:
 		--optimize
 
 anvilFork:
-	anvil --chain-id 31337 --fork-url $(MAINNET_RPC) --auto-impersonate --gas-price 0
+	anvil --chain-id 31337 --fork-url $(MAINNET_RPC) --auto-impersonate #--gas-price 0
