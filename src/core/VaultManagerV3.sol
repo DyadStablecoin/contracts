@@ -42,20 +42,12 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize(
-    DNft          _dNft,
-    Dyad          _dyad,
-    VaultLicenser _vaultLicenser
-  ) 
+  function initialize() 
     public 
-      initializer 
+      reinitializer(2) 
   {
     __UUPSUpgradeable_init();
     __Ownable_init(msg.sender);
-
-    dNft          = _dNft;
-    dyad          = _dyad;
-    vaultLicenser = _vaultLicenser;
   }
 
   function add(
