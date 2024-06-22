@@ -178,8 +178,7 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isValidDNft(to)
     {
       if (collatRatio(id) >= MIN_COLLAT_RATIO) revert CrTooHigh();
-      uint debt = dyad.mintedDyad(id);
-      dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
+      dyad.burn(id, msg.sender, amount); // changes `cr`
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
