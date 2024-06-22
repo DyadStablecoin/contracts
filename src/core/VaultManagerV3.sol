@@ -194,8 +194,8 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
         if (vaultLicenser.isLicensed(address(vault))) {
           uint value       = vault.getUsdValue(id);
           uint share       = value.divWadDown(totalValue);
-          uint amountShare = share.mulWadDown(amount);
-          uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
+          uint amountShare = share.mulWadUp(amount);
+          uint valueToMove = amountShare + amountShare.mulWadUp(reward_rate);
           uint cappedValue = valueToMove > value ? value : valueToMove;
           uint asset = cappedValue 
                          * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
