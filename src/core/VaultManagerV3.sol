@@ -193,6 +193,7 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
         Vault vault = Vault(vaults[id].at(i));
         if (vaultLicenser.isLicensed(address(vault))) {
           uint value       = vault.getUsdValue(id);
+          if (value == 0) continue; 
           uint share       = value.divWadDown(totalValue);
           uint amountShare = share.mulWadDown(amount);
           uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
