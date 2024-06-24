@@ -18,7 +18,7 @@ contract DeployVaultManagerV3 is Script, Parameters {
     Upgrades.upgradeProxy(
       MAINNET_V2_VAULT_MANAGER,
       "VaultManagerV3.sol",
-      abi.encodeCall(VaultManagerV3.initialize)
+      abi.encodeCall(VaultManagerV3.initialize, ())
     );
 
     vm.stopBroadcast();  // ----------------------------
