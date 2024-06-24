@@ -197,11 +197,11 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
           uint value = vault.getUsdValue(id);
           if (value == 0) continue;
           uint asset;
-          if (cr < 1.2e18 && debt != amount) {
+          if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
             uint cappedCr               = cr < 1e18 ? 1e18 : cr;
-            uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(0.2e18);
+            uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
             uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
-            uint256 allAsset = value.mulWadUp(liquidationAssetShare);
+            uint allAsset = vault.id2asset(id).mulWadUp(liquidationAssetShare);
             asset = allAsset.mulWadDown(amount).divWadDown(debt);
           } else {
             uint share       = value.divWadDown(totalValue);
