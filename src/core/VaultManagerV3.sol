@@ -177,7 +177,8 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isValidDNft(id)
       isValidDNft(to)
     {
-      if (collatRatio(id) >= MIN_COLLAT_RATIO) revert CrTooHigh();
+      uint cr = collatRatio(id);
+      if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
@@ -192,16 +193,24 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[id].at(i));
         if (vaultLicenser.isLicensed(address(vault))) {
-          uint value       = vault.getUsdValue(id);
-          uint share       = value.divWadDown(totalValue);
-          uint amountShare = share.mulWadDown(amount);
-          uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
-          uint cappedValue = valueToMove > value ? value : valueToMove;
-          uint asset = cappedValue 
-                         * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
-                         / vault.assetPrice() 
-                         / 1e18;
-
+          uint value = vault.getUsdValue(id);
+          uint asset;
+          if (cr < 1.2e18 && debt != amount) {
+            uint cappedCr               = cr < 1e18 ? 1e18 : cr;
+            uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(0.2e18);
+            uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
+            uint256 allAsset = value.mulWadUp(liquidationAssetShare);
+            asset = allAsset.mulWadDown(amount).divWadDown(debt);
+          } else {
+            uint share       = value.divWadDown(totalValue);
+            uint amountShare = share.mulWadDown(amount);
+            uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
+            uint cappedValue = valueToMove > value ? value : valueToMove;
+            asset = cappedValue 
+                       * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
+                       / vault.assetPrice() 
+                       / 1e18;
+          }
           vault.move(id, to, asset);
         }
       }
