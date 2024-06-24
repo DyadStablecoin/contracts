@@ -207,9 +207,9 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
             uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
             uint cappedValue = valueToMove > value ? value : valueToMove;
             asset = cappedValue 
-                       * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
-                       / vault.assetPrice() 
-                       / 1e18;
+                      * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
+                      / vault.assetPrice() 
+                      / 1e18;
           }
           vault.move(id, to, asset);
         }
