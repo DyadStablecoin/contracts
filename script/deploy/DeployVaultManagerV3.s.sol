@@ -18,14 +18,7 @@ contract DeployVaultManagerV3 is Script, Parameters {
     Upgrades.upgradeProxy(
       MAINNET_V2_VAULT_MANAGER,
       "VaultManagerV3.sol",
-      abi.encodeCall(
-        VaultManagerV3.initialize,
-        (
-          DNft         (MAINNET_DNFT),
-          Dyad         (MAINNET_V2_DYAD),
-          VaultLicenser(MAINNET_V2_VAULT_LICENSER)
-        )
-      )
+      abi.encodeCall(VaultManagerV3.initialize, ())
     );
 
     vm.stopBroadcast();  // ----------------------------
