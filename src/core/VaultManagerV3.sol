@@ -185,6 +185,7 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
       uint totalValue  = getTotalValue(id);
+      if (totalValue == 0) return;
       uint reward_rate = amount
                           .divWadDown(debt)
                           .mulWadDown(LIQUIDATION_REWARD);
