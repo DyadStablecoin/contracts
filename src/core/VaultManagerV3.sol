@@ -194,6 +194,7 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
         Vault vault = Vault(vaults[id].at(i));
         if (vaultLicenser.isLicensed(address(vault))) {
           uint value = vault.getUsdValue(id);
+          if (value == 0) continue;
           uint asset;
           if (cr < 1.2e18 && debt != amount) {
             uint cappedCr               = cr < 1e18 ? 1e18 : cr;
