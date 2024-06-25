@@ -178,9 +178,6 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
       uint totalValue = getTotalValue(id);
       if (totalValue == 0) return;
-      uint reward_rate = amount
-                          .divWadDown(debt)
-                          .mulWadDown(LIQUIDATION_REWARD);
 
       uint numberOfVaults = vaults[id].length();
       for (uint i = 0; i < numberOfVaults; i++) {
@@ -198,6 +195,9 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
           } else {
             uint share       = value.divWadDown(totalValue);
             uint amountShare = share.mulWadUp(amount);
+            uint reward_rate = amount
+                                .divWadDown(debt)
+                                .mulWadDown(LIQUIDATION_REWARD);
             uint valueToMove = amountShare + amountShare.mulWadUp(reward_rate);
             uint cappedValue = valueToMove > value ? value : valueToMove;
             asset = cappedValue 
