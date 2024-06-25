@@ -42,6 +42,7 @@ contract KeroseneDnftClaim is Owned, IERC721TokenReceiver {
         if (msg.sender != address(DNFT)) {
             revert NotNote();
         }
+        return KeroseneDnftClaim.onERC721Received.selector;
     }
 
     function buyNote(bytes32[] calldata proof) external {
