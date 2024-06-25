@@ -130,3 +130,15 @@ deployKeroseneVaultV2:
 
 anvilFork:
 	anvil --chain-id 31337 --fork-url $(MAINNET_RPC) --auto-impersonate --gas-price 0
+
+deployV3:
+	forge clean
+	forge script script/deploy/DeployVaultManagerV3.s.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A \
+		--broadcast \
+		--verify \
+		-i 1 \
+		-vvvv \
+		--via-ir \
+		--optimize
