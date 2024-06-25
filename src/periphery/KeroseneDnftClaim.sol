@@ -13,8 +13,10 @@ contract KeroseneDnftClaim is Owned, IERC721TokenReceiver {
     error InvalidProof();
     error AlreadyPurchased();
 
-    IERC721Enumerable immutable DNFT;
-    ERC20 immutable KEROSENE;
+    address constant RECEIVER = 0xDeD796De6a14E255487191963dEe436c45995813;
+
+    IERC721Enumerable public immutable DNFT;
+    ERC20 public immutable KEROSENE;
 
     uint256 public price;
     bytes32 public merkleRoot;
@@ -60,7 +62,7 @@ contract KeroseneDnftClaim is Owned, IERC721TokenReceiver {
         purchased[msg.sender] = true;
 
         // transfer payment from the
-        KEROSENE.transferFrom(msg.sender, address(this), price);
+        KEROSENE.transferFrom(msg.sender, RECEIVER, price);
         // transfer the last token owned to save gas
         uint256 tokenId = DNFT.tokenOfOwnerByIndex(address(this), balance - 1);
         DNFT.transferFrom(address(this), msg.sender, tokenId);

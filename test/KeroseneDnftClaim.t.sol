@@ -20,8 +20,6 @@ contract KeroseneDnftClaimTest is Test {
     address constant USER_2 = address(0xcdcd); // allowlisted, has enough kero
     address constant USER_3 = address(0xefef); // not allowlisted, has kero
 
-
-
     function setUp() external {
         kero = new Kerosine();
         dnft = new DNft();
