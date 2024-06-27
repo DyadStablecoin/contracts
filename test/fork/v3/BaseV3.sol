@@ -7,7 +7,7 @@ import "forge-std/Test.sol";
 import {Parameters}          from "../../../src/params/Parameters.sol";
 import {Licenser}            from "../../../src/core/Licenser.sol";
 import {Modifiers}           from "../../Modifiers.sol";
-import {DeployV2, Contracts} from "../../../script/deploy/Deploy.V2.s.sol";
+import {DeployV3, Contracts} from "../../../script/deploy/Deploy.V3.s.sol";
 import {IVault}              from "../../../src/interfaces/IVault.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
@@ -34,14 +34,12 @@ contract BaseTestV3 is Modifiers, Parameters {
   address bob = address(0x42);
 
   function setUp() public {
-    contracts = new DeployV2().run();
+    contracts = new DeployV3().run();
     weth      = ERC20(MAINNET_WETH);
     alice     = address(this);
 
     ETH_TO_USD       = contracts.ethVault.assetPrice();
     MIN_COLLAT_RATIO = contracts.vaultManager.MIN_COLLAT_RATIO();
-
-    licenseVauleManager();
   }
 
   // --- alice ---
@@ -58,12 +56,6 @@ contract BaseTestV3 is Modifiers, Parameters {
     uint price = startPrice + (priceIncrease * publicMints);
     vm.deal(address(this), price);
     id = contracts.dNft.mintNft{value: price}(owner);
-  }
-
-  function licenseVauleManager() public {
-    Licenser licenser = Licenser(MAINNET_VAULT_MANAGER_LICENSER);
-    vm.prank(MAINNET_OWNER);
-    licenser.add(address(contracts.vaultManager));
   }
 
   // -- helpers --

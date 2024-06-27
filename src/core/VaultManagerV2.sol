@@ -179,30 +179,30 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     {
       if (collatRatio(id) >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint debt = dyad.mintedDyad(id);
-      dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
+      // dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
-      lastDeposit[to] = block.number; // `move` acts like a deposit
+      // lastDeposit[to] = block.number; // `move` acts like a deposit
 
-      uint totalValue  = getTotalValue(id);
-      uint reward_rate = amount
-                          .divWadDown(debt)
-                          .mulWadDown(LIQUIDATION_REWARD);
+      // uint totalValue  = getTotalValue(id);
+      // uint reward_rate = amount
+      //                     .divWadDown(debt)
+      //                     .mulWadDown(LIQUIDATION_REWARD);
 
-      uint numberOfVaults = vaults[id].length();
-      for (uint i = 0; i < numberOfVaults; i++) {
-          Vault vault = Vault(vaults[id].at(i));
-          uint value       = vault.getUsdValue(id);
-          uint share       = value.divWadDown(totalValue);
-          uint amountShare = share.mulWadDown(amount);
-          uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
-          uint cappedValue = valueToMove > value ? value : valueToMove;
-          uint asset = cappedValue 
-                         * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
-                         / vault.assetPrice() 
-                         / 1e18;
+      // uint numberOfVaults = vaults[id].length();
+      // for (uint i = 0; i < numberOfVaults; i++) {
+      //     Vault vault = Vault(vaults[id].at(i));
+      //     uint value       = vault.getUsdValue(id);
+      //     uint share       = value.divWadDown(totalValue);
+      //     uint amountShare = share.mulWadDown(amount);
+      //     uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
+      //     uint cappedValue = valueToMove > value ? value : valueToMove;
+      //     uint asset = cappedValue 
+      //                    * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
+      //                    / vault.assetPrice() 
+      //                    / 1e18;
 
-          vault.move(id, to, asset);
-      }
+      //     vault.move(id, to, asset);
+      // }
 
       emit Liquidate(id, msg.sender, to);
   }

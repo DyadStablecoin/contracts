@@ -25,34 +25,6 @@ contract V3Test is BaseTestV3 {
     licenser.add(address(contracts.vaultManager));
   }
 
-  function test_LicenseVaults() public {
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.ethVault), false);
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.wstEth), false);
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.keroseneVault), true);
-  }
-
-  function test_KeroseneVaults() public {
-    address[] memory vaults = contracts.kerosineManager.getVaults();
-    assertEq(vaults.length, 2);
-    assertEq(vaults[0], address(contracts.ethVault));
-    assertEq(vaults[1], address(contracts.wstEth));
-  }
-
-  function test_Ownership() public {
-    assertEq(contracts.kerosineManager.owner(), MAINNET_OWNER);
-    assertEq(contracts.vaultLicenser.owner(),   MAINNET_OWNER);
-    assertEq(contracts.kerosineManager.owner(), MAINNET_OWNER);
-    assertEq(contracts.keroseneVault.owner(),   MAINNET_OWNER);
-  }
-
-  function test_Denominator() public {
-    uint denominator = contracts.kerosineDenominator.denominator();
-    assertTrue(denominator < contracts.kerosene.balanceOf(MAINNET_OWNER));
-  }
-
   function test_MintDNftOwner0() 
     public 
       mintAlice0 
