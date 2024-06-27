@@ -142,3 +142,11 @@ deployV3:
 		-vvvv \
 		--via-ir \
 		--optimize
+
+testV3:
+	forge clean
+	forge test \
+		--match-contract V3 \
+		--fork-url $(MAINNET_RPC) \
+		--fork-block-number 19621640 \
+		-vv
