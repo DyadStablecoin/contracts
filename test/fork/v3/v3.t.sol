@@ -335,7 +335,7 @@ contract V3Test is BaseTestV3 {
     uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(alice0);
 
     assertTrue(ethAfter_Liquidator > 0);
-    assertTrue(ethAfter_Liquidatee > 0);
+    assertTrue(ethAfter_Liquidatee == 0);
 
     assertEq(getMintedDyad(alice0), 0);
     assertEq(getCR(alice0), type(uint256).max);

@@ -147,6 +147,7 @@ testV3:
 	forge clean
 	forge test \
 		--match-contract V3 \
+		--match-test test_Liquidate \
 		--fork-url $(MAINNET_RPC) \
 		--fork-block-number 19621640 \
-		-vv
+		-vvvv
