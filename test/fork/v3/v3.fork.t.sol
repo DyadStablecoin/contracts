@@ -31,7 +31,7 @@ contract V3ForkTest is BaseTestV3 {
     _;
   }
 
-  function test_LiquidateXXX() 
+  function test_Liquidate() 
     public 
       // alice 
       mintAlice0 
@@ -56,4 +56,37 @@ contract V3ForkTest is BaseTestV3 {
     assertEq(dyadAfter_Liquidatee, 0);
   }
 
+  function test_LiquidatePartial() 
+    public 
+      // alice 
+      mintAlice0 
+      
+      addVault(alice0, contracts.ethVault)
+      deposit (alice0, contracts.ethVault, 100 ether)
+
+      addVault(alice0, contracts.wstEth)
+      deposit (alice0, contracts.wstEth, 100 ether)
+
+      mintDyad(alice0, _ethToUSD(50 ether))
+
+      changeAsset(alice0, contracts.ethVault, 50 ether)
+      changeAsset(alice0, contracts.wstEth,   10 ether)
+
+      // bob
+      mintBob0 
+  {
+    uint crBefore = getCR(alice0);
+    console.log("crBefore: ", crBefore/1e15);
+
+    uint debtBefore = getMintedDyad(alice0);
+    console.log("debtBefore: ", debtBefore/1e18);
+
+    contracts.vaultManager.liquidate(alice0, bob0, _ethToUSD(10 ether));
+
+    uint crAfter = getCR(alice0);
+    console.log("crAfter: ", crAfter/1e15);
+
+    uint debtAfter = getMintedDyad(alice0);
+    console.log("debtAfter: ", debtAfter/1e18);
+  }
 }
