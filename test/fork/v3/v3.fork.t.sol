@@ -31,7 +31,37 @@ contract V3ForkTest is BaseTestV3 {
     _;
   }
 
-  function test_Liquidate() 
+  function test_LiquidateWithManyVaults() 
+    public 
+      // alice 
+      mintAlice0 
+
+      // eth vault
+      addVault(alice0, contracts.ethVault)
+      deposit (alice0, contracts.ethVault, 100 ether)
+
+      // wstEth vault
+      addVault(alice0, contracts.wstEth)
+      deposit (alice0, contracts.wstEth, 100 ether)
+
+      // kerosene vault
+      addVault(alice0, contracts.keroseneVault)
+      deposit (alice0, contracts.keroseneVault, 5 ether)
+
+      mintDyad(alice0, _ethToUSD(10 ether))
+
+      // change assets
+      changeAsset(alice0, contracts.ethVault,      1 ether)
+      changeAsset(alice0, contracts.wstEth,        1 ether)
+      changeAsset(alice0, contracts.keroseneVault, 1 ether)
+
+      // bob
+      mintBob0 
+      liquidate(alice0, bob0, bob)
+  {
+  }
+
+  function test_LiquidateNoCollateralLeft() 
     public 
       // alice 
       mintAlice0 
@@ -50,6 +80,31 @@ contract V3ForkTest is BaseTestV3 {
 
     assertTrue(ethAfter_Liquidator > 0);
     assertTrue(ethAfter_Liquidatee == 0);
+
+    assertEq(getMintedDyad(alice0), 0);
+    assertEq(getCR(alice0), type(uint256).max);
+    assertEq(dyadAfter_Liquidatee, 0);
+  }
+
+  function test_LiquidateSomeCollateralLeft() 
+    public 
+      // alice 
+      mintAlice0 
+      addVault(alice0, contracts.ethVault)
+      deposit (alice0, contracts.ethVault, 100 ether)
+      mintDyad(alice0, _ethToUSD(1 ether))
+      changeAsset(alice0, contracts.ethVault, 1.4 ether)
+
+      // bob
+      mintBob0 
+      liquidate(alice0, bob0, bob)
+  {
+    uint ethAfter_Liquidator  = contracts.ethVault.id2asset(bob0);
+    uint ethAfter_Liquidatee  = contracts.ethVault.id2asset(alice0);
+    uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(alice0);
+
+    assertTrue(ethAfter_Liquidator > 0);
+    assertTrue(ethAfter_Liquidatee > 0);
 
     assertEq(getMintedDyad(alice0), 0);
     assertEq(getCR(alice0), type(uint256).max);
