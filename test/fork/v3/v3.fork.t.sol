@@ -58,10 +58,40 @@ contract V3ForkTest is BaseTestV3 {
       // bob
       mintBob0 
       liquidate(alice0, bob0, bob)
+  {}
+
+  function testFuzz_LiquidateWithManyVaults(uint amount) 
+    public 
+      // alice 
+      mintAlice0 
+
+      // eth vault
+      addVault(alice0, contracts.ethVault)
+      deposit (alice0, contracts.ethVault, 100 ether)
+
+      // wstEth vault
+      addVault(alice0, contracts.wstEth)
+      deposit (alice0, contracts.wstEth, 100 ether)
+
+      // kerosene vault
+      addVault(alice0, contracts.keroseneVault)
+      deposit (alice0, contracts.keroseneVault, 5 ether)
+
+      mintDyad(alice0, _ethToUSD(10 ether))
+
+      // change assets
+      changeAsset(alice0, contracts.ethVault,      1 ether)
+      changeAsset(alice0, contracts.wstEth,        1 ether)
+      changeAsset(alice0, contracts.keroseneVault, 1 ether)
+
+      // bob
+      mintBob0 
   {
+    amount = bound(amount, 1, _ethToUSD(10 ether));
+    contracts.vaultManager.liquidate(alice0, bob0, amount);
   }
 
-  function test_LiquidateNoCollateralLeft() 
+  function test_LiquidateNoCollateralLeftForLiquidatee() 
     public 
       // alice 
       mintAlice0 
