@@ -146,8 +146,8 @@ deployV3:
 testV3:
 	forge clean
 	forge test \
-		--match-contract V3 \
-		--match-test Fuzz \
+		--match-test test_Deployment \
 		--fork-url $(MAINNET_RPC) \
 		--fork-block-number 20182948 \
 		-vv
+		# --match-contract V3 \

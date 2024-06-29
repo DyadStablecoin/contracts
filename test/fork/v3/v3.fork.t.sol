@@ -12,12 +12,6 @@ import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 contract V3ForkTest is BaseTestV3 {
 
-  // function test_LiquidateXXX() public {
-  //   contracts.vaultManager.liquidate(1, 2, 30);
-
-  //   console.log("test");
-  // }
-
   modifier mintDyad(uint id, uint amount) {
     vm.prank(contracts.dNft.ownerOf(id));
     contracts.vaultManager.mintDyad(id, amount, address(this));
