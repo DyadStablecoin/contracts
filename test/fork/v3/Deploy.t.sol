@@ -15,6 +15,8 @@ contract DeployV3Test is Test, Parameters {
     UUPSUpgradeable proxy = UUPSUpgradeable(MAINNET_V2_VAULT_MANAGER);
 
     vm.startPrank(MAINNET_OWNER);
+    console.logBytes(abi.encodeCall(VaultManagerV3.initialize, ()));
+    // proxy.upgradeToAndCall(address(vm3), abi.encodeCall(VaultManagerV3.initialize, ()));
     proxy.upgradeToAndCall(address(vm3), "0x8129fc1c");
     vm.stopPrank();
 
