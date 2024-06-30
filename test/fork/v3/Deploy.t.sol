@@ -16,12 +16,16 @@ contract DeployV3Test is Test, Parameters {
 
     vm.startPrank(MAINNET_OWNER);
     console.logBytes(abi.encodeCall(VaultManagerV3.initialize, ()));
-    // proxy.upgradeToAndCall(address(vm3), abi.encodeCall(VaultManagerV3.initialize, ()));
-    proxy.upgradeToAndCall(address(vm3), "0x8129fc1c");
+    proxy.upgradeToAndCall(address(vm3), abi.encodeCall(VaultManagerV3.initialize, ()));
+    // proxy.upgradeToAndCall(address(vm3), "0x8129fc1c");
     vm.stopPrank();
 
     vm3 = VaultManagerV3(address(proxy)); 
 
     assertEq(address(proxy), MAINNET_V2_VAULT_MANAGER);
+    assertEq(vm3.MAX_VAULTS(), 6);
+
+    console.log(vm3.owner());
+    assertEq(vm3.owner(), MAINNET_OWNER);
   }
 }

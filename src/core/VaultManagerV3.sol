@@ -1,8 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import "forge-std/console.sol";
-
 import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
@@ -173,25 +171,20 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isValidDNft(to)
     {
       uint cr = collatRatio(id);
-      console.log("collatRatio: %s", cr);
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint debt = dyad.mintedDyad(id);
-      console.log("debt: %s", debt);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
       uint totalValue = getTotalValue(id);
-      console.log("totalValue: %s", totalValue);
       if (totalValue == 0) return;
 
       uint numberOfVaults = vaults[id].length();
-      console.log("numberOfVaults: %s", numberOfVaults);
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[id].at(i));
         if (vaultLicenser.isLicensed(address(vault))) {
           uint value = vault.getUsdValue(id);
-          console.log("value of vault: %s", value);
           if (value == 0) continue;
           uint asset;
           if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
@@ -202,22 +195,16 @@ contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
             asset = allAsset.mulWadDown(amount).divWadDown(debt);
           } else {
             uint share       = value.divWadDown(totalValue);
-            console.log("share: %s", share);
             uint amountShare = share.mulWadUp(amount);
-            console.log("amountShare: %s", amountShare);
             uint reward_rate = amount
                                 .divWadDown(debt)
                                 .mulWadDown(LIQUIDATION_REWARD);
-            console.log("reward_rate: %s", reward_rate);
             uint valueToMove = amountShare + amountShare.mulWadUp(reward_rate);
-            console.log("valueToMove: %s", valueToMove);
             uint cappedValue = valueToMove > value ? value : valueToMove;
-            console.log("cappedValue: %s", cappedValue);
             asset = cappedValue 
                       * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
                       / vault.assetPrice() 
                       / 1e18;
-            console.log("asset: %s", asset);
           }
           vault.move(id, to, asset);
         }
