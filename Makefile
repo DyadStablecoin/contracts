@@ -135,13 +135,13 @@ deployV3:
 	forge clean
 	forge script script/deploy/DeployVaultManagerV3.s.sol \
 		--rpc-url $(MAINNET_RPC) \
-		--sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A \
+		--sender 0x3a37e58345Eb6c67503766d60a33d7EAFBFfA4af \
 		--broadcast \
-		--verify \
 		-i 1 \
 		-vvvv \
 		--via-ir \
 		--optimize
+		# --verify \
 
 testV3:
 	forge clean
@@ -151,3 +151,6 @@ testV3:
 		--fork-block-number 20182948 \
 		-vv
 		# --match-contract V3 \
+			
+verify:
+	forge verify-contract 0x5c1a3f77EE504bd802bd72dA68Fa7B4Bafe0Fd79 --etherscan-api-key $(ETHERSCAN_API_KEY) src/core/VaultManagerV3.sol:VaultManagerV3 --compiler-version 0.8.20
