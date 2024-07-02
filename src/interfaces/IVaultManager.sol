@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity = 0.8.17;
+pragma solidity ^0.8.20;
 
 interface IVaultManager {
   event Added     (uint indexed id, address indexed vault);
@@ -20,8 +20,9 @@ interface IVaultManager {
   error InvalidDNft();
   error CrTooLow();
   error CrTooHigh();
-  error DepositedInSameBlock();
-  error NotEnoughExoCollat();   // Not enough exogenous collateral
+  error CanNotWithdrawInSameBlock();
+  error NotEnoughExoCollat();
+  error VaultNotKerosene();
 
   /**
    * @notice Adds a vault to the dNFT position
@@ -85,5 +86,5 @@ interface IVaultManager {
    * @param id The ID of the dNFT to be liquidated.
    * @param to The address where the collateral will be sent.
    */
-  function liquidate(uint id, uint to) external;
+  // function liquidate(uint id, uint to, uint amount) external;
 }

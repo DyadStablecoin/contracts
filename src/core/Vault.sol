@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IDNft}         from "../interfaces/IDNft.sol";

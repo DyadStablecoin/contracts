@@ -4,7 +4,7 @@ ifdef FILE
   matchFile = --match-contract $(FILE)
 endif
 ifdef FUNC
-  matchFunction = --match $(FUNC)
+  matchFunction = --match-test $(FUNC)
 endif
 
 test = forge test $(matchFile) $(matchFunction)
@@ -55,7 +55,12 @@ mdeployVault:
 	forge script script/deploy/Deploy.Vault.Mainnet.s.sol --rpc-url $(MAINNET_RPC) --sender 0x4794d0E92E4C01AF3473839749826394a7FB770A --broadcast --verify -i 1 -vvvv
 
 transferWsteth:
-	forge script script/mock/transfer.wsteth.s.sol   --rpc-url http://127.0.0.1:8545 --broadcast --sender 0x176F3DAb24a159341c0509bB36B833E7fdd0a132 --unlocked
+	forge script script/mock/transfer.wsteth.s.sol \
+		--rpc-url http://127.0.0.1:8545 \
+		--broadcast \
+		--sender 0x2fEb1512183545f48f6b9C5b4EbfCaF49CfCa6F3 \
+		--unlocked \
+		--legacy
 	
 # deploy staking contracts on goerli
 gdeployStaking:
@@ -85,4 +90,68 @@ mDeployV2:
 	forge script script/deploy/Deploy.V2.s.sol --rpc-url $(MAINNET_RPC) --sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A --broadcast --verify -i 1 -vvvv --via-ir --optimize
 
 forkTestV2:
-	forge test --match-contract V2 --fork-url $(MAINNET_RPC) --fork-block-number 19621640 -vvvv
+	forge clean
+	forge test $(matchFile) $(matchFunction) \
+		--fork-url $(MAINNET_RPC) \
+		--fork-block-number 19621640 \
+		-vvv
+
+testV2:
+	forge clean
+	forge test \
+		--match-contract V2 \
+		--fork-url $(MAINNET_RPC) \
+		--fork-block-number 19621640 \
+		-vv
+
+deployV2:
+	forge clean
+	forge script script/deploy/Deploy.V2.s.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0xEEB785F7700ab3EBbD084CE22f274b4961950d9A \
+		--broadcast \
+		--verify \
+		-i 1 \
+		-vvvv \
+		--legacy \
+		--via-ir \
+		--optimize
+
+deployKeroseneVaultV2:
+	forge clean
+	forge script script/deploy/Deploy.KeroseneVaultV2.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0xe1d3244073f45a8f1Ed28b31975755c85181161C \
+		--broadcast \
+		--verify \
+		-i 1 \
+		-vvvv \
+		--via-ir \
+		--optimize
+
+anvilFork:
+	anvil --chain-id 31337 --fork-url $(MAINNET_RPC) --auto-impersonate --gas-price 0
+
+deployV3:
+	forge clean
+	forge script script/deploy/DeployVaultManagerV3.s.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0x3a37e58345Eb6c67503766d60a33d7EAFBFfA4af \
+		--broadcast \
+		-i 1 \
+		-vvvv \
+		--via-ir \
+		--optimize
+		# --verify \
+
+testV3:
+	forge clean
+	forge test \
+		--match-test test_Deployment \
+		--fork-url $(MAINNET_RPC) \
+		--fork-block-number 20182948 \
+		-vv
+		# --match-contract V3 \
+			
+verify:
+	forge verify-contract 0x5c1a3f77EE504bd802bd72dA68Fa7B4Bafe0Fd79 --etherscan-api-key $(ETHERSCAN_API_KEY) src/core/VaultManagerV3.sol:VaultManagerV3 --compiler-version 0.8.20
