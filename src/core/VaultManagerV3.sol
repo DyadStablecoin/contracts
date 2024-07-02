@@ -16,7 +16,8 @@ import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
+/// @custom:oz-upgrades-from src/core/VaultManagerV2.sol:VaultManagerV2
+contract VaultManagerV3 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
@@ -42,20 +43,12 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize(
-    DNft          _dNft,
-    Dyad          _dyad,
-    VaultLicenser _vaultLicenser
-  ) 
+  function initialize() 
     public 
-      initializer 
+      reinitializer(2) 
   {
     __UUPSUpgradeable_init();
     __Ownable_init(msg.sender);
-
-    dNft          = _dNft;
-    dyad          = _dyad;
-    vaultLicenser = _vaultLicenser;
   }
 
   function add(
@@ -177,31 +170,44 @@ contract VaultManagerV2 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isValidDNft(id)
       isValidDNft(to)
     {
-      if (collatRatio(id) >= MIN_COLLAT_RATIO) revert CrTooHigh();
+      uint cr = collatRatio(id);
+      if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
-      uint totalValue  = getTotalValue(id);
-      uint reward_rate = amount
-                          .divWadDown(debt)
-                          .mulWadDown(LIQUIDATION_REWARD);
+      uint totalValue = getTotalValue(id);
+      if (totalValue == 0) return;
 
       uint numberOfVaults = vaults[id].length();
       for (uint i = 0; i < numberOfVaults; i++) {
-          Vault vault = Vault(vaults[id].at(i));
-          uint value       = vault.getUsdValue(id);
-          uint share       = value.divWadDown(totalValue);
-          uint amountShare = share.mulWadDown(amount);
-          uint valueToMove = amountShare + amountShare.mulWadDown(reward_rate);
-          uint cappedValue = valueToMove > value ? value : valueToMove;
-          uint asset = cappedValue 
-                         * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
-                         / vault.assetPrice() 
-                         / 1e18;
-
+        Vault vault = Vault(vaults[id].at(i));
+        if (vaultLicenser.isLicensed(address(vault))) {
+          uint value = vault.getUsdValue(id);
+          if (value == 0) continue;
+          uint asset;
+          if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
+            uint cappedCr               = cr < 1e18 ? 1e18 : cr;
+            uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
+            uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
+            uint allAsset = vault.id2asset(id).mulWadUp(liquidationAssetShare);
+            asset = allAsset.mulWadDown(amount).divWadDown(debt);
+          } else {
+            uint share       = value.divWadDown(totalValue);
+            uint amountShare = share.mulWadUp(amount);
+            uint reward_rate = amount
+                                .divWadDown(debt)
+                                .mulWadDown(LIQUIDATION_REWARD);
+            uint valueToMove = amountShare + amountShare.mulWadUp(reward_rate);
+            uint cappedValue = valueToMove > value ? value : valueToMove;
+            asset = cappedValue 
+                      * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
+                      / vault.assetPrice() 
+                      / 1e18;
+          }
           vault.move(id, to, asset);
+        }
       }
 
       emit Liquidate(id, msg.sender, to);

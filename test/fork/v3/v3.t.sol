@@ -3,15 +3,13 @@ pragma solidity ^0.8.20;
 
 import "forge-std/console.sol";
 
-import {BaseTestV2}          from "./BaseV2.sol";
-import {Licenser}            from "../../src/core/Licenser.sol";
-import {VaultManagerV2}      from "../../src/core/VaultManagerV2.sol";
-import {IVaultManager}       from "../../src/interfaces/IVaultManager.sol";
-import {IVault}              from "../../src/interfaces/IVault.sol";
+import {BaseTestV3}          from "./BaseV3.sol";
+import {Licenser}            from "../../../src/core/Licenser.sol";
+import {VaultManagerV2}      from "../../../src/core/VaultManagerV2.sol";
+import {IVaultManager}       from "../../../src/interfaces/IVaultManager.sol";
+import {IVault}              from "../../../src/interfaces/IVault.sol";
 import {ERC20}    from "@solmate/src/tokens/ERC20.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
-
-import {VaultManagerV2UpgradeMock} from "../VaultManagerV2UpgradeMock.sol";
 
 /**
 Notes: Fork test 
@@ -19,40 +17,12 @@ Notes: Fork test
   - $3,545.56 / ETH
 */
 
-contract V2Test is BaseTestV2 {
+contract V3Test is BaseTestV3 {
 
   function test_LicenseVaultManager() public {
     Licenser licenser = Licenser(MAINNET_VAULT_MANAGER_LICENSER);
     vm.prank(MAINNET_OWNER);
     licenser.add(address(contracts.vaultManager));
-  }
-
-  function test_LicenseVaults() public {
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.ethVault), false);
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.wstEth), false);
-    vm.prank(MAINNET_OWNER);
-    contracts.vaultLicenser.add(address(contracts.keroseneVault), true);
-  }
-
-  function test_KeroseneVaults() public {
-    address[] memory vaults = contracts.kerosineManager.getVaults();
-    assertEq(vaults.length, 2);
-    assertEq(vaults[0], address(contracts.ethVault));
-    assertEq(vaults[1], address(contracts.wstEth));
-  }
-
-  function test_Ownership() public {
-    assertEq(contracts.kerosineManager.owner(), MAINNET_OWNER);
-    assertEq(contracts.vaultLicenser.owner(),   MAINNET_OWNER);
-    assertEq(contracts.kerosineManager.owner(), MAINNET_OWNER);
-    assertEq(contracts.keroseneVault.owner(),   MAINNET_OWNER);
-  }
-
-  function test_Denominator() public {
-    uint denominator = contracts.kerosineDenominator.denominator();
-    assertTrue(denominator < contracts.kerosene.balanceOf(MAINNET_OWNER));
   }
 
   function test_MintDNftOwner0() 
@@ -337,7 +307,7 @@ contract V2Test is BaseTestV2 {
     uint dyadAfter_Liquidatee = contracts.dyad.mintedDyad(alice0);
 
     assertTrue(ethAfter_Liquidator > 0);
-    assertTrue(ethAfter_Liquidatee > 0);
+    assertTrue(ethAfter_Liquidatee == 0);
 
     assertEq(getMintedDyad(alice0), 0);
     assertEq(getCR(alice0), type(uint256).max);
@@ -403,25 +373,4 @@ contract V2Test is BaseTestV2 {
     console.log("debtAfter: ", debtAfter/1e18);
   }
 
-  function test_UpgradeVaultManager() 
-    public 
-  {
-    vm.startPrank(MAINNET_OWNER);
-
-    console.log(address(contracts.vaultManager.dNft()));
-
-    Upgrades.upgradeProxy(
-      address(contracts.vaultManager),
-      "VaultManagerV2UpgradeMock.sol",
-      abi.encodeCall(
-        VaultManagerV2UpgradeMock.initialize,
-        (address(1))
-      )
-    );
-
-    // dnft address should be different now
-    console.log(address(contracts.vaultManager.dNft()));
-
-    vm.stopPrank();
-  }
 }

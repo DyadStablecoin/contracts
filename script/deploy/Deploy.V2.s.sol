@@ -14,8 +14,8 @@ import {VaultWstEth}            from "../../src/core/Vault.wsteth.sol";
 import {IWETH}                  from "../../src/interfaces/IWETH.sol";
 import {IAggregatorV3}          from "../../src/interfaces/IAggregatorV3.sol";
 import {KerosineManager}        from "../../src/core/KerosineManager.sol";
-import {UnboundedKerosineVault} from "../../src/core/Vault.kerosine.unbounded.sol";
 import {KeroseneOracle}         from "../../src/core/KeroseneOracle.sol";
+import {KeroseneVault}          from "../../src/core/VaultKerosene.sol";
 import {Kerosine}               from "../../src/staking/Kerosine.sol";
 import {KerosineDenominator}    from "../../src/staking/KerosineDenominator.sol";
 
@@ -24,16 +24,16 @@ import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import {Options}  from "openzeppelin-foundry-upgrades/Options.sol";
 
 struct Contracts {
-  DNft                   dNft;
-  Dyad                   dyad;
-  Kerosine               kerosene;
-  VaultLicenser          vaultLicenser;
-  VaultManagerV2         vaultManager;
-  Vault                  ethVault;
-  VaultWstEth            wstEth;
-  KerosineManager        kerosineManager;
-  UnboundedKerosineVault unboundedKerosineVault;
-  KerosineDenominator    kerosineDenominator;
+  DNft                dNft;
+  Dyad                dyad;
+  Kerosine            kerosene;
+  VaultLicenser       vaultLicenser;
+  VaultManagerV2      vaultManager;
+  Vault               ethVault;
+  VaultWstEth         wstEth;
+  KerosineManager     kerosineManager;
+  KeroseneVault       keroseneVault;
+  KerosineDenominator kerosineDenominator;
 }
 
 /**
@@ -90,25 +90,24 @@ contract DeployV2 is Script, Parameters {
 
     KeroseneOracle keroseneOracle = new KeroseneOracle();
 
-    UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
-      vaultManager,
-      Kerosine(MAINNET_KEROSENE), 
-      dyad,
-      kerosineManager, 
-      keroseneOracle
-    );
-
     KerosineDenominator kerosineDenominator = new KerosineDenominator(
       Kerosine(MAINNET_KEROSENE)
     );
 
-    unboundedKerosineVault.setDenominator(kerosineDenominator);
+    KeroseneVault keroseneVault = new KeroseneVault(
+      vaultManager,
+      Kerosine(MAINNET_KEROSENE), 
+      dyad,
+      kerosineManager, 
+      keroseneOracle,
+      kerosineDenominator
+    );
 
-    unboundedKerosineVault.transferOwnership(MAINNET_OWNER);
+    keroseneVault.transferOwnership(MAINNET_OWNER);
 
-    vaultLicenser.add(address(ethVault), false);
-    vaultLicenser.add(address(wstEth),   false);
-    vaultLicenser.add(address(unboundedKerosineVault), true);
+    vaultLicenser.add(address(ethVault),      false);
+    vaultLicenser.add(address(wstEth),        false);
+    vaultLicenser.add(address(keroseneVault), true);
 
     vaultLicenser.transferOwnership(MAINNET_OWNER);
 
@@ -123,7 +122,7 @@ contract DeployV2 is Script, Parameters {
       ethVault,
       wstEth,
       kerosineManager,
-      unboundedKerosineVault,
+      keroseneVault,
       kerosineDenominator
     );
   }
