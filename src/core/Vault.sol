@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
-import {VaultManager}  from "./VaultManager.sol";
+import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IDNft}         from "../interfaces/IDNft.sol";
 import {IVault}        from "../interfaces/IVault.sol";
 import {IAggregatorV3} from "../interfaces/IAggregatorV3.sol";
@@ -18,7 +18,7 @@ contract Vault is IVault {
 
   uint public constant STALE_DATA_TIMEOUT = 90 minutes; 
 
-  VaultManager  public immutable vaultManager;
+  IVaultManager public immutable vaultManager;
   ERC20         public immutable asset;
   IAggregatorV3 public immutable oracle;
 
@@ -30,7 +30,7 @@ contract Vault is IVault {
   }
 
   constructor(
-    VaultManager  _vaultManager,
+    IVaultManager _vaultManager,
     ERC20         _asset,
     IAggregatorV3 _oracle
   ) {

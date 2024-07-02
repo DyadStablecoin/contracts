@@ -1,22 +1,23 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.17;
+pragma solidity ^0.8.20;
 
-import {BoundedKerosineVault} from "../core/Vault.kerosine.bounded.sol";
-import {ERC20}                from "@solmate/src/tokens/ERC20.sol";
+import {Parameters} from "../params/Parameters.sol";
+import {Kerosine} from "../staking/Kerosine.sol";
 
-contract KerosineDenominator {
+contract KerosineDenominator is Parameters {
 
-  BoundedKerosineVault public boundedKerosineVault;
+  Kerosine public kerosine;
 
   constructor(
-    BoundedKerosineVault _boundedKerosineVault
+    Kerosine _kerosine
   ) {
-    boundedKerosineVault = _boundedKerosineVault;
+    kerosine = _kerosine;
   }
 
   function denominator() external view returns (uint) {
-    uint boundedKerosine = boundedKerosineVault.deposits();
-    return boundedKerosineVault.asset().totalSupply() + boundedKerosine;
+    // @dev: We subtract all the Kerosene in the multi-sig.
+    //       We are aware that this is not a great solution. That is
+    //       why we can switch out Denominator contracts.
+    return kerosine.totalSupply() - kerosine.balanceOf(MAINNET_OWNER);
   } 
-
 }

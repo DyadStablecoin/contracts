@@ -3,11 +3,14 @@ pragma solidity ^0.8.17;
 
 import {IStaking} from "../interfaces/IStaking.sol";
 
-import {Owned} from "@solmate/src/auth/Owned.sol";
-import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {Owned}           from "@solmate/src/auth/Owned.sol";
+import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
+import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 
 // from https://solidity-by-example.org/defi/staking-rewards/
 contract Staking is IStaking, Owned(msg.sender) {
+    using SafeTransferLib for ERC20;
+
     ERC20 public immutable stakingToken;
     ERC20 public immutable rewardsToken;
 
@@ -65,7 +68,7 @@ contract Staking is IStaking, Owned(msg.sender) {
 
     function stake(uint _amount) external updateReward(msg.sender) {
       require(_amount > 0, "amount = 0");
-      stakingToken.transferFrom(msg.sender, address(this), _amount);
+      stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
       balanceOf[msg.sender] += _amount;
       totalSupply += _amount;
       emit Staked(msg.sender, _amount);
@@ -75,7 +78,7 @@ contract Staking is IStaking, Owned(msg.sender) {
       require(_amount > 0, "amount = 0");
       balanceOf[msg.sender] -= _amount;
       totalSupply -= _amount;
-      stakingToken.transfer(msg.sender, _amount);
+      stakingToken.safeTransfer(msg.sender, _amount);
       emit Withdrawn(msg.sender, _amount);
     }
 
@@ -90,7 +93,7 @@ contract Staking is IStaking, Owned(msg.sender) {
       uint reward = rewards[msg.sender];
       if (reward > 0) {
           rewards[msg.sender] = 0;
-          rewardsToken.transfer(msg.sender, reward);
+          rewardsToken.safeTransfer(msg.sender, reward);
           emit RewardPaid(msg.sender, reward);
       }
     }
