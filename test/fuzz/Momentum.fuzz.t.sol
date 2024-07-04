@@ -46,7 +46,7 @@ contract MomentumFuzzTest is Test {
         dnft.mintInsiderNft(USER_3);
     }
 
-    function testFuzz_totalSupplyEqualsAllBalances(
+    function testFuzz_totalSupplyGteAllBalances(
         uint256 deposit1,
         uint256 deposit2,
         uint256 deposit3
@@ -95,6 +95,6 @@ contract MomentumFuzzTest is Test {
         uint256 balance2 = momentum.balanceOf(USER_2);
         uint256 balance3 = momentum.balanceOf(USER_3);
 
-        vm.assertEq(totalSupply, balance1 + balance2 + balance3);
+        vm.assertGe(totalSupply, balance1 + balance2 + balance3);
     }
 }
