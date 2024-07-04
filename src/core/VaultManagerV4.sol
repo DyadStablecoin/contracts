@@ -218,6 +218,10 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
                       / 1e18;
           }
           vault.move(id, to, asset);
+          if (address(vault) == KEROSENE_VAULT) {
+            momentum.beforeKeroseneWithdrawn(id, asset);
+            momentum.afterKeroseneDeposited(to);
+          } 
         }
       }
 
