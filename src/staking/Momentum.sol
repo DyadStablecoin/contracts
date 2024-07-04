@@ -19,6 +19,8 @@ struct NoteMomentumData {
 }
 
 contract Momentum is IERC20 {
+    using FixedPointMathLib for uint256;
+
     error TransferNotAllowed();
     error NotVaultManager();
 
@@ -26,6 +28,8 @@ contract Momentum is IERC20 {
     IERC721Enumerable public immutable DNFT;
     IVault public immutable KEROSENE_VAULT;
     ERC20 public immutable KEROSENE;
+
+    uint256 private constant WAD = 1e18;
 
     string public constant name = "Kerosene Momentum";
     string public constant symbol = "kMOM";
@@ -66,7 +70,7 @@ contract Momentum is IERC20 {
         // all notes is expensive from a gas perspective especially as the number of notes grows
         // unbounded over time.
         uint256 timeElapsed = block.timestamp - globalLastUpdate;
-        return  globalLastMomentum + uint192(timeElapsed * 1e18);
+        return uint256(globalLastMomentum + uint192(timeElapsed * WAD));
     }
 
     /// @notice Returns the amount of tokens owned by `account`.
@@ -143,7 +147,7 @@ contract Momentum is IERC20 {
             lastMomentum: uint120(newMomentum)
         });
 
-        globalLastMomentum += uint192((globalLastUpdate - block.timestamp) * 1e18);
+        globalLastMomentum += uint192((globalLastUpdate - block.timestamp));
         globalLastUpdate = uint40(block.timestamp);
 
         emit Transfer(
@@ -170,8 +174,8 @@ contract Momentum is IERC20 {
             noteData[noteId]
         );
 
-        uint256 slash = (amountWithdrawn * 1e18) / lastUpdate.keroseneDeposited;
-        uint256 slashedMomentum = (slash * momentum) / 1e18;
+        uint256 slash = amountWithdrawn.divWadDown(lastUpdate.keroseneDeposited);
+        uint256 slashedMomentum = slash.mulWadUp(momentum);
         uint256 updatedMomentum = momentum - slashedMomentum;
 
         noteData[noteId] = NoteMomentumData({
@@ -182,7 +186,9 @@ contract Momentum is IERC20 {
             lastMomentum: uint120(updatedMomentum)
         });
 
-        globalLastMomentum += uint192((globalLastUpdate - block.timestamp) * 1e18);
+        globalLastMomentum += uint192(
+            (globalLastUpdate - block.timestamp)
+        );
         globalLastUpdate = uint40(block.timestamp);
     }
 
@@ -190,10 +196,11 @@ contract Momentum is IERC20 {
         uint256 totalKeroseneInVault,
         NoteMomentumData memory lastUpdate
     ) internal view returns (uint256) {
-        uint256 userShare = FixedPointMathLib.divWadUp(lastUpdate.keroseneDeposited, totalKeroseneInVault);
-        uint256 timePassed = block.timestamp - lastUpdate.lastAction;
+        uint256 userShare = uint256(lastUpdate.keroseneDeposited)
+            .divWadDown(totalKeroseneInVault);
+        uint256 timePassed = (block.timestamp - lastUpdate.lastAction);
         uint256 momentumAccrued = timePassed * userShare;
 
-        return lastUpdate.lastMomentum + momentumAccrued;
+        return (lastUpdate.lastMomentum + momentumAccrued);
     }
 }
