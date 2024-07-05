@@ -173,12 +173,8 @@ contract DyadXP is IERC20 {
         );
         globalLastUpdate = uint40(block.timestamp);
 
-        uint256 xpDelta = xp - lastUpdate.lastXP;
-        if (slashedXP > xpDelta) {
-            emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP - xpDelta);
-        } else {
-            emit Transfer(address(0), DNFT.ownerOf(noteId), xpDelta - slashedXP);
-        }
+        emit Transfer(address(0), address(DNFT.ownerOf(noteId)), xp - lastUpdate.lastXP);
+        emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
     }
 
     function _computeXP(
