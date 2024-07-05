@@ -8,40 +8,35 @@ import {IERC721Enumerable} from "forge-std/interfaces/IERC721.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IVault} from "../interfaces/IVault.sol";
 import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
-import {console} from "forge-std/Console.sol";
 
-struct NoteMomentumData {
+struct NoteXPData {
     // uint40 supports 34,000 years before overflow
     uint40 lastAction;
     // uint96 max is 79b at 18 decimals which is more than total kero supply
     uint96 keroseneDeposited;
     // uint120 supports deposit of entire kerosene supply by a single note for ~42 years before overflow
-    uint120 lastMomentum;
+    uint120 lastXP;
 }
 
-contract Momentum is IERC20 {
+contract DyadXP is IERC20 {
     using FixedPointMathLib for uint256;
 
     error TransferNotAllowed();
     error NotVaultManager();
-
-    event MomentumSlashed(uint256 noteId, uint256 amount);
 
     IVaultManager public immutable VAULT_MANAGER;
     IERC721Enumerable public immutable DNFT;
     IVault public immutable KEROSENE_VAULT;
     ERC20 public immutable KEROSENE;
 
-    uint256 private constant WAD = 1e18;
-
-    string public constant name = "Kerosene Momentum";
-    string public constant symbol = "kMOM";
+    string public constant name = "Dyad XP";
+    string public constant symbol = "dXP";
     uint8 public constant decimals = 18;
 
     uint40 globalLastUpdate;
-    uint192 globalLastMomentum;
+    uint192 globalLastXP;
 
-    mapping(uint256 => NoteMomentumData) public noteData;
+    mapping(uint256 => NoteXPData) public noteData;
 
     constructor(address vaultManager, address keroseneVault, address dnft) {
         VAULT_MANAGER = IVaultManager(vaultManager);
@@ -57,10 +52,10 @@ contract Momentum is IERC20 {
             if (depositedKero == 0) {
                 continue;
             }
-            noteData[i] = NoteMomentumData({
+            noteData[i] = NoteXPData({
                 lastAction: uint40(block.timestamp),
                 keroseneDeposited: uint96(depositedKero),
-                lastMomentum: 0
+                lastXP: 0
             });
         }
     }
@@ -69,7 +64,7 @@ contract Momentum is IERC20 {
     function totalSupply() public view returns (uint256) {
         uint256 totalKerosene = KEROSENE.balanceOf(address(KEROSENE_VAULT));
         uint256 timeElapsed = block.timestamp - globalLastUpdate;
-        return uint256(globalLastMomentum + timeElapsed * totalKerosene);
+        return uint256(globalLastXP + timeElapsed * totalKerosene);
     }
 
     /// @notice Returns the amount of tokens owned by `account`.
@@ -79,16 +74,16 @@ contract Momentum is IERC20 {
 
         for (uint256 i = 0; i < noteBalance; i++) {
             uint256 noteId = DNFT.tokenOfOwnerByIndex(account, i);
-            NoteMomentumData memory lastUpdate = noteData[noteId];
-            totalMomentum += _computeMomentum(lastUpdate);
+            NoteXPData memory lastUpdate = noteData[noteId];
+            totalMomentum += _computeXP(lastUpdate);
         }
 
         return totalMomentum;
     }
 
     function balanceOfNote(uint256 noteId) external view returns (uint256) {
-        NoteMomentumData memory lastUpdate = noteData[noteId];
-        return _computeMomentum(lastUpdate);
+        NoteXPData memory lastUpdate = noteData[noteId];
+        return _computeXP(lastUpdate);
     }
 
     /// @notice Moves `amount` tokens from the caller's account to `to`.
@@ -123,23 +118,25 @@ contract Momentum is IERC20 {
             revert NotVaultManager();
         }
 
-        NoteMomentumData memory lastUpdate = noteData[noteId];
+        NoteXPData memory lastUpdate = noteData[noteId];
         uint256 totalKeroseneInVault = KEROSENE.balanceOf(
             address(KEROSENE_VAULT)
         ) - lastUpdate.keroseneDeposited;
 
-        uint256 newMomentum = _computeMomentum(lastUpdate);
+        uint256 newXP = _computeXP(lastUpdate);
 
-        noteData[noteId] = NoteMomentumData({
+        noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
-            lastMomentum: uint120(newMomentum)
+            lastXP: uint120(newXP)
         });
 
-        globalLastMomentum += uint192(
+        globalLastXP += uint192(
             (block.timestamp - globalLastUpdate) * totalKeroseneInVault
         );
         globalLastUpdate = uint40(block.timestamp);
+
+        emit Transfer(address(0), address(DNFT.ownerOf(noteId)), newXP - lastUpdate.lastXP);
     }
 
     function beforeKeroseneWithdrawn(
@@ -150,43 +147,46 @@ contract Momentum is IERC20 {
             revert NotVaultManager();
         }
 
-        NoteMomentumData memory lastUpdate = noteData[noteId];
+        NoteXPData memory lastUpdate = noteData[noteId];
         uint256 totalKeroseneInVault = KEROSENE.balanceOf(
             address(KEROSENE_VAULT)
         );
-        uint256 momentum = _computeMomentum(lastUpdate);
-        uint256 slashedMomentum = momentum.mulDivUp(
+        uint256 xp = _computeXP(lastUpdate);
+        uint256 slashedXP = xp.mulDivUp(
             amountWithdrawn,
             lastUpdate.keroseneDeposited
         );
-        if (slashedMomentum > momentum) {
-            slashedMomentum = momentum;
+        if (slashedXP > xp) {
+            slashedXP = xp;
         }
 
-        noteData[noteId] = NoteMomentumData({
+        noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(
                 lastUpdate.keroseneDeposited - amountWithdrawn
             ),
-            lastMomentum: uint120(momentum - slashedMomentum)
+            lastXP: uint120(xp - slashedXP)
         });
 
-        globalLastMomentum += uint192(
-            (block.timestamp - globalLastUpdate) * totalKeroseneInVault
+        globalLastXP = uint192(
+            globalLastXP + (block.timestamp - globalLastUpdate) * totalKeroseneInVault - slashedXP
         );
-
-        globalLastMomentum -= uint192(slashedMomentum);
         globalLastUpdate = uint40(block.timestamp);
 
-        emit MomentumSlashed(noteId, slashedMomentum);
+        uint256 xpDelta = xp - lastUpdate.lastXP;
+        if (slashedXP > xpDelta) {
+            emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP - xpDelta);
+        } else {
+            emit Transfer(address(0), DNFT.ownerOf(noteId), xpDelta - slashedXP);
+        }
     }
 
-    function _computeMomentum(
-        NoteMomentumData memory lastUpdate
+    function _computeXP(
+        NoteXPData memory lastUpdate
     ) internal view returns (uint256) {
         uint256 elapsed = block.timestamp - lastUpdate.lastAction;
         uint256 deposited = lastUpdate.keroseneDeposited;
 
-        return uint256(lastUpdate.lastMomentum + elapsed * deposited);
+        return uint256(lastUpdate.lastXP + elapsed * deposited);
     }
 }

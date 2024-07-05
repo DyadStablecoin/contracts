@@ -1,6 +1,6 @@
 import {Test} from "forge-std/Test.sol";
 import {IVaultManager} from "../../src/interfaces/IVaultManager.sol";
-import {Momentum} from "../../src/staking/Momentum.sol";
+import {DyadXP} from "../../src/staking/DyadXP.sol";
 import {Kerosine} from "../../src/staking/Kerosine.sol";
 import {DNft} from "../../src/core/DNft.sol";
 import {KeroseneVault} from "../../src/core/VaultKerosene.sol";
@@ -10,10 +10,10 @@ import {KerosineManager} from "../../src/core/KerosineManager.sol";
 import {Licenser} from "../../src/core/Licenser.sol";
 import {KerosineDenominator} from "../../src/staking/KerosineDenominator.sol";
 
-contract MomentumFuzzTest is Test {
+contract DyadXPFuzzTest is Test {
     address VAULT_MANAGER = address(0x5678);
 
-    Momentum momentum;
+    DyadXP momentum;
     Kerosine kerosine;
     DNft dnft;
     Dyad dyad;
@@ -35,7 +35,7 @@ contract MomentumFuzzTest is Test {
             IAggregatorV3(address(0x0)),
             KerosineDenominator(address(0x0))
         );
-        momentum = new Momentum(
+        momentum = new DyadXP(
             VAULT_MANAGER,
             address(keroseneVault),
             address(dnft)
