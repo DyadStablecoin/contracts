@@ -51,9 +51,9 @@ contract MomentumFuzzTest is Test {
         uint256 deposit2,
         uint256 deposit3
     ) external {
-        vm.assume(deposit1 > 0);
-        vm.assume(deposit2 > 0);
-        vm.assume(deposit3 > 0);
+        vm.assume(deposit1 > 1);
+        vm.assume(deposit2 > 1);
+        vm.assume(deposit3 > 1);
         vm.assume(deposit1 < kerosine.totalSupply());
         vm.assume(deposit2 < kerosine.totalSupply());
         vm.assume(deposit3 < kerosine.totalSupply());
@@ -87,6 +87,24 @@ contract MomentumFuzzTest is Test {
 
         vm.warp(block.timestamp + 1 days);
         _checkInvariantSupplyBalances();
+
+        vm.startPrank(VAULT_MANAGER);
+        uint256 totalMomentumBefore = momentum.totalSupply();
+        uint256 userMomentumBefore = momentum.balanceOf(USER_1);
+        momentum.beforeKeroseneWithdrawn(0, deposit1 / 2);
+        keroseneVault.withdraw(0, USER_1, deposit1 / 2);
+        uint256 totalMomentumAfter = momentum.totalSupply();
+        uint256 userMomentumAfter = momentum.balanceOf(USER_1);
+        assertTrue(totalMomentumBefore > totalMomentumAfter);
+        assertTrue(userMomentumBefore > userMomentumAfter);
+        keroseneVault.deposit(0, deposit1 / 2);
+        momentum.afterKeroseneDeposited(0);
+        assertEq(momentum.totalSupply(), totalMomentumAfter);
+        assertEq(momentum.balanceOf(USER_1), userMomentumAfter);
+        vm.stopPrank();
+
+        _checkInvariantSupplyBalances();
+        
     }
 
     function _checkInvariantSupplyBalances() internal view {
@@ -95,6 +113,6 @@ contract MomentumFuzzTest is Test {
         uint256 balance2 = momentum.balanceOf(USER_2);
         uint256 balance3 = momentum.balanceOf(USER_3);
 
-        vm.assertGe(totalSupply, balance1 + balance2 + balance3);
+        vm.assertEq(totalSupply, balance1 + balance2 + balance3);
     }
 }
