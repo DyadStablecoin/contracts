@@ -1,6 +1,6 @@
 import {Test} from "forge-std/Test.sol";
 import {IVaultManager} from "../../src/interfaces/IVaultManager.sol";
-import {Momentum} from "../../src/staking/Momentum.sol";
+import {DyadXP} from "../../src/staking/DyadXP.sol";
 import {Kerosine} from "../../src/staking/Kerosine.sol";
 import {DNft} from "../../src/core/DNft.sol";
 import {KeroseneVault} from "../../src/core/VaultKerosene.sol";
@@ -10,10 +10,10 @@ import {KerosineManager} from "../../src/core/KerosineManager.sol";
 import {Licenser} from "../../src/core/Licenser.sol";
 import {KerosineDenominator} from "../../src/staking/KerosineDenominator.sol";
 
-contract MomentumFuzzTest is Test {
+contract DyadXPFuzzTest is Test {
     address VAULT_MANAGER = address(0x5678);
 
-    Momentum momentum;
+    DyadXP momentum;
     Kerosine kerosine;
     DNft dnft;
     Dyad dyad;
@@ -35,7 +35,7 @@ contract MomentumFuzzTest is Test {
             IAggregatorV3(address(0x0)),
             KerosineDenominator(address(0x0))
         );
-        momentum = new Momentum(
+        momentum = new DyadXP(
             VAULT_MANAGER,
             address(keroseneVault),
             address(dnft)
@@ -46,14 +46,14 @@ contract MomentumFuzzTest is Test {
         dnft.mintInsiderNft(USER_3);
     }
 
-    function testFuzz_totalSupplyEqualsAllBalances(
+    function testFuzz_totalSupplyGteAllBalances(
         uint256 deposit1,
         uint256 deposit2,
         uint256 deposit3
     ) external {
-        vm.assume(deposit1 > 0);
-        vm.assume(deposit2 > 0);
-        vm.assume(deposit3 > 0);
+        vm.assume(deposit1 > 1);
+        vm.assume(deposit2 > 1);
+        vm.assume(deposit3 > 1);
         vm.assume(deposit1 < kerosine.totalSupply());
         vm.assume(deposit2 < kerosine.totalSupply());
         vm.assume(deposit3 < kerosine.totalSupply());
@@ -87,6 +87,24 @@ contract MomentumFuzzTest is Test {
 
         vm.warp(block.timestamp + 1 days);
         _checkInvariantSupplyBalances();
+
+        vm.startPrank(VAULT_MANAGER);
+        uint256 totalMomentumBefore = momentum.totalSupply();
+        uint256 userMomentumBefore = momentum.balanceOf(USER_1);
+        momentum.beforeKeroseneWithdrawn(0, deposit1 / 2);
+        keroseneVault.withdraw(0, USER_1, deposit1 / 2);
+        uint256 totalMomentumAfter = momentum.totalSupply();
+        uint256 userMomentumAfter = momentum.balanceOf(USER_1);
+        assertTrue(totalMomentumBefore > totalMomentumAfter);
+        assertTrue(userMomentumBefore > userMomentumAfter);
+        keroseneVault.deposit(0, deposit1 / 2);
+        momentum.afterKeroseneDeposited(0);
+        assertEq(momentum.totalSupply(), totalMomentumAfter);
+        assertEq(momentum.balanceOf(USER_1), userMomentumAfter);
+        vm.stopPrank();
+
+        _checkInvariantSupplyBalances();
+        
     }
 
     function _checkInvariantSupplyBalances() internal view {
