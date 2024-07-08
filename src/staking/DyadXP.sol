@@ -22,6 +22,7 @@ contract DyadXP is IERC20 {
     using FixedPointMathLib for uint256;
 
     error TransferNotAllowed();
+    error ApproveNotAllowed();
     error NotVaultManager();
 
     IVaultManager public immutable VAULT_MANAGER;
@@ -100,7 +101,7 @@ contract DyadXP is IERC20 {
     /// @notice Sets `amount` as the allowance of `spender` over the caller's tokens.
     /// @dev Be aware of front-running risks: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     function approve(address, uint256) external pure returns (bool) {
-        revert TransferNotAllowed();
+        revert ApproveNotAllowed();
     }
 
     /// @notice Moves `amount` tokens from `from` to `to` using the allowance mechanism.
