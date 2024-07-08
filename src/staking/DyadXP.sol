@@ -69,16 +69,16 @@ contract DyadXP is IERC20 {
 
     /// @notice Returns the amount of tokens owned by `account`.
     function balanceOf(address account) external view returns (uint256) {
-        uint256 totalMomentum;
+        uint256 totalXP;
         uint256 noteBalance = DNFT.balanceOf(account);
 
         for (uint256 i = 0; i < noteBalance; i++) {
             uint256 noteId = DNFT.tokenOfOwnerByIndex(account, i);
             NoteXPData memory lastUpdate = noteData[noteId];
-            totalMomentum += _computeXP(lastUpdate);
+            totalXP += _computeXP(lastUpdate);
         }
 
-        return totalMomentum;
+        return totalXP;
     }
 
     function balanceOfNote(uint256 noteId) external view returns (uint256) {
