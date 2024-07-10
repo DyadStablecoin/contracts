@@ -119,15 +119,17 @@ contract DyadXP is IERC20 {
         }
 
         NoteXPData memory lastUpdate = noteData[noteId];
+        uint96 noteIdNewBalance = uint96(KEROSENE_VAULT.id2asset(noteId));
+
         uint256 totalKeroseneInVault = KEROSENE.balanceOf(
             address(KEROSENE_VAULT)
-        ) - lastUpdate.keroseneDeposited;
+        ) - (noteIdNewBalance - lastUpdate.keroseneDeposited);
 
         uint256 newXP = _computeXP(lastUpdate);
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
-            keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
+            keroseneDeposited: noteIdNewBalance,
             lastXP: uint120(newXP)
         });
 
