@@ -22,6 +22,7 @@ contract DyadXP is IERC20 {
     using FixedPointMathLib for uint256;
 
     error TransferNotAllowed();
+    error ApproveNotAllowed();
     error NotVaultManager();
 
     IVaultManager public immutable VAULT_MANAGER;
@@ -69,16 +70,16 @@ contract DyadXP is IERC20 {
 
     /// @notice Returns the amount of tokens owned by `account`.
     function balanceOf(address account) external view returns (uint256) {
-        uint256 totalMomentum;
+        uint256 totalXP;
         uint256 noteBalance = DNFT.balanceOf(account);
 
         for (uint256 i = 0; i < noteBalance; i++) {
             uint256 noteId = DNFT.tokenOfOwnerByIndex(account, i);
             NoteXPData memory lastUpdate = noteData[noteId];
-            totalMomentum += _computeXP(lastUpdate);
+            totalXP += _computeXP(lastUpdate);
         }
 
-        return totalMomentum;
+        return totalXP;
     }
 
     function balanceOfNote(uint256 noteId) external view returns (uint256) {
@@ -100,7 +101,7 @@ contract DyadXP is IERC20 {
     /// @notice Sets `amount` as the allowance of `spender` over the caller's tokens.
     /// @dev Be aware of front-running risks: https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729
     function approve(address, uint256) external pure returns (bool) {
-        revert TransferNotAllowed();
+        revert ApproveNotAllowed();
     }
 
     /// @notice Moves `amount` tokens from `from` to `to` using the allowance mechanism.
