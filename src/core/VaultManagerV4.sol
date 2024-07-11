@@ -48,7 +48,7 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize(DyadXP _dyadXP)
+  function initialize()
     public 
       reinitializer(4) 
   {
