@@ -50,12 +50,16 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
   function initialize(DyadXP _dyadXP)
     public 
-      reinitializer(3) 
+      reinitializer(4) 
   {
     __UUPSUpgradeable_init();
     __Ownable_init(msg.sender);
 
-    dyadXP = _dyadXP;
+    dyadXP = new DyadXP(
+      address(this),
+      0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43, // MAINNET_V2_KEROSENE_V2_VAULT
+      0xDc400bBe0B8B79C07A962EA99a642F5819e3b712  // MAINNET_DNFT
+    );
   }
 
   function add(
