@@ -5,16 +5,16 @@ import "forge-std/Script.sol";
 
 import {VaultManagerV4} from "../../src/core/VaultManagerV4.sol";
 import {Parameters}     from "../../src/params/Parameters.sol";
-import {Momentum}       from "../../src/staking/Momentum.sol";
+import {DyadXP}       from "../../src/staking/DyadXP.sol";
 
-contract DeployMomentum is Script, Parameters {
+contract DeployXP is Script, Parameters {
   function run() public {
     vm.startBroadcast();  // ----------------------
 
     /// @dev we do the upgrade manually through the multi-sig UI
     VaultManagerV4 vm4 = new VaultManagerV4();
 
-    Momentum momentum = new Momentum(
+    DyadXP dyadXP = new DyadXP(
       MAINNET_V2_VAULT_MANAGER,
       MAINNET_V2_KEROSENE_V2_VAULT,
       MAINNET_DNFT

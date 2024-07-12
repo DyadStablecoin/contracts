@@ -5,7 +5,7 @@ import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
-import {Momentum}      from "../staking/Momentum.sol";
+import {DyadXP}      from "../staking/DyadXP.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
@@ -36,7 +36,7 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
   mapping (uint/* id */ => uint/* block */)  public   lastDeposit;
 
-  Momentum public momentum;
+  DyadXP public dyadXP;
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender) revert NotOwner();    _;
@@ -48,14 +48,14 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize(Momentum _momentum)
+  function initialize(DyadXP _dyadXP)
     public 
       reinitializer(3) 
   {
     __UUPSUpgradeable_init();
     __Ownable_init(msg.sender);
 
-    momentum = _momentum;
+    dyadXP = _dyadXP;
   }
 
   function add(
@@ -96,7 +96,9 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     _vault.asset().safeTransferFrom(msg.sender, vault, amount);
     _vault.deposit(id, amount);
 
-    if (vault == KEROSENE_VAULT) momentum.afterKeroseneDeposited(id);
+    if (vault == KEROSENE_VAULT) {
+      dyadXP.afterKeroseneDeposited(id);
+    }
   }
 
   function withdraw(
@@ -217,11 +219,11 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
                       / 1e18;
           }
           if (address(vault) == KEROSENE_VAULT) {
-            momentum.beforeKeroseneWithdrawn(id, asset);
+            dyadXP.beforeKeroseneWithdrawn(id, asset);
           }
           vault.move(id, to, asset);
           if (address(vault) == KEROSENE_VAULT) {
-            momentum.afterKeroseneDeposited(to);
+            dyadXP.afterKeroseneDeposited(to);
           } 
         }
       }
