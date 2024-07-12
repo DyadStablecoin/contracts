@@ -18,8 +18,7 @@ import {ERC1967Proxy}  from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-
-/// @custom:oz-upgrades-from src/core/VaultManagerV2.sol:VaultManagerV2
+/// @custom:oz-upgrades-from src/core/VaultManagerV3.sol:VaultManagerV3
 contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
@@ -52,7 +51,7 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
   function initialize(address dyadXPImpl)
     public 
-      reinitializer(3) 
+      reinitializer(4) 
   {
     ERC1967Proxy proxy = new ERC1967Proxy(address(dyadXPImpl), abi.encodeWithSignature("initialize(address)", owner()));
     dyadXP = DyadXP(address(proxy));
@@ -97,7 +96,7 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     _vault.deposit(id, amount);
 
     if (vault == KEROSENE_VAULT) {
-      dyadXP.afterKeroseneDeposited(id);
+      dyadXP.afterKeroseneDeposited(id, amount);
     }
   }
 
@@ -111,12 +110,9 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isDNftOwner(id)
   {
     if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
+    if (vault == KEROSENE_VAULT) momentum.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     _checkExoValueAndCollatRatio(id);
-
-    if (vault == KEROSENE_VAULT) {
-      dyadXP.beforeKeroseneWithdrawn(id, amount);
-    }
   }
 
   function mintDyad(
@@ -226,7 +222,7 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
           }
           vault.move(id, to, asset);
           if (address(vault) == KEROSENE_VAULT) {
-            dyadXP.afterKeroseneDeposited(to);
+            dyadXP.afterKeroseneDeposited(to, asset);
           } 
         }
       }
