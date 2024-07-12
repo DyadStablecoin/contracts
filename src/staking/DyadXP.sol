@@ -54,6 +54,7 @@ contract DyadXP is IERC20 {
             if (depositedKero == 0) {
                 continue;
             }
+            totalVaultKerosene += depositedKero;
             noteData[i] = NoteXPData({
                 lastAction: uint40(block.timestamp),
                 keroseneDeposited: uint96(depositedKero),
@@ -135,7 +136,7 @@ contract DyadXP is IERC20 {
         });
 
         globalLastXP += uint192(
-            (block.timestamp - globalLastUpdate) * totalVaultKerosene
+            (block.timestamp - globalLastUpdate) * (totalVaultKerosene - amountDeposited)
         );
         globalLastUpdate = uint40(block.timestamp);
 
@@ -149,8 +150,6 @@ contract DyadXP is IERC20 {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
-
-        totalVaultKerosene -= amountWithdrawn;
 
         NoteXPData memory lastUpdate = noteData[noteId];
         uint256 xp = _computeXP(lastUpdate);
@@ -174,6 +173,7 @@ contract DyadXP is IERC20 {
             globalLastXP + (block.timestamp - globalLastUpdate) * totalVaultKerosene - slashedXP
         );
         globalLastUpdate = uint40(block.timestamp);
+        totalVaultKerosene -= amountWithdrawn;
 
         emit Transfer(address(0), address(DNFT.ownerOf(noteId)), xp - lastUpdate.lastXP);
         emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
