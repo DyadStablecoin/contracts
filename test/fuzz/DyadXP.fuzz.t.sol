@@ -9,6 +9,7 @@ import {IAggregatorV3} from "../../src/interfaces/IAggregatorV3.sol";
 import {KerosineManager} from "../../src/core/KerosineManager.sol";
 import {Licenser} from "../../src/core/Licenser.sol";
 import {KerosineDenominator} from "../../src/staking/KerosineDenominator.sol";
+import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 contract DyadXPFuzzTest is Test {
     address VAULT_MANAGER = address(0x5678);
@@ -35,10 +36,18 @@ contract DyadXPFuzzTest is Test {
             IAggregatorV3(address(0x0)),
             KerosineDenominator(address(0x0))
         );
-        momentum = new DyadXP(
+        DyadXP impl = new DyadXP(
             VAULT_MANAGER,
             address(keroseneVault),
             address(dnft)
+        );
+        momentum = DyadXP(
+            address(
+                new ERC1967Proxy(
+                    address(impl),
+                    abi.encodeWithSignature("initialize(address)", msg.sender)
+                )
+            )
         );
 
         dnft.mintInsiderNft(USER_1);
@@ -104,7 +113,6 @@ contract DyadXPFuzzTest is Test {
         vm.stopPrank();
 
         _checkInvariantSupplyBalances();
-        
     }
 
     function _checkInvariantSupplyBalances() internal view {

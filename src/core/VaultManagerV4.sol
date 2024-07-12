@@ -13,6 +13,7 @@ import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {ERC1967Proxy}  from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -48,18 +49,12 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize()
+  function initialize(address dyadXPImpl)
     public 
       reinitializer(4) 
   {
-    __UUPSUpgradeable_init();
-    __Ownable_init(msg.sender);
-
-    dyadXP = new DyadXP(
-      address(this),
-      0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43, // MAINNET_V2_KEROSENE_V2_VAULT
-      0xDc400bBe0B8B79C07A962EA99a642F5819e3b712  // MAINNET_DNFT
-    );
+    ERC1967Proxy proxy = new ERC1967Proxy(address(dyadXPImpl), abi.encodeWithSignature("initialize(address)", owner()));
+    dyadXP = DyadXP(address(proxy));
   }
 
   function add(
