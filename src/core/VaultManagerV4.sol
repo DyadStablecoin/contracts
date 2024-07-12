@@ -13,9 +13,11 @@ import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {ERC1967Proxy}  from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+
 
 /// @custom:oz-upgrades-from src/core/VaultManagerV2.sol:VaultManagerV2
 contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
@@ -48,14 +50,13 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize(DyadXP _dyadXP)
+  function initialize()
     public 
       reinitializer(3) 
   {
-    __UUPSUpgradeable_init();
-    __Ownable_init(msg.sender);
-
-    dyadXP = _dyadXP;
+    DyadXP dyadXPImpl = new DyadXP(address(this), KEROSENE_VAULT, address(dNft));
+    ERC1967Proxy proxy = new ERC1967Proxy(address(dyadXPImpl), abi.encodeWithSignature("initialize(address)", owner()));
+    dyadXP = DyadXP(address(proxy));
   }
 
   function add(

@@ -8,6 +8,8 @@ import {IERC721Enumerable} from "forge-std/interfaces/IERC721.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IVault} from "../interfaces/IVault.sol";
 import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 struct NoteXPData {
     // uint40 supports 34,000 years before overflow
@@ -18,7 +20,7 @@ struct NoteXPData {
     uint120 lastXP;
 }
 
-contract DyadXP is IERC20 {
+contract DyadXP is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     using FixedPointMathLib for uint256;
 
     error TransferNotAllowed();
@@ -44,6 +46,11 @@ contract DyadXP is IERC20 {
         DNFT = IERC721Enumerable(dnft);
         KEROSENE_VAULT = IVault(keroseneVault);
         KEROSENE = ERC20(KEROSENE_VAULT.asset());
+        _disableInitializers();
+    }
+
+    function initialize(address owner) public initializer {
+        __Ownable_init(owner);
 
         globalLastUpdate = uint40(block.timestamp);
         uint256 dnftSupply = DNFT.totalSupply();
@@ -137,7 +144,11 @@ contract DyadXP is IERC20 {
         );
         globalLastUpdate = uint40(block.timestamp);
 
-        emit Transfer(address(0), address(DNFT.ownerOf(noteId)), newXP - lastUpdate.lastXP);
+        emit Transfer(
+            address(0),
+            address(DNFT.ownerOf(noteId)),
+            newXP - lastUpdate.lastXP
+        );
     }
 
     function beforeKeroseneWithdrawn(
@@ -170,13 +181,24 @@ contract DyadXP is IERC20 {
         });
 
         globalLastXP = uint192(
-            globalLastXP + (block.timestamp - globalLastUpdate) * totalKeroseneInVault - slashedXP
+            globalLastXP +
+                (block.timestamp - globalLastUpdate) *
+                totalKeroseneInVault -
+                slashedXP
         );
         globalLastUpdate = uint40(block.timestamp);
 
-        emit Transfer(address(0), address(DNFT.ownerOf(noteId)), xp - lastUpdate.lastXP);
+        emit Transfer(
+            address(0),
+            address(DNFT.ownerOf(noteId)),
+            xp - lastUpdate.lastXP
+        );
         emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
     }
+
+    function _authorizeUpgrade(
+        address
+    ) internal view override onlyOwner {}
 
     function _computeXP(
         NoteXPData memory lastUpdate
