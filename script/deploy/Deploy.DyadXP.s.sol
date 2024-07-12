@@ -14,12 +14,6 @@ contract DeployXP is Script, Parameters {
     /// @dev we do the upgrade manually through the multi-sig UI
     VaultManagerV4 vm4 = new VaultManagerV4();
 
-    DyadXP dyadXP = new DyadXP(
-      MAINNET_V2_VAULT_MANAGER,
-      MAINNET_V2_KEROSENE_V2_VAULT,
-      MAINNET_DNFT
-    );
-
     vm.stopBroadcast();  // ----------------------------
   }
 }
