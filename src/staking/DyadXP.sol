@@ -36,6 +36,7 @@ contract DyadXP is IERC20 {
 
     uint40 globalLastUpdate;
     uint192 globalLastXP;
+    uint256 totalKeroseneInVault;
 
     mapping(uint256 => NoteXPData) public noteData;
 
@@ -53,6 +54,7 @@ contract DyadXP is IERC20 {
             if (depositedKero == 0) {
                 continue;
             }
+            totalKeroseneInVault += depositedKero;
             noteData[i] = NoteXPData({
                 lastAction: uint40(block.timestamp),
                 keroseneDeposited: uint96(depositedKero),
@@ -63,9 +65,8 @@ contract DyadXP is IERC20 {
 
     /// @notice Returns the amount of tokens in existence.
     function totalSupply() public view returns (uint256) {
-        uint256 totalKerosene = KEROSENE.balanceOf(address(KEROSENE_VAULT));
         uint256 timeElapsed = block.timestamp - globalLastUpdate;
-        return uint256(globalLastXP + timeElapsed * totalKerosene);
+        return uint256(globalLastXP + timeElapsed * totalKeroseneInVault);
     }
 
     /// @notice Returns the amount of tokens owned by `account`.
@@ -114,17 +115,19 @@ contract DyadXP is IERC20 {
         revert TransferNotAllowed();
     }
 
-    function afterKeroseneDeposited(uint256 noteId) external {
+    function afterKeroseneDeposited(
+      uint256 noteId,
+      uint256 amountDeposited
+    ) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
 
         NoteXPData memory lastUpdate = noteData[noteId];
-        uint256 totalKeroseneInVault = KEROSENE.balanceOf(
-            address(KEROSENE_VAULT)
-        ) - lastUpdate.keroseneDeposited;
 
         uint256 newXP = _computeXP(lastUpdate);
+
+        totalKeroseneInVault += amountDeposited;
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
@@ -133,7 +136,7 @@ contract DyadXP is IERC20 {
         });
 
         globalLastXP += uint192(
-            (block.timestamp - globalLastUpdate) * totalKeroseneInVault
+            (block.timestamp - globalLastUpdate) * (totalKeroseneInVault - amountDeposited)
         );
         globalLastUpdate = uint40(block.timestamp);
 
@@ -149,9 +152,6 @@ contract DyadXP is IERC20 {
         }
 
         NoteXPData memory lastUpdate = noteData[noteId];
-        uint256 totalKeroseneInVault = KEROSENE.balanceOf(
-            address(KEROSENE_VAULT)
-        );
         uint256 xp = _computeXP(lastUpdate);
         uint256 slashedXP = xp.mulDivUp(
             amountWithdrawn,
@@ -173,6 +173,7 @@ contract DyadXP is IERC20 {
             globalLastXP + (block.timestamp - globalLastUpdate) * totalKeroseneInVault - slashedXP
         );
         globalLastUpdate = uint40(block.timestamp);
+        totalKeroseneInVault -= amountWithdrawn;
 
         emit Transfer(address(0), address(DNFT.ownerOf(noteId)), xp - lastUpdate.lastXP);
         emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
