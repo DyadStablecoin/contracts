@@ -50,11 +50,10 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize()
+  function initialize(address dyadXPImpl)
     public 
       reinitializer(3) 
   {
-    DyadXP dyadXPImpl = new DyadXP(address(this), KEROSENE_VAULT, address(dNft));
     ERC1967Proxy proxy = new ERC1967Proxy(address(dyadXPImpl), abi.encodeWithSignature("initialize(address)", owner()));
     dyadXP = DyadXP(address(proxy));
   }

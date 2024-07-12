@@ -45,7 +45,7 @@ contract DyadXPFuzzTest is Test {
             address(
                 new ERC1967Proxy(
                     address(impl),
-                    abi.encodeWithSignature("initialize()")
+                    abi.encodeWithSignature("initialize(address)", msg.sender)
                 )
             )
         );
