@@ -155,3 +155,15 @@ testV3:
 			
 verify:
 	forge verify-contract 0x5c1a3f77EE504bd802bd72dA68Fa7B4Bafe0Fd79 --etherscan-api-key $(ETHERSCAN_API_KEY) src/core/VaultManagerV3.sol:VaultManagerV3 --compiler-version 0.8.20
+
+deployV4:
+	forge clean
+	forge script script/deploy/Deploy.DyadXP.s.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0x4F8c7f56815D5D6101565B281525bAC9b468346B \
+		--broadcast \
+		-i 1 \
+		-vvvv \
+		--via-ir \
+		--verify \
+		--optimize
