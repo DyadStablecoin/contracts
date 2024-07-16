@@ -29,6 +29,14 @@ contract KerosineDenominatorV2 is Owned {
     }
   }
 
+  function isExcludedAddress(address _address) external view returns (bool) {
+    return _excludedAddresses.contains(_address);
+  }
+
+  function excludedAddresses() external view returns (address[] memory) {
+    return _excludedAddresses.values();
+  }
+
   function denominator() external view returns (uint) {
     uint computedDenominator = kerosine.totalSupply();
     uint excludedAddressLength = _excludedAddresses.length();
