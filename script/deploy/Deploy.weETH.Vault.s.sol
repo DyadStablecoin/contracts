@@ -17,7 +17,7 @@ contract DeployVault is Script, Parameters {
 
     new VaultWeETH(
       VaultManager (MAINNET_V2_VAULT_MANAGER), 
-      ERC20        (0xcd5fe23c85820f7b72d0926fc9b05b43e359b7ee), 
+      ERC20        (0xCd5fE23C85820F7B72D0926FC9b05b43E359b7ee), 
       IAggregatorV3(0x5c9C449BbC9a6075A2c061dF312a35fd1E05fF22)
     );
 

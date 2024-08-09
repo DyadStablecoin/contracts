@@ -16,7 +16,7 @@ contract VaultWeETH is IVault {
   using SafeCast          for int;
   using FixedPointMathLib for uint;
 
-  uint public constant STALE_DATA_TIMEOUT = 90 minutes; 
+  uint public constant STALE_DATA_TIMEOUT = 36 hours; 
 
   IVaultManager public immutable vaultManager;
   ERC20         public immutable asset;
