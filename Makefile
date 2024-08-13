@@ -167,3 +167,15 @@ deployV4:
 		--via-ir \
 		--verify \
 		--optimize
+
+deployUSDe:
+	forge clean
+	forge script script/deploy/Deploy.sUSDeVault.Mainnet.s.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0xaf17f6E53f6CC15AD685cF548A0d48d38462B23e \
+		--broadcast \
+		-i 1 \
+		-vvvv \
+		--via-ir \
+		--verify \
+		--optimize
