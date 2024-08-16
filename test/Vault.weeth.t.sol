@@ -36,6 +36,13 @@ contract VaultWeETHTest is Test, Parameters {
         console.log("price: %s", price);
     }
 
+    function test_usdValue() public {
+        vm.prank(MAINNET_V2_VAULT_MANAGER);
+        vault.deposit(1, 2.21 ether);
+        uint256 usdValue = vault.getUsdValue(1);
+        console.log("usdValue: %s", usdValue);
+    }
+
     function testFuzzDepositCap(
         uint256 currentDeposit,
         uint256 depositAmount

@@ -125,7 +125,7 @@ contract VaultWeETH is IVault, Owned {
         uint256 updatedAt, 
       ) = oracle.latestRoundData();
       if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) revert StaleData();
-      return answer.toUint256().mulWadDown(wethVault.assetPrice());
+      return answer.toUint256().mulDivDown(wethVault.assetPrice(), 10 ** wethVault.oracle().decimals());
   }
 }
 
