@@ -5,7 +5,7 @@ import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
-import {DyadXP}      from "../staking/DyadXP.sol";
+import {DyadXP}        from "../staking/DyadXP.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
