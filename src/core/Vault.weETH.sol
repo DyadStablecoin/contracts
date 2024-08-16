@@ -5,22 +5,30 @@ import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IDNft}         from "../interfaces/IDNft.sol";
 import {IVault}        from "../interfaces/IVault.sol";
 import {IAggregatorV3} from "../interfaces/IAggregatorV3.sol";
+import {DNft}          from "../core/DNft.sol";
 
 import {SafeCast}          from "@openzeppelin/contracts/utils/math/SafeCast.sol";
 import {SafeTransferLib}   from "@solmate/src/utils/SafeTransferLib.sol";
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
+import {Owned}             from "@solmate/src/auth/Owned.sol";
 
-contract VaultWeETH is IVault {
+contract VaultWeETH is IVault, Owned {
   using SafeTransferLib   for ERC20;
   using SafeCast          for int;
   using FixedPointMathLib for uint;
+
+  error ExceedsDepositCap();
 
   uint public constant STALE_DATA_TIMEOUT = 36 hours; 
 
   IVaultManager public immutable vaultManager;
   ERC20         public immutable asset;
   IAggregatorV3 public immutable oracle;
+  IVault        public immutable wethVault;
+  DNft          public immutable dNft;
+
+  uint256 public depositCap;
 
   mapping(uint => uint) public id2asset;
 
@@ -30,24 +38,27 @@ contract VaultWeETH is IVault {
   }
 
   constructor(
+    address owner,
     IVaultManager _vaultManager,
     ERC20         _asset,
-    IAggregatorV3 _oracle
-  ) {
+    IAggregatorV3 _oracle,
+    IVault        _wethVault,
+    DNft          _dNft
+  ) Owned(owner) {
     vaultManager   = _vaultManager;
     asset          = _asset;
     oracle         = _oracle;
+    wethVault      = _wethVault;
+    dNft           = _dNft;
+    depositCap     = type(uint256).max;
   }
 
-  function deposit(
-    uint id,
-    uint amount
-  )
-    external 
-      onlyVaultManager
-  {
-    id2asset[id] += amount;
-    emit Deposit(id, amount);
+  function deposit(uint id, uint amount) external onlyVaultManager {
+      if (asset.balanceOf(address(this)) + amount > depositCap) {
+          revert ExceedsDepositCap();
+      }
+      id2asset[id] += amount;
+      emit Deposit(id, amount);
   }
 
   function withdraw(
@@ -88,6 +99,21 @@ contract VaultWeETH is IVault {
               / 10**asset.decimals();
   }
 
+
+  function balanceOf(
+      address account
+  ) external view returns (uint256 assetBalance) {
+      uint256 dnftBalance = dNft.balanceOf(account);
+      for (uint256 i; i < dnftBalance; ++i) {
+          uint256 id = dNft.tokenOfOwnerByIndex(account, i);
+          assetBalance += id2asset[id];
+      }
+  }
+
+  function setDepositCap(uint _depositCap) external onlyOwner {
+      depositCap = _depositCap;
+  }
+
   function assetPrice() 
     public 
     view 
@@ -99,7 +125,7 @@ contract VaultWeETH is IVault {
         uint256 updatedAt, 
       ) = oracle.latestRoundData();
       if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) revert StaleData();
-      return answer.toUint256();
+      return answer.toUint256().mulWadDown(wethVault.assetPrice());
   }
 }
 
