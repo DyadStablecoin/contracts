@@ -19,7 +19,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /// @custom:oz-upgrades-from src/core/VaultManagerV3.sol:VaultManagerV3
-contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
+contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
@@ -51,10 +51,9 @@ contract VaultManagerV4 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
   function initialize(address dyadXPImpl)
     public 
-      reinitializer(4) 
+      reinitializer(5) 
   {
-    ERC1967Proxy proxy = new ERC1967Proxy(address(dyadXPImpl), abi.encodeWithSignature("initialize(address)", owner()));
-    dyadXP = DyadXP(address(proxy));
+    // Nothing to initialize right now
   }
 
   function add(
