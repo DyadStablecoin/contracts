@@ -194,14 +194,15 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       for (uint i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[id].at(i));
         if (vaultLicenser.isLicensed(address(vault))) {
+          uint256 depositAmount = vault.id2asset(id);
+          if (depositAmount == 0) continue;
           uint value = vault.getUsdValue(id);
-          if (value == 0) continue;
           uint asset;
           if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
             uint cappedCr               = cr < 1e18 ? 1e18 : cr;
             uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
             uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
-            uint allAsset = vault.id2asset(id).mulWadUp(liquidationAssetShare);
+            uint allAsset = depositAmount.mulWadUp(liquidationAssetShare);
             asset = allAsset.mulWadDown(amount).divWadDown(debt);
           } else {
             uint share       = value.divWadDown(totalValue);
