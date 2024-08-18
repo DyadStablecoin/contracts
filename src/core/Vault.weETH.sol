@@ -54,7 +54,7 @@ contract VaultWeETH is IVault, Owned {
   }
 
   function deposit(uint id, uint amount) external onlyVaultManager {
-      if (asset.balanceOf(address(this)) + amount > depositCap) {
+      if (asset.balanceOf(address(this)) > depositCap) {
           revert ExceedsDepositCap();
       }
       id2asset[id] += amount;
