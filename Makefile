@@ -171,14 +171,14 @@ deployV4:
 deployWeETH:
 	forge clean
 	forge script script/deploy/Deploy.weETH.Vault.s.sol \
-	--rpc-url $(MAINNET_RPC) \
-	--sender 0x4794d0E92E4C01AF3473839749826394a7FB770A \
-	--broadcast \
-	--via-ir \
-	--verify \
-	--optimize \
-	-i 1 \
-	-vvvv
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0x4794d0E92E4C01AF3473839749826394a7FB770A \
+		--broadcast \
+		--via-ir \
+		--verify \
+		--optimize \
+		-i 1 \
+		-vvvv
 
 deployUSDe:
 	forge clean
