@@ -111,6 +111,9 @@ contract VaultWeETH is IVault, Owned {
   }
 
   function setDepositCap(uint _depositCap) external onlyOwner {
+       if (asset.balanceOf(address(this)) > _depositCap) {
+          revert ExceedsDepositCap();
+      }
       depositCap = _depositCap;
   }
 
