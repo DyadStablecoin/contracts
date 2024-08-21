@@ -172,7 +172,7 @@ deployWeETH:
 	forge clean
 	forge script script/deploy/Deploy.weETH.Vault.s.sol \
 		--rpc-url $(MAINNET_RPC) \
-		--sender 0x4794d0E92E4C01AF3473839749826394a7FB770A \
+		--sender 0xaf17f6E53f6CC15AD685cF548A0d48d38462B23e \
 		--broadcast \
 		--via-ir \
 		--verify \
