@@ -38,7 +38,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     IERC721Enumerable public immutable DNFT;
     IVault public immutable KEROSENE_VAULT;
     ERC20 public immutable KEROSENE;
-    IDyad public immutable DYAD;
+    Dyad public immutable DYAD;
 
     string public constant name = "Dyad XP";
     string public constant symbol = "dXP";
@@ -54,17 +54,21 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     uint40 public halvingStart;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address vaultManager, address keroseneVault, address dnft) {
+    constructor(address vaultManager, address keroseneVault, address dnft, address dyad) {
         VAULT_MANAGER = IVaultManager(vaultManager);
         DNFT = IERC721Enumerable(dnft);
         KEROSENE_VAULT = IVault(keroseneVault);
         KEROSENE = ERC20(KEROSENE_VAULT.asset());
+        DYAD = Dyad(dyad);
         _disableInitializers();
     }
 
     function initialize() public reinitializer(2) {
         __UUPSUpgradeable_init();
         __Ownable_init(msg.sender);
+
+        uint256 dnftSupply = DNFT.totalSupply();
+
     }
 
     /// @notice Returns the amount of tokens in existence.
@@ -178,7 +182,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         if (slashedXP > xp) {
             slashedXP = xp;
         }
-        uint256 newXP = uint120(xp - slashedXP);
+        uint120 newXP = uint120(xp - slashedXP);
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
@@ -199,7 +203,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         if (halvingStart != 0) {
             uint256 dnftSupply = DNFT.totalSupply();
             for (uint256 i = 0; i < dnftSupply; ++i) {
-                _updateNoteBalance(i, 0);
+                _updateNoteBalance(i);
             }
         } else if (_halvingStart < halvingStart) {
             revert InvalidConfiguration();
@@ -240,7 +244,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             lastAction: uint40(block.timestamp),
             keroseneDeposited: lastUpdate.keroseneDeposited,
             lastXP: uint120(newXP),
-            dyadMinted:  uint96(DYAD.dyadMinted(noteId))
+            dyadMinted:  uint96(DYAD.mintedDyad(noteId))
         });
 
         _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
