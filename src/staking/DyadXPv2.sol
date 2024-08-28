@@ -18,6 +18,8 @@ struct NoteXPData {
     uint96 keroseneDeposited;
     // uint120 supports deposit of entire kerosene supply by a single note for ~42 years before overflow
     uint120 lastXP;
+    // dyad minted
+    uint96 dyadMinted;
 }
 
 /// @custom:oz-upgrades-from src/staking/DyadXP.sol:DyadXP
@@ -57,12 +59,9 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _disableInitializers();
     }
 
-    function initialize() 
-      public 
-        reinitializer(2) 
-    {
-      __UUPSUpgradeable_init();
-      __Ownable_init(msg.sender);
+    function initialize() public reinitializer(2) {
+        __UUPSUpgradeable_init();
+        __Ownable_init(msg.sender);
     }
 
     /// @notice Returns the amount of tokens in existence.
@@ -127,8 +126,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function afterKeroseneDeposited(
-      uint256 noteId,
-      uint256 amountDeposited
+        uint256 noteId,
+        uint256 amountDeposited
     ) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
@@ -142,7 +141,6 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 revert Unauthorized();
             }
         }
-        
         _updateNoteBalance(noteId, 0);
     }
 
@@ -169,7 +167,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             keroseneDeposited: uint96(
                 lastUpdate.keroseneDeposited - amountWithdrawn
             ),
-            lastXP: uint120(xp - slashedXP)
+            lastXP: uint120(xp - slashedXP),
+            dyadMinted: lastUpdate.dyadMinted
         });
 
         globalLastXP = uint192(
@@ -189,7 +188,10 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
     }
 
-    function setHalvingConfiguration(uint40 _halvingStart, uint40 _halvingCadence) external onlyOwner {
+    function setHalvingConfiguration(
+        uint40 _halvingStart,
+        uint40 _halvingCadence
+    ) external onlyOwner {
         if (halvingStart != 0) {
             uint256 dnftSupply = DNFT.totalSupply();
             for (uint256 i = 0; i < dnftSupply; ++i) {
@@ -208,9 +210,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         halvingCadence = _halvingCadence;
     }
 
-    function _authorizeUpgrade(
-        address
-    ) internal view override onlyOwner {}
+    function _authorizeUpgrade(address) internal view override onlyOwner {}
 
     function _updateNoteBalance(uint256 noteId, uint256 amount) internal {
         NoteXPData memory lastUpdate = noteData[noteId];
@@ -222,11 +222,13 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
-            lastXP: uint120(newXP)
+            lastXP: uint120(newXP),
+            dyadMinted: lastUpdate.dyadMinted
         });
 
         globalLastXP += uint192(
-            (block.timestamp - globalLastUpdate) * (totalKeroseneInVault - amount)
+            (block.timestamp - globalLastUpdate) *
+                (totalKeroseneInVault - amount)
         );
         globalLastUpdate = uint40(block.timestamp);
 
@@ -250,9 +252,16 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     ) internal view returns (uint256) {
         uint256 elapsed = block.timestamp - lastUpdate.lastAction;
         uint256 halvings = (block.timestamp - halvingStart) / halvingCadence;
-        uint256 deposited = lastUpdate.keroseneDeposited;
+        uint256 keroDeposited = lastUpdate.keroseneDeposited;
+        uint256 dyadMinted = lastUpdate.dyadMinted;
 
-        return uint256(lastUpdate.lastXP + elapsed * deposited) >> halvings;
+        // boost = kerosene * (dyad / (dyad + kerosene))
+        uint256 boost = keroDeposited.mulWadDown(
+            dyadMinted.divWadDown(dyadMinted + keroDeposited)
+        );
+
+        return
+            uint256(lastUpdate.lastXP + elapsed * (keroDeposited + boost)) >>
+            halvings;
     }
 }
-
