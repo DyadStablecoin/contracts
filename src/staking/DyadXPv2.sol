@@ -7,6 +7,8 @@ import {IERC721Enumerable} from "forge-std/interfaces/IERC721.sol";
 
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IVault} from "../interfaces/IVault.sol";
+import {Dyad} from "../core/Dyad.sol";
+
 import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -36,14 +38,15 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     IERC721Enumerable public immutable DNFT;
     IVault public immutable KEROSENE_VAULT;
     ERC20 public immutable KEROSENE;
+    IDyad public immutable DYAD;
 
     string public constant name = "Dyad XP";
     string public constant symbol = "dXP";
     uint8 public constant decimals = 18;
 
-    uint40 globalLastUpdate;
-    uint192 globalLastXP;
-    uint256 totalKeroseneInVault;
+    uint40 private globalLastUpdate; // unused
+    uint192 private globalLastXP; // unused
+    uint256 private totalKeroseneInVault; // unused
 
     mapping(uint256 => NoteXPData) public noteData;
 
@@ -132,7 +135,21 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
-        _updateNoteBalance(noteId, amountDeposited);
+        _updateNoteBalance(noteId);
+    }
+
+    function afterDyadMinted(uint256 noteId) external {
+        if (msg.sender != address(VAULT_MANAGER)) {
+            revert NotVaultManager();
+        }
+        _updateNoteBalanceForDyad(noteId);
+    }
+
+    function afterDyadBurned(uint256 noteId) external {
+        if (msg.sender != address(VAULT_MANAGER)) {
+            revert NotVaultManager();
+        }
+        _updateNoteBalanceForDyad(noteId);
     }
 
     function forceUpdateXPBalance(uint256 noteId) external {
@@ -141,7 +158,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 revert Unauthorized();
             }
         }
-        _updateNoteBalance(noteId, 0);
+        _updateNoteBalance(noteId);
     }
 
     function beforeKeroseneWithdrawn(
@@ -161,31 +178,18 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         if (slashedXP > xp) {
             slashedXP = xp;
         }
+        uint256 newXP = uint120(xp - slashedXP);
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(
                 lastUpdate.keroseneDeposited - amountWithdrawn
             ),
-            lastXP: uint120(xp - slashedXP),
+            lastXP: newXP,
             dyadMinted: lastUpdate.dyadMinted
         });
 
-        globalLastXP = uint192(
-            globalLastXP +
-                (block.timestamp - globalLastUpdate) *
-                totalKeroseneInVault -
-                slashedXP
-        );
-        globalLastUpdate = uint40(block.timestamp);
-        totalKeroseneInVault -= amountWithdrawn;
-
-        emit Transfer(
-            address(0),
-            address(DNFT.ownerOf(noteId)),
-            xp - lastUpdate.lastXP
-        );
-        emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
+        _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
     }
 
     function setHalvingConfiguration(
@@ -212,12 +216,10 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     function _authorizeUpgrade(address) internal view override onlyOwner {}
 
-    function _updateNoteBalance(uint256 noteId, uint256 amount) internal {
+    function _updateNoteBalance(uint256 noteId) internal {
         NoteXPData memory lastUpdate = noteData[noteId];
 
         uint256 newXP = _computeXP(lastUpdate);
-
-        totalKeroseneInVault += amount;
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
@@ -226,23 +228,36 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             dyadMinted: lastUpdate.dyadMinted
         });
 
-        globalLastXP += uint192(
-            (block.timestamp - globalLastUpdate) *
-                (totalKeroseneInVault - amount)
-        );
-        globalLastUpdate = uint40(block.timestamp);
+        _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
+    }
 
-        if (newXP > lastUpdate.lastXP) {
+    function _updateNoteBalanceForDyad(uint256 noteId) internal {
+        NoteXPData memory lastUpdate = noteData[noteId];
+
+        uint256 newXP = _computeXP(lastUpdate);
+
+        noteData[noteId] = NoteXPData({
+            lastAction: uint40(block.timestamp),
+            keroseneDeposited: lastUpdate.keroseneDeposited,
+            lastXP: uint120(newXP),
+            dyadMinted:  uint96(DYAD.dyadMinted(noteId))
+        });
+
+        _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
+    }
+
+    function _emitTransfer(address user, uint256 oldBalance, uint256 newBalance) internal {
+        if (newBalance > oldBalance) {
             emit Transfer(
                 address(0),
-                address(DNFT.ownerOf(noteId)),
-                newXP - lastUpdate.lastXP
+                user,
+                newBalance - oldBalance
             );
         } else {
             emit Transfer(
-                address(DNFT.ownerOf(noteId)),
+                user,
                 address(0),
-                lastUpdate.lastXP - newXP
+                oldBalance - newBalance
             );
         }
     }
