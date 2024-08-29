@@ -23,6 +23,7 @@ interface IVaultManager {
   error CanNotWithdrawInSameBlock();
   error NotEnoughExoCollat();
   error VaultNotKerosene();
+  error Unauthorized();
 
   /**
    * @notice Adds a vault to the dNFT position

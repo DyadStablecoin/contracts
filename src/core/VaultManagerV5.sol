@@ -7,6 +7,7 @@ import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
 import {DyadXPv2}      from "../staking/DyadXPv2.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
+import {IExtension}    from "../interfaces/IExtension.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
@@ -38,6 +39,12 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   mapping (uint/* id */ => uint/* block */)  public   lastDeposit;
 
   DyadXPv2 public dyadXP;
+
+  // Extensions authorized for use in the system
+  mapping(address extension => bool enabled) systemExtensions;
+
+  // Extensions authorized by a user for their use
+  mapping(address user => mapping(address extension => bool authorized)) authorizedExtensions;
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender) revert NotOwner();    _;
@@ -87,8 +94,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     uint    amount
   ) 
     external 
-      isDNftOwner(id)
   {
+    bool doCallback = _authorizeCall(id);
     lastDeposit[id] = block.number;
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, vault, amount);
@@ -96,6 +103,10 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
     if (vault == KEROSENE_VAULT) {
       dyadXP.afterKeroseneDeposited(id, amount);
+    }
+
+    if (doCallback) {
+      IExtension(msg.sender).afterDeposit();
     }
   }
 
@@ -106,11 +117,14 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     address to
   ) 
     public
-      isDNftOwner(id)
   {
+    bool doCallback = _authorizeCall(id);
     if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
     if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
+    if (doCallback) {
+      IExtension(msg.sender).afterWithdraw();
+    }
     _checkExoValueAndCollatRatio(id);
   }
 
@@ -120,11 +134,14 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     address to
   )
     external 
-      isDNftOwner(id)
   {
+    bool doCallback = _authorizeCall(id);
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
-    _checkExoValueAndCollatRatio(id);
     dyadXP.afterDyadMinted(id);
+    if (doCallback) {
+      IExtension(msg.sender).afterMint();
+    }
+    _checkExoValueAndCollatRatio(id);
     emit MintDyad(id, amount, to);
   }
 
@@ -146,10 +163,13 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     uint amount
   ) 
     public 
-      isDNftOwner(id)
   {
+    bool doCallback = _authorizeCall(id);
     dyad.burn(id, msg.sender, amount);
     dyadXP.afterDyadBurned(id);
+    if (doCallback) {
+      IExtension(msg.sender).afterBurn();
+    }
     emit BurnDyad(id, amount, msg.sender);
   }
 
@@ -160,8 +180,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     address to
   )
     external 
-      isDNftOwner(id)
     returns (uint) { 
+      bool doCallback = _authorizeCall(id);
       burnDyad(id, amount);
       Vault _vault = Vault(vault);
       uint asset = amount 
@@ -170,6 +190,10 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
                     / 1e18;
       withdraw(id, vault, asset, to);
       dyadXP.afterDyadBurned(id);
+
+      if (doCallback) {
+        IExtension(msg.sender).afterRedeem(asset);
+      }
       emit RedeemDyad(id, vault, amount, to);
       return asset;
   }
@@ -232,6 +256,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
       dyadXP.afterDyadBurned(id);
       emit Liquidate(id, msg.sender, to);
+
+      return (assetVaults, amounts);
   }
 
   function collatRatio(
@@ -318,5 +344,19 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     override 
   {
     if (msg.sender != owner()) revert NotOwner();
+  }
+
+  function _authorizeCall(uint256 id) internal view returns (bool) {
+    address dnftOwner = dNft.ownerOf(id);
+    if (dnftOwner != msg.sender) {
+      if (!systemExtensions[msg.sender]) {
+        revert Unauthorized();
+      }
+      if (!authorizedExtensions[dnftOwner][msg.sender]) {
+        revert Unauthorized();
+      }
+      return true;
+    }
+    return false;
   }
 }
