@@ -275,14 +275,22 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         NoteXPData memory lastUpdate
     ) internal view returns (uint256) {
         uint256 elapsed = block.timestamp - lastUpdate.lastAction;
-        uint256 halvings = (block.timestamp - halvingStart) / halvingCadence;
+        uint256 halvings;
+        if (halvingCadence > 0) {
+            if (halvingStart < block.timestamp) {
+                halvings = (block.timestamp - halvingStart) / halvingCadence;   
+            }
+        }
         uint256 keroDeposited = lastUpdate.keroseneDeposited;
         uint256 dyadMinted = lastUpdate.dyadMinted;
 
+        uint256 boost;
+        if (keroDeposited > 0) {
         // boost = kerosene * (dyad / (dyad + kerosene))
-        uint256 boost = keroDeposited.mulWadDown(
-            dyadMinted.divWadDown(dyadMinted + keroDeposited)
-        );
+            boost = keroDeposited.mulWadDown(
+                dyadMinted.divWadDown(dyadMinted + keroDeposited)
+            );
+        }
 
         return
             uint256(lastUpdate.lastXP + elapsed * (keroDeposited + boost)) >>
