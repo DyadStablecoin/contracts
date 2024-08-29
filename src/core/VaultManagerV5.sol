@@ -5,7 +5,7 @@ import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
-import {DyadXP}      from "../staking/DyadXP.sol";
+import {DyadXPv2}      from "../staking/DyadXPv2.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
@@ -37,7 +37,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
   mapping (uint/* id */ => uint/* block */)  public   lastDeposit;
 
-  DyadXP public dyadXP;
+  DyadXPv2 public dyadXP;
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender) revert NotOwner();    _;
@@ -124,6 +124,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   {
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
     _checkExoValueAndCollatRatio(id);
+    dyadXP.afterDyadMinted(id);
     emit MintDyad(id, amount, to);
   }
 
@@ -148,6 +149,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isDNftOwner(id)
   {
     dyad.burn(id, msg.sender, amount);
+    dyadXP.afterDyadBurned(id);
     emit BurnDyad(id, amount, msg.sender);
   }
 
@@ -167,6 +169,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
                     / _vault.assetPrice() 
                     / 1e18;
       withdraw(id, vault, asset, to);
+      dyadXP.afterDyadBurned(id);
       emit RedeemDyad(id, vault, amount, to);
       return asset;
   }
@@ -227,6 +230,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
         }
       }
 
+      dyadXP.afterDyadBurned(id);
       emit Liquidate(id, msg.sender, to);
   }
 
