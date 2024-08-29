@@ -25,7 +25,8 @@ contract DyadXPFuzzTest is Test {
     address USER_3 = address(0x3333);
 
     function setUp() external {
-        dyad = new Dyad(Licenser(address(0x0)));
+        Licenser licenser = new Licenser();
+        dyad = new Dyad(licenser);
         dnft = new DNft();
         kerosine = new Kerosine();
         keroseneVault = new KeroseneVault(
@@ -54,6 +55,8 @@ contract DyadXPFuzzTest is Test {
         dnft.mintInsiderNft(USER_1);
         dnft.mintInsiderNft(USER_2);
         dnft.mintInsiderNft(USER_3);
+
+        licenser.add(VAULT_MANAGER);
     }
 
     function testFuzz_totalSupplyGteAllBalances(
@@ -77,6 +80,8 @@ contract DyadXPFuzzTest is Test {
 
         kerosine.transfer(address(keroseneVault), deposit2);
         vm.startPrank(VAULT_MANAGER);
+        dyad.mint(1, address(this), 10_000 * 1e18);
+        momentum.afterDyadMinted(1);
         keroseneVault.deposit(1, deposit2);
         momentum.afterKeroseneDeposited(1, deposit2);
         vm.stopPrank();
