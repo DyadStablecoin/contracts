@@ -338,6 +338,19 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       return vaults[id].contains(vault);
   }
 
+  function authorizeExtension(address extension, bool isAuthorized) external {
+    if (isAuthorized) {
+      if (systemExtensions[extension]) {
+        revert Unauthorized();
+      }
+    }
+    authorizedExtensions[msg.sender][extension] = isAuthorized;
+  }
+
+  function authorizeSystemExtension(address extension, bool isAuthorized) external onlyOwner {
+    systemExtensions[extension] = isAuthorized;
+  }
+
   // ----------------- UPGRADABILITY ----------------- //
   function _authorizeUpgrade(address newImplementation) 
     internal 
