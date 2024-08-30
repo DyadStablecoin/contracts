@@ -54,7 +54,12 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     uint40 public halvingStart;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address vaultManager, address keroseneVault, address dnft, address dyad) {
+    constructor(
+        address vaultManager,
+        address keroseneVault,
+        address dnft,
+        address dyad
+    ) {
         VAULT_MANAGER = IVaultManager(vaultManager);
         DNFT = IERC721Enumerable(dnft);
         KEROSENE_VAULT = IVault(keroseneVault);
@@ -223,6 +228,16 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         halvingCadence = _halvingCadence;
     }
 
+    function accrualRate(uint256 noteId) external view returns (uint256) {
+        NoteXPData memory lastUpdate = noteData[noteId];
+
+        return
+            _computeAccrualRate(
+                lastUpdate.keroseneDeposited,
+                lastUpdate.dyadMinted
+            );
+    }
+
     function _authorizeUpgrade(address) internal view override onlyOwner {}
 
     function _updateNoteBalance(uint256 noteId) internal {
@@ -249,25 +264,21 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             lastAction: uint40(block.timestamp),
             keroseneDeposited: lastUpdate.keroseneDeposited,
             lastXP: uint120(newXP),
-            dyadMinted:  uint96(DYAD.mintedDyad(noteId))
+            dyadMinted: uint96(DYAD.mintedDyad(noteId))
         });
 
         _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
     }
 
-    function _emitTransfer(address user, uint256 oldBalance, uint256 newBalance) internal {
+    function _emitTransfer(
+        address user,
+        uint256 oldBalance,
+        uint256 newBalance
+    ) internal {
         if (newBalance > oldBalance) {
-            emit Transfer(
-                address(0),
-                user,
-                newBalance - oldBalance
-            );
+            emit Transfer(address(0), user, newBalance - oldBalance);
         } else {
-            emit Transfer(
-                user,
-                address(0),
-                oldBalance - newBalance
-            );
+            emit Transfer(user, address(0), oldBalance - newBalance);
         }
     }
 
@@ -278,22 +289,30 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         uint256 halvings;
         if (halvingCadence > 0) {
             if (halvingStart < block.timestamp) {
-                halvings = (block.timestamp - halvingStart) / halvingCadence;   
+                halvings = (block.timestamp - halvingStart) / halvingCadence;
             }
         }
-        uint256 keroDeposited = lastUpdate.keroseneDeposited;
-        uint256 dyadMinted = lastUpdate.dyadMinted;
 
+        uint256 rate = _computeAccrualRate(
+            lastUpdate.keroseneDeposited,
+            lastUpdate.dyadMinted
+        );
+
+        return uint256(lastUpdate.lastXP + elapsed * rate) >> halvings;
+    }
+
+    function _computeAccrualRate(
+        uint256 keroDeposited,
+        uint256 dyadMinted
+    ) internal pure returns (uint256) {
         uint256 boost;
         if (keroDeposited > 0) {
-        // boost = kerosene * (dyad / (dyad + kerosene))
+            // boost = kerosene * (dyad / (dyad + kerosene))
             boost = keroDeposited.mulWadDown(
                 dyadMinted.divWadDown(dyadMinted + keroDeposited)
             );
         }
 
-        return
-            uint256(lastUpdate.lastXP + elapsed * (keroDeposited + boost)) >>
-            halvings;
+        return keroDeposited + boost;
     }
 }
