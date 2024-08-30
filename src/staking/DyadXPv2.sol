@@ -288,8 +288,13 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         uint256 elapsed = block.timestamp - lastUpdate.lastAction;
         uint256 halvings;
         if (halvingCadence > 0) {
-            if (halvingStart < block.timestamp) {
-                halvings = (block.timestamp - halvingStart) / halvingCadence;
+            uint256 start = halvingStart;
+            if (start < block.timestamp) {
+                halvings = (block.timestamp - start) / halvingCadence;
+                if (start < lastUpdate.lastAction) {
+                    uint256 halvingsSinceLastUpdate = (lastUpdate.lastAction - start) / halvingCadence;
+                    halvings = halvings - halvingsSinceLastUpdate;
+                }
             }
         }
 

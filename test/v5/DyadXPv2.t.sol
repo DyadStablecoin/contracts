@@ -42,4 +42,31 @@ contract DyadXPv2Test is BaseTestV5 {
         assertEq(dyadXP.balanceOfNote(0), 0);
         assertEq(dyadXP.accrualRate(0), 150_000 ether);
     }
+
+    function test_XPHalving() public {
+        dyadXP.setHalvingConfiguration(uint40(block.timestamp + 7 days), 7 days);
+
+        kerosene.transfer(USER_1, 100_000 ether);
+
+        vm.startPrank(USER_1);
+        kerosene.approve(address(vaultManager), type(uint256).max);
+        vaultManager.deposit(0, address(keroseneVault), 100_000 ether);
+        
+        vm.warp(block.timestamp + 7 days);
+        assertEq(dyadXP.balanceOfNote(0), 60_480_000_000 ether);
+
+        vm.warp(block.timestamp - 1 + 7 days);
+        assertEq(dyadXP.balanceOfNote(0), 120_959_900_000 ether);
+
+        vm.warp(block.timestamp + 1);
+        assertEq(dyadXP.balanceOfNote(0), 60_480_000_000 ether);
+
+        vm.roll(block.number + 1);
+        _mockOracleResponse(address(wethVault.oracle()), 200000000000, 8);
+
+        vaultManager.withdraw(0, address(keroseneVault), 50_000 ether, USER_1);
+        assertEq(dyadXP.balanceOfNote(0), 30_240_000_000 ether);
+        
+        vm.stopPrank();
+    }
 }

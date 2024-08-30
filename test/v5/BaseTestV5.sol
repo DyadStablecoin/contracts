@@ -83,6 +83,10 @@ contract BaseTestV5 is Test, Parameters {
         );
         vm.etch(MAINNET_V2_KEROSENE_V2_VAULT, address(keroseneVault).code);
         keroseneVault = KeroseneVault(MAINNET_V2_KEROSENE_V2_VAULT);
+        // set owner
+        vm.store(address(keroseneVault), bytes32(uint256(0x00)), bytes32(uint256(uint160(address(this)))));
+        keroseneManager.add(address(wethVault));
+        keroseneVault.setDenominator(keroseneDenominator);
 
         DyadXP dxp = new DyadXP(proxy, address(keroseneVault), address(dNft));
         DyadXPv2 dyadXPv2 = new DyadXPv2(proxy, address(keroseneVault), address(dNft), address(dyad));
