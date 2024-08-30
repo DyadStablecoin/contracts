@@ -7,7 +7,7 @@ import {IWETH} from "../interfaces/IWETH.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IERC721} from "forge-std/interfaces/IERC721.sol";
 
-contract NativeCurrencyGateway is IExtension {
+contract WETHGateway is IExtension {
     error NotDnftOwner();
     error WithdrawFailed();
     error InvalidOperation();
@@ -24,6 +24,7 @@ contract NativeCurrencyGateway is IExtension {
         weth = IWETH(_weth);
         vaultManager = IVaultManager(_vaultManager);
         wethVault = _wethVault;
+        weth.approve(_vaultManager, type(uint256).max);
     }
 
     function name() external pure override returns (string memory) {
@@ -39,7 +40,7 @@ contract NativeCurrencyGateway is IExtension {
             revert NotDnftOwner();
         }
         weth.deposit{value: msg.value}();
-        weth.approve(address(vaultManager), msg.value);
+        //weth.approve(address(vaultManager), msg.value);
         vaultManager.deposit(id, wethVault, msg.value);
     }
 
@@ -61,7 +62,7 @@ contract NativeCurrencyGateway is IExtension {
         }
 
         dyad.transferFrom(msg.sender, address(this), amount);
-        dyad.approve(address(vaultManager), amount);
+        //dyad.approve(address(vaultManager), amount);
         uint256 redeemedAmount = vaultManager.redeemDyad(id, wethVault, amount, address(this));
         weth.withdraw(redeemedAmount);
         (bool success,) = to.call{value: redeemedAmount}("");

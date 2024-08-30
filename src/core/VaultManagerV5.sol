@@ -41,10 +41,10 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   DyadXPv2 public dyadXP;
 
   // Extensions authorized for use in the system
-  mapping(address extension => bool enabled) systemExtensions;
+  EnumerableSet.AddressSet private _systemExtensions;
 
   // Extensions authorized by a user for their use
-  mapping(address user => mapping(address extension => bool authorized)) authorizedExtensions;
+  mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
   modifier isDNftOwner(uint id) {
     if (dNft.ownerOf(id) != msg.sender) revert NotOwner();    _;
@@ -338,15 +338,37 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
   function authorizeExtension(address extension, bool isAuthorized) external {
     if (isAuthorized) {
-      if (systemExtensions[extension]) {
+      if (!_systemExtensions.contains(extension)) {
         revert Unauthorized();
       }
+      _authorizedExtensions[msg.sender].add(extension);
+    } else {
+      _authorizedExtensions[msg.sender].remove(extension);
     }
-    authorizedExtensions[msg.sender][extension] = isAuthorized;
   }
 
   function authorizeSystemExtension(address extension, bool isAuthorized) external onlyOwner {
-    systemExtensions[extension] = isAuthorized;
+    if (isAuthorized) {
+      _systemExtensions.add(extension);
+    } else {
+      _systemExtensions.remove(extension);
+    }
+  }
+
+  function systemExtensions() external view returns (address[] memory) {
+    return _systemExtensions.values();
+  }
+
+  function isSystemExtension(address extension) external view returns (bool) {
+    return _systemExtensions.contains(extension);
+  }
+
+  function authorizedExtensions(address user) external view returns (address[] memory) {
+    return _authorizedExtensions[user].values();
+  }
+
+  function isExtensionAuthorized(address user, address extension) public view returns (bool) {
+    return _authorizedExtensions[user].contains(extension);
   }
 
   // ----------------- UPGRADABILITY ----------------- //
@@ -360,10 +382,10 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   function _authorizeCall(uint256 id) internal view returns (bool) {
     address dnftOwner = dNft.ownerOf(id);
     if (dnftOwner != msg.sender) {
-      if (!systemExtensions[msg.sender]) {
+      if (!_systemExtensions.contains(msg.sender)) {
         revert Unauthorized();
       }
-      if (!authorizedExtensions[dnftOwner][msg.sender]) {
+      if (!_authorizedExtensions[dnftOwner].contains(msg.sender)) {
         revert Unauthorized();
       }
       return true;
