@@ -106,7 +106,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     if (doCallback) {
-      IExtension(msg.sender).afterDeposit();
+      IExtension(msg.sender).afterDeposit(id, vault, amount);
     }
   }
 
@@ -123,7 +123,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     if (doCallback) {
-      IExtension(msg.sender).afterWithdraw();
+      IExtension(msg.sender).afterWithdraw(id, vault, amount, to);
     }
     _checkExoValueAndCollatRatio(id);
   }
@@ -139,7 +139,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
     dyadXP.afterDyadMinted(id);
     if (doCallback) {
-      IExtension(msg.sender).afterMint();
+      IExtension(msg.sender).afterMint(id, amount, to);
     }
     _checkExoValueAndCollatRatio(id);
     emit MintDyad(id, amount, to);
@@ -168,7 +168,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     dyad.burn(id, msg.sender, amount);
     dyadXP.afterDyadBurned(id);
     if (doCallback) {
-      IExtension(msg.sender).afterBurn();
+      IExtension(msg.sender).afterBurn(id, amount);
     }
     emit BurnDyad(id, amount, msg.sender);
   }
@@ -192,7 +192,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       dyadXP.afterDyadBurned(id);
 
       if (doCallback) {
-        IExtension(msg.sender).afterRedeem(asset);
+        IExtension(msg.sender).afterRedeem(id, vault, amount, to, asset);
       }
       emit RedeemDyad(id, vault, amount, to);
       return asset;
@@ -256,8 +256,6 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
       dyadXP.afterDyadBurned(id);
       emit Liquidate(id, msg.sender, to);
-
-      return (assetVaults, amounts);
   }
 
   function collatRatio(
