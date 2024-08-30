@@ -43,6 +43,7 @@ contract BaseTestV5 is Test, Parameters {
     KerosineDenominator internal keroseneDenominator;
     WETHGateway internal wethGateway;
     Vault internal wethVault;
+    DyadXPv2 internal dyadXP;
 
     function setUp() public virtual {
         vm.etch(
@@ -80,8 +81,10 @@ contract BaseTestV5 is Test, Parameters {
         keroseneVault = new KeroseneVault(
             VaultManagerV2(proxy), kerosene, dyad, keroseneManager, keroseneOracleV2, keroseneDenominator
         );
+        vm.etch(MAINNET_V2_KEROSENE_V2_VAULT, address(keroseneVault).code);
+        keroseneVault = KeroseneVault(MAINNET_V2_KEROSENE_V2_VAULT);
 
-        DyadXP dyadXP = new DyadXP(proxy, address(keroseneVault), address(dNft));
+        DyadXP dxp = new DyadXP(proxy, address(keroseneVault), address(dNft));
         DyadXPv2 dyadXPv2 = new DyadXPv2(proxy, address(keroseneVault), address(dNft), address(dyad));
 
         vaultLicenser.add(address(wethVault), false);
@@ -89,14 +92,14 @@ contract BaseTestV5 is Test, Parameters {
 
         VaultManagerV2(proxy).upgradeToAndCall(address(vaultManagerV3), abi.encodeWithSignature("initialize()"));
         VaultManagerV3(proxy).upgradeToAndCall(
-            address(vaultManagerV4), abi.encodeWithSignature("initialize(address)", address(dyadXP))
+            address(vaultManagerV4), abi.encodeWithSignature("initialize(address)", address(dxp))
         );
 
-        dyadXP = VaultManagerV4(proxy).dyadXP();
+        dxp = VaultManagerV4(proxy).dyadXP();
 
         VaultManagerV5(proxy).upgradeToAndCall(address(vaultManagerV5), abi.encodeWithSignature("initialize()"));
 
-        dyadXP.upgradeToAndCall(address(dyadXPv2), abi.encodeWithSignature("initialize()"));
+        dxp.upgradeToAndCall(address(dyadXPv2), abi.encodeWithSignature("initialize()"));
         vaultManager = VaultManagerV5(proxy);
 
         wethGateway =
@@ -107,11 +110,8 @@ contract BaseTestV5 is Test, Parameters {
         dNft.mintInsiderNft(USER_1);
         dNft.mintInsiderNft(USER_2);
         dNft.mintInsiderNft(USER_3);
-    }
 
-    function test_initialized() public {
-        // just verify that the setup is correct
-        assertTrue(true);
+        dyadXP = vaultManager.dyadXP();
     }
 
     function _mockOracleResponse(address oracle, int256 price, uint8 decimals) public {
