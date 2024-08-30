@@ -18,6 +18,14 @@ contract NativeCurrencyGateway is IExtension {
     IVaultManager public immutable vaultManager;
     address public immutable wethVault;
 
+    constructor(address _dyad, address _dNft, address _weth, address _vaultManager, address _wethVault) {
+        dyad = IERC20(_dyad);
+        dNft = IERC721(_dNft);
+        weth = IWETH(_weth);
+        vaultManager = IVaultManager(_vaultManager);
+        wethVault = _wethVault;
+    }
+
     function name() external pure override returns (string memory) {
         return "Native Currency Gateway";
     }
