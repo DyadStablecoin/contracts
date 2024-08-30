@@ -82,8 +82,8 @@ contract WETHGateway is IExtension {
         revert InvalidOperation();
     }
 
-    function afterBurn(uint256, uint256) external pure {
-        revert InvalidOperation();
+    function afterBurn(uint256, uint256) external pure {    
+        // Do nothing
     }
 
     function afterRedeem(uint256, address, uint256, address, uint256) external {
