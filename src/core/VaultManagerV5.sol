@@ -56,7 +56,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize(address dyadXPImpl)
+  function initialize()
     public 
       reinitializer(5) 
   {
