@@ -89,4 +89,10 @@ contract WETHGateway is IExtension {
     function afterRedeem(uint256, address, uint256, address, uint256) external {
         // Do nothing
     }
+
+    receive() external payable {
+        if (msg.sender != address(weth)) {
+            revert InvalidOperation();
+        }
+    }
 }

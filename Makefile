@@ -191,3 +191,8 @@ deployUSDe:
 		--via-ir \
 		--verify \
 		--optimize
+
+testV5:
+	forge test \
+		--match-path "test/v5/**" \
+		-vvv
