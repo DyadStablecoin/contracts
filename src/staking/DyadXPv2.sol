@@ -13,6 +13,7 @@ import {Dyad} from "../core/Dyad.sol";
 import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import "forge-std/console2.sol";
 
 struct NoteXPData {
     // uint40 supports 34,000 years before overflow
@@ -300,25 +301,28 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                     lastUpdate.lastXP += uint120((start - lastUpdate.lastAction) * rate);
                     lastUpdate.lastAction = uint40(start);
                 }
-
                 // get the start of the last halving period
                 uint256 mostRecentHalvingStart = start + halvings * halvingCadence;
-
+                
                 if (lastUpdate.lastAction < mostRecentHalvingStart) {
-                    // catch up the XP accrual to the most recent halving after the last action
-                    uint256 halvingsAlreadyProcessed = (lastUpdate.lastAction - start) / halvingCadence;
-                    uint256 nextHalving = start + (halvingsAlreadyProcessed + 1) * halvingCadence;
+                    
+                    uint256 halvingsAlreadyProcessed = 1 + (lastUpdate.lastAction - start) / halvingCadence;
+                    uint256 nextHalving = start + (halvingsAlreadyProcessed) * halvingCadence;
 
-                    // catch up the XP accrual to the instant of the next halving;
-                    // we can skip any subsequent periods in between because the net accrual during a
-                    // full halving period is zero if there are no changes.
-                    uint256 elapsed;
-                    if (nextHalving < mostRecentHalvingStart) {
-                        elapsed = (nextHalving - lastUpdate.lastAction);
-                    } else {
-                        elapsed = (mostRecentHalvingStart - lastUpdate.lastAction);
+                    // catch up the XP balance to the first halving after the last action
+                    if (nextHalving <= mostRecentHalvingStart) {
+                        uint256 elapsed = (nextHalving - lastUpdate.lastAction);
+                        lastUpdate.lastXP = uint120(lastUpdate.lastXP + elapsed * rate >> 1);
                     }
-                    lastUpdate.lastXP = uint120(lastUpdate.lastXP + elapsed * rate) >> 1;
+                    
+                    // if there are more halvings to process, process them
+                    if (halvings > halvingsAlreadyProcessed) {
+                        uint256 halvingsToProcess = halvings - halvingsAlreadyProcessed;
+                        uint256 accrued = uint256(halvingCadence * rate).mulWadDown(1e18 - (1e18 >> halvingsToProcess));
+
+                        // formula is (existing balance / 2^n) + (accrualPerHalving * (1 - (1 / 2^n)))
+                        lastUpdate.lastXP = uint120((lastUpdate.lastXP >> halvingsToProcess) + accrued);
+                    }
                     lastUpdate.lastAction = uint40(mostRecentHalvingStart);
                 }
             }
