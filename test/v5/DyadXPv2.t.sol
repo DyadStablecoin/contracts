@@ -47,7 +47,7 @@ contract DyadXPv2Test is BaseTestV5 {
         uint256 halvingStart = block.timestamp + 7 days;
         dyadXP.setHalvingConfiguration(uint40(halvingStart), 7 days);
 
-        kerosene.transfer(USER_1, 100_000 ether);
+        kerosene.transfer(USER_1, 200_000 ether);
 
         vm.startPrank(USER_1);
         kerosene.approve(address(vaultManager), type(uint256).max);
@@ -69,7 +69,7 @@ contract DyadXPv2Test is BaseTestV5 {
         vaultManager.withdraw(0, address(keroseneVault), 50_000 ether, USER_1);
         assertEq(dyadXP.balanceOfNote(0), 30_240_000_000 ether);
         assertEq(dyadXP.accrualRate(0), 50_000 ether);
-        
+
         skip(7 days);
         assertEq(dyadXP.balanceOfNote(0), 30_240_000_000 ether);
 
@@ -100,6 +100,10 @@ contract DyadXPv2Test is BaseTestV5 {
 
         skip(3.5 days);
         assertEq(dyadXP.balanceOfNote(0), 45_360_000_000 ether);
+        vaultManager.deposit(0, address(keroseneVault), 150_000 ether);
+
+        skip(3.5 days);
+        assertEq(dyadXP.balanceOfNote(0), 52_920_000_000 ether);
         
         vm.stopPrank();
     }
