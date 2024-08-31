@@ -312,13 +312,13 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                     // catch up the XP accrual to the instant of the next halving;
                     // we can skip any subsequent periods in between because the net accrual during a
                     // full halving period is zero if there are no changes.
+                    uint256 elapsed;
                     if (nextHalving < mostRecentHalvingStart) {
-                        lastUpdate.lastXP += uint120((nextHalving - lastUpdate.lastAction) * rate);
-                        lastUpdate.lastAction = uint40(mostRecentHalvingStart);
+                        elapsed = (nextHalving - lastUpdate.lastAction);
+                    } else {
+                        elapsed = (mostRecentHalvingStart - lastUpdate.lastAction);
                     }
-
-                    // compute the accrual for a single halving
-                    lastUpdate.lastXP = uint120(lastUpdate.lastXP + (mostRecentHalvingStart - lastUpdate.lastAction) * rate >> 1);
+                    lastUpdate.lastXP = uint120(lastUpdate.lastXP + elapsed * rate) >> 1;
                     lastUpdate.lastAction = uint40(mostRecentHalvingStart);
                 }
             }
