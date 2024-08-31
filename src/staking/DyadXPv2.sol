@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {console2} from "forge-std/console2.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {IERC721Enumerable} from "forge-std/interfaces/IERC721.sol";
@@ -285,25 +286,44 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     function _computeXP(
         NoteXPData memory lastUpdate
     ) internal view returns (uint256) {
-        uint256 elapsed = block.timestamp - lastUpdate.lastAction;
-        uint256 halvings;
-        if (halvingCadence > 0) {
-            uint256 start = halvingStart;
-            if (start < block.timestamp) {
-                halvings = (block.timestamp - start) / halvingCadence;
-                if (start < lastUpdate.lastAction) {
-                    uint256 halvingsSinceLastUpdate = (lastUpdate.lastAction - start) / halvingCadence;
-                    halvings = halvings - halvingsSinceLastUpdate;
-                }
-            }
-        }
-
         uint256 rate = _computeAccrualRate(
             lastUpdate.keroseneDeposited,
             lastUpdate.dyadMinted
         );
 
-        return uint256(lastUpdate.lastXP + elapsed * rate) >> halvings;
+        if (halvingCadence > 0) {
+            uint256 start = halvingStart;
+            if (start < block.timestamp) {
+                uint256 halvings = ((block.timestamp - start) / halvingCadence);
+                // if the last action was before the start of halvings, catch it up
+                if (lastUpdate.lastAction < start) {
+                    lastUpdate.lastXP += uint120((start - lastUpdate.lastAction) * rate);
+                    lastUpdate.lastAction = uint40(start);
+                }
+
+                // get the start of the last halving period
+                uint256 mostRecentHalvingStart = start + halvings * halvingCadence;
+
+                if (lastUpdate.lastAction < mostRecentHalvingStart) {
+                    // catch up the XP accrual to the most recent halving after the last action
+                    uint256 halvingsAlreadyProcessed = (lastUpdate.lastAction - start) / halvingCadence;
+                    uint256 nextHalving = start + (halvingsAlreadyProcessed + 1) * halvingCadence;
+
+                    if (nextHalving < mostRecentHalvingStart) {
+                        lastUpdate.lastXP += uint120((nextHalving - lastUpdate.lastAction) * rate);
+                        lastUpdate.lastAction = uint40(mostRecentHalvingStart);
+                    }
+
+                    // compute the accrual for a single halving
+                    lastUpdate.lastXP = uint120(lastUpdate.lastXP + (mostRecentHalvingStart - lastUpdate.lastAction) * rate >> 1);
+                    lastUpdate.lastAction = uint40(mostRecentHalvingStart);
+                }
+            }
+        }
+
+        uint256 elapsed = block.timestamp - lastUpdate.lastAction;
+
+        return uint256(lastUpdate.lastXP + elapsed * rate);
     }
 
     function _computeAccrualRate(
