@@ -145,7 +145,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     function afterKeroseneDeposited(
         uint256 noteId,
-        uint256 amountDeposited
+        uint256 //amountDeposited not used
     ) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
@@ -167,7 +167,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _updateNoteBalanceForDyad(noteId);
     }
 
-    function forceUpdateXPBalance(uint256 noteId) external {
+    function forceUpdateXPBalance(uint256 noteId) external onlyOwner {
         if (msg.sender != owner()) {
             if (msg.sender != DNFT.ownerOf(noteId)) {
                 revert Unauthorized();
@@ -323,10 +323,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 }
             }
         }
-
-        uint256 elapsed = block.timestamp - lastUpdate.lastAction;
-
-        return uint256(lastUpdate.lastXP + elapsed * rate);
+        return uint256(lastUpdate.lastXP + (block.timestamp - lastUpdate.lastAction) * rate);
     }
 
     function _computeAccrualRate(
