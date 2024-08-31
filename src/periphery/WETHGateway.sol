@@ -35,6 +35,11 @@ contract WETHGateway is IExtension {
         return "Gateway for depositing and withdrawing native currency from the WETH Vault";
     }
 
+    function getHookFlags() external pure override returns (uint256) {
+        // no hooks needed for this extension
+        return 0;
+    }
+
     function depositNative(uint256 id) external payable {
         if (dNft.ownerOf(id) != msg.sender) {
             revert NotDnftOwner();
@@ -69,25 +74,6 @@ contract WETHGateway is IExtension {
         if (!success) {
             revert WithdrawFailed();
         }
-    }
-
-    function afterDeposit(uint256, address, uint256) external {
-        // Do nothing
-    }
-    function afterWithdraw(uint256, address, uint256, address) external {
-        // Do nothing
-    }
-
-    function afterMint(uint256, uint256, address) external pure {
-        revert InvalidOperation();
-    }
-
-    function afterBurn(uint256, uint256) external pure {    
-        // Do nothing
-    }
-
-    function afterRedeem(uint256, address, uint256, address, uint256) external {
-        // Do nothing
     }
 
     receive() external payable {

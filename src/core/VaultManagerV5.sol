@@ -7,7 +7,8 @@ import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
 import {DyadXPv2}      from "../staking/DyadXPv2.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
-import {IExtension}    from "../interfaces/IExtension.sol";
+import {DyadHooks}     from "./DyadHooks.sol";
+import "../interfaces/IExtension.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20}             from "@solmate/src/tokens/ERC20.sol";
@@ -40,8 +41,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
   DyadXPv2 public dyadXP;
 
-  // Extensions authorized for use in the system
-  EnumerableSet.AddressSet private _systemExtensions;
+  // Extensions authorized for use in the system, with bitmap of enabled hooks
+  mapping(address => uint256) private _systemExtensions;
 
   // Extensions authorized by a user for their use
   mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
@@ -95,7 +96,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     external 
   {
-    bool doCallback = _authorizeCall(id);
+    uint256 extensionFlags = _authorizeCall(id);
     lastDeposit[id] = block.number;
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, vault, amount);
@@ -105,8 +106,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       dyadXP.afterKeroseneDeposited(id, amount);
     }
 
-    if (doCallback) {
-      IExtension(msg.sender).afterDeposit(id, vault, amount);
+    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_DEPOSIT)) {
+      IAfterDepositHook(msg.sender).afterDeposit(id, vault, amount);
     }
   }
 
@@ -118,12 +119,12 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     public
   {
-    bool doCallback = _authorizeCall(id);
+    uint256 extensionFlags = _authorizeCall(id);
     if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
     if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
-    if (doCallback) {
-      IExtension(msg.sender).afterWithdraw(id, vault, amount, to);
+    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_WITHDRAW)) {
+      IAfterWithdrawHook(msg.sender).afterWithdraw(id, vault, amount, to);
     }
     _checkExoValueAndCollatRatio(id);
   }
@@ -135,11 +136,11 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   )
     external 
   {
-    bool doCallback = _authorizeCall(id);
+    uint256 extensionFlags = _authorizeCall(id);
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
     dyadXP.afterDyadMinted(id);
-    if (doCallback) {
-      IExtension(msg.sender).afterMint(id, amount, to);
+    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_MINT)) {
+      IAfterMintHook(msg.sender).afterMint(id, amount, to);
     }
     _checkExoValueAndCollatRatio(id);
     emit MintDyad(id, amount, to);
@@ -164,11 +165,11 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     public 
   {
-    bool doCallback = _authorizeCall(id);
+    uint256 extensionFlags = _authorizeCall(id);
     dyad.burn(id, msg.sender, amount);
     dyadXP.afterDyadBurned(id);
-    if (doCallback) {
-      IExtension(msg.sender).afterBurn(id, amount);
+    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_BURN)) {
+      IAfterBurnHook(msg.sender).afterBurn(id, amount);
     }
     emit BurnDyad(id, amount, msg.sender);
   }
@@ -181,7 +182,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   )
     external 
     returns (uint) { 
-      bool doCallback = _authorizeCall(id);
+      uint256 extensionFlags = _authorizeCall(id);
       burnDyad(id, amount);
       Vault _vault = Vault(vault);
       uint asset = amount 
@@ -191,8 +192,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       withdraw(id, vault, asset, to);
       dyadXP.afterDyadBurned(id);
 
-      if (doCallback) {
-        IExtension(msg.sender).afterRedeem(id, vault, amount, to, asset);
+      if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_REDEEM)) {
+        IAfterRedeemHook(msg.sender).afterRedeem(id, vault, amount, to, asset);
       }
       emit RedeemDyad(id, vault, amount, to);
       return asset;
@@ -338,7 +339,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
   function authorizeExtension(address extension, bool isAuthorized) external {
     if (isAuthorized) {
-      if (!_systemExtensions.contains(extension)) {
+      if (!DyadHooks.hookEnabled(_systemExtensions[extension], DyadHooks.EXTENSION_ENABLED)) {
         revert Unauthorized();
       }
       _authorizedExtensions[msg.sender].add(extension);
@@ -349,18 +350,15 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
   function authorizeSystemExtension(address extension, bool isAuthorized) external onlyOwner {
     if (isAuthorized) {
-      _systemExtensions.add(extension);
+      uint256 hooks = IExtension(extension).getHookFlags();
+      _systemExtensions[extension] = hooks | DyadHooks.EXTENSION_ENABLED;
     } else {
-      _systemExtensions.remove(extension);
+      _systemExtensions[extension] = DyadHooks.disableExtension(_systemExtensions[extension]);
     }
   }
 
-  function systemExtensions() external view returns (address[] memory) {
-    return _systemExtensions.values();
-  }
-
   function isSystemExtension(address extension) external view returns (bool) {
-    return _systemExtensions.contains(extension);
+    return DyadHooks.hookEnabled(_systemExtensions[extension], DyadHooks.EXTENSION_ENABLED);
   }
 
   function authorizedExtensions(address user) external view returns (address[] memory) {
@@ -374,22 +372,24 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   // ----------------- UPGRADABILITY ----------------- //
   function _authorizeUpgrade(address newImplementation) 
     internal 
+    view
     override 
   {
     if (msg.sender != owner()) revert NotOwner();
   }
 
-  function _authorizeCall(uint256 id) internal view returns (bool) {
+  function _authorizeCall(uint256 id) internal view returns (uint256) {
     address dnftOwner = dNft.ownerOf(id);
     if (dnftOwner != msg.sender) {
-      if (!_systemExtensions.contains(msg.sender)) {
+      uint256 extensionFlags = _systemExtensions[msg.sender];
+      if (!DyadHooks.hookEnabled(extensionFlags, DyadHooks.EXTENSION_ENABLED)) {
         revert Unauthorized();
       }
       if (!_authorizedExtensions[dnftOwner].contains(msg.sender)) {
         revert Unauthorized();
       }
-      return true;
+      return extensionFlags;
     }
-    return false;
+    return 0;
   }
 }
