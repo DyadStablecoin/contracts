@@ -475,7 +475,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   }
 
   /// @dev Authorizes that the caller is either the owner of the specified note, or a system extension
-  ///      that is both enabled and authorized by the owner of the note.
+  ///      that is both enabled and authorized by the owner of the note. Returns the extension flags if
+  ///      the caller is an authorized extension. Reverts if the caller is not authorized.
   /// @param id The note id 
   function _authorizeCall(uint256 id) internal view returns (uint256) {
     address dnftOwner = dNft.ownerOf(id);
