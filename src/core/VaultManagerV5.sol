@@ -111,7 +111,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       dyadXP.afterKeroseneDeposited(id, amount);
     }
 
-    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.EXTENSION_ENABLED))
+    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.EXTENSION_ENABLED)) {
       if(DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_DEPOSIT)) {
         IAfterDepositHook(msg.sender).afterDeposit(id, vault, amount);
       }
