@@ -33,9 +33,13 @@ contract VaultManagerV5Test is BaseTestV5 {
         _mockOracleResponse(address(wethVault.oracle()), 145000000000, 8);
 
         vm.startPrank(USER_2);
-        vaultManager.liquidate(0, 1, 1000 ether);
+        (address[] memory vaults, uint256[] memory amounts) = vaultManager.liquidate(0, 1, 1000 ether);
         // amount is 0.827586206896551724 WETH
         vm.stopPrank();
+        assertEq(vaults.length, 1);
+        assertEq(amounts.length, 1);
+        assertEq(vaults[0], address(wethVault));
+        assertEq(amounts[0], 827586206896551724);
 
         assertEq(wethVault.id2asset(0), 172413793103448276);
         assertEq(wethVault.id2asset(1), 827586206896551724);

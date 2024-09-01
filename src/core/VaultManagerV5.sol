@@ -41,10 +41,10 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
 
   DyadXPv2 public dyadXP;
 
-  // Extensions authorized for use in the system, with bitmap of enabled hooks
+  /// @notice Extensions authorized for use in the system, with bitmap of enabled hooks
   mapping(address => uint256) private _systemExtensions;
 
-  // Extensions authorized by a user for their use
+  /// @notice Extensions authorized by a user for use on their notes
   mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
   modifier isDNftOwner(uint256 id) {
@@ -465,14 +465,18 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   }
 
   // ----------------- UPGRADABILITY ----------------- //
-  function _authorizeUpgrade(address newImplementation) 
+  /// @dev UUPS upgrade authorization - only owner can upgrade
+  function _authorizeUpgrade(address) 
     internal 
     view
-    override 
+    override
+    onlyOwner
   {
-    if (msg.sender != owner()) revert NotOwner();
   }
 
+  /// @dev Authorizes that the caller is either the owner of the specified note, or a system extension
+  ///      that is both enabled and authorized by the owner of the note.
+  /// @param id The note id 
   function _authorizeCall(uint256 id) internal view returns (uint256) {
     address dnftOwner = dNft.ownerOf(id);
     if (dnftOwner != msg.sender) {
