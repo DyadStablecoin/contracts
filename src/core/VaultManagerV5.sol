@@ -20,7 +20,7 @@ import {ERC1967Proxy}  from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-/// @custom:oz-upgrades-from src/core/VaultManagerV3.sol:VaultManagerV3
+/// @custom:oz-upgrades-from src/core/VaultManagerV4.sol:VaultManagerV4
 contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
