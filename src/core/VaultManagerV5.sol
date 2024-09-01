@@ -37,7 +37,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   VaultLicenser public vaultLicenser;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
-  mapping (uint/* id */ => uint/* block */)  public   lastDeposit;
+  mapping (uint/* id */ => uint/* block */)  private lastDeposit; // not used anymore
 
   DyadXPv2 public dyadXP;
 
@@ -94,10 +94,9 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     address vault,
     uint    amount
   ) 
-    external 
+    external isValidDNft(id)
   {
-    uint256 extensionFlags = _authorizeCall(id);
-    lastDeposit[id] = block.number;
+    uint256 extensionFlags = _systemExtensions[msg.sender];
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, vault, amount);
     _vault.deposit(id, amount);
@@ -120,7 +119,6 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     public
   {
     uint256 extensionFlags = _authorizeCall(id);
-    if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
     if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_WITHDRAW)) {
@@ -163,9 +161,9 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     uint id,
     uint amount
   ) 
-    public 
+    public isValidDNft(id)
   {
-    uint256 extensionFlags = _authorizeCall(id);
+    uint256 extensionFlags = _systemExtensions[msg.sender];
     dyad.burn(id, msg.sender, amount);
     dyadXP.afterDyadBurned(id);
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_BURN)) {
@@ -212,8 +210,6 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
-
-      lastDeposit[to] = block.number; // `move` acts like a deposit
 
       uint totalValue = getTotalValue(id);
       if (totalValue == 0) return;
