@@ -37,7 +37,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   VaultLicenser public vaultLicenser;
 
   mapping (uint => EnumerableSet.AddressSet) internal vaults; 
-  mapping (uint/* id */ => uint/* block */)  public   lastDeposit;
+  mapping (uint blockNumber => uint kerosenePrice) public cachedKeroDV;
 
   DyadXPv2 public dyadXP;
 
@@ -96,8 +96,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     external 
   {
+    _getAssetPriceCacheKerosene(KEROSENE_VAULT);
     uint256 extensionFlags = _authorizeCall(id);
-    lastDeposit[id] = block.number;
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, vault, amount);
     _vault.deposit(id, amount);
@@ -119,8 +119,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     public
   {
+    _getAssetPriceCacheKerosene(KEROSENE_VAULT);
     uint256 extensionFlags = _authorizeCall(id);
-    if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
     if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_WITHDRAW)) {
@@ -136,6 +136,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   )
     external 
   {
+    _getAssetPriceCacheKerosene(KEROSENE_VAULT);
     uint256 extensionFlags = _authorizeCall(id);
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
     dyadXP.afterDyadMinted(id);
@@ -165,6 +166,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     public 
   {
+    _getAssetPriceCacheKerosene(KEROSENE_VAULT);
     uint256 extensionFlags = _authorizeCall(id);
     dyad.burn(id, msg.sender, amount);
     dyadXP.afterDyadBurned(id);
@@ -182,12 +184,13 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   )
     external 
     returns (uint) { 
+      _getAssetPriceCacheKerosene(KEROSENE_VAULT);
       uint256 extensionFlags = _authorizeCall(id);
       burnDyad(id, amount);
       Vault _vault = Vault(vault);
       uint asset = amount 
                     * (10**(_vault.oracle().decimals() + _vault.asset().decimals())) 
-                    / _vault.assetPrice() 
+                    / _getAssetPriceCacheKerosene(address(vault))
                     / 1e18;
       withdraw(id, vault, asset, to);
       dyadXP.afterDyadBurned(id);
@@ -208,12 +211,11 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isValidDNft(id)
       isValidDNft(to)
     {
+      _getAssetPriceCacheKerosene(KEROSENE_VAULT);
       uint cr = collatRatio(id);
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
-
-      lastDeposit[to] = block.number; // `move` acts like a deposit
 
       uint totalValue = getTotalValue(id);
       if (totalValue == 0) return;
@@ -242,7 +244,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
             uint cappedValue = valueToMove > value ? value : valueToMove;
             asset = cappedValue 
                       * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
-                      / vault.assetPrice() 
+                      / _getAssetPriceCacheKerosene(address(vault))
                       / 1e18;
           }
           if (address(vault) == KEROSENE_VAULT) {
@@ -391,5 +393,19 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       return extensionFlags;
     }
     return 0;
+  }
+
+  function _getAssetPriceCacheKerosene(address vault) private returns (uint256) {
+    if (vault == KEROSENE_VAULT) {
+      uint256 dv = cachedKeroDV[block.number];
+      if (dv > 0) {
+        return dv;
+      } else {
+        dv = Vault(vault).assetPrice();
+        cachedKeroDV[block.number] = dv;
+        return dv;
+      }
+    }
+    return Vault(vault).assetPrice();
   }
 }
