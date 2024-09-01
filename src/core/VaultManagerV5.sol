@@ -64,6 +64,9 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     // Nothing to initialize right now
   }
 
+  /// @notice Enables a vault for the specified note
+  /// @param id The note id
+  /// @param vault The vault address
   function add(
       uint    id,
       address vault
@@ -77,6 +80,9 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     emit Added(id, vault);
   }
 
+  /// @notice Disables a vault for the specified note. Will fail if the vault has any assets deposited.
+  /// @param id The note id
+  /// @param vault The vault address
   function remove(
       uint    id,
       address vault
@@ -105,8 +111,10 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       dyadXP.afterKeroseneDeposited(id, amount);
     }
 
-    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_DEPOSIT)) {
-      IAfterDepositHook(msg.sender).afterDeposit(id, vault, amount);
+    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.EXTENSION_ENABLED))
+      if(DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_DEPOSIT)) {
+        IAfterDepositHook(msg.sender).afterDeposit(id, vault, amount);
+      }
     }
   }
 
@@ -166,8 +174,10 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     uint256 extensionFlags = _systemExtensions[msg.sender];
     dyad.burn(id, msg.sender, amount);
     dyadXP.afterDyadBurned(id);
-    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_BURN)) {
-      IAfterBurnHook(msg.sender).afterBurn(id, amount);
+    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.EXTENSION_ENABLED)) {
+      if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_BURN)) {
+        IAfterBurnHook(msg.sender).afterBurn(id, amount);
+      }
     }
     emit BurnDyad(id, amount, msg.sender);
   }
