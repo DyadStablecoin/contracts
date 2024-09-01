@@ -157,7 +157,6 @@ contract VaultManagerV2UpgradeMock is IVaultManager, UUPSUpgradeable, OwnableUpg
     emit BurnDyad(id, amount, msg.sender);
   }
 
-  /// @inheritdoc IVaultManager
   function redeemDyad(
     uint    id,
     address vault,

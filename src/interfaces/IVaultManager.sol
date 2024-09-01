@@ -70,22 +70,4 @@ interface IVaultManager {
    * @param amount The amount of DYAD to be burned.
    */
   function burnDyad(uint id, uint amount) external;
-
-  /**
-   * @notice Redeem DYAD through a dNFT
-   * @param id The ID of the dNFT for which the DYAD is being redeemed.
-   * @param vault Address of the vault through which the DYAD is being redeemed
-   *        for its underlying collateral.
-   * @param amount The amount of DYAD to be redeemed.
-   * @param to The address where the collateral will be sent.
-   * @return The amount of collateral that was redeemed.
-   */
-  function redeemDyad(uint id, address vault, uint amount, address to) external returns (uint);
-
-  /**
-   * @notice Liquidate a dNFT
-   * @param id The ID of the dNFT to be liquidated.
-   * @param to The address where the collateral will be sent.
-   */
-  // function liquidate(uint id, uint to, uint amount) external;
 }

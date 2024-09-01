@@ -5,6 +5,7 @@ import {IExtension} from "../interfaces/IExtension.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {IWETH} from "../interfaces/IWETH.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
+import {IVault} from "../interfaces/IVault.sol";
 import {IERC721} from "forge-std/interfaces/IERC721.sol";
 
 contract WETHGateway is IExtension {
@@ -67,8 +68,13 @@ contract WETHGateway is IExtension {
         }
 
         dyad.transferFrom(msg.sender, address(this), amount);
-        //dyad.approve(address(vaultManager), amount);
-        uint256 redeemedAmount = vaultManager.redeemDyad(id, wethVault, amount, address(this));
+        vaultManager.burnDyad(id, amount);
+        IVault vault = IVault(wethVault);
+        uint256 redeemedAmount = amount 
+                    * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
+                    / vault.assetPrice() 
+                    / 1e18;
+        vaultManager.withdraw(id, wethVault, redeemedAmount, address(this));
         weth.withdraw(redeemedAmount);
         (bool success,) = to.call{value: redeemedAmount}("");
         if (!success) {

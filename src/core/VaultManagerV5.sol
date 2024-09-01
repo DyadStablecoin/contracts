@@ -64,41 +64,37 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     // Nothing to initialize right now
   }
 
-  /// @notice Enables a vault for the specified note
-  /// @param id The note id
-  /// @param vault The vault address
+  /// @inheritdoc IVaultManager
   function add(
       uint256 id,
       address vault
   ) 
     external
-      isDNftOwner(id)
   {
+    _authorizeCall(id);
     if (!vaultLicenser.isLicensed(vault))   revert VaultNotLicensed();
     if ( vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
-    if (!vaults[id].add(vault))             revert VaultAlreadyAdded();
-    emit Added(id, vault);
+    if (vaults[id].add(vault)) {
+      emit Added(id, vault);
+    }
   }
 
-  /// @notice Disables a vault for the specified note. Will fail if the vault has any assets deposited.
-  /// @param id The note id
-  /// @param vault The vault address
+  /// @inheritdoc IVaultManager
   function remove(
       uint256 id,
       address vault
-  ) 
+  )
     external
       isDNftOwner(id)
   {
+    _authorizeCall(id);
     if (Vault(vault).id2asset(id) > 0) revert VaultHasAssets();
-    if (!vaults[id].remove(vault))     revert VaultNotAdded();
-    emit Removed(id, vault);
+    if (vaults[id].remove(vault)) {
+      emit Removed(id, vault);
+    }
   }
 
-  /// @notice Deposits collateral into the specified vault
-  /// @param id The note id
-  /// @param vault The vault address
-  /// @param amount The amount to deposit
+  /// @inheritdoc IVaultManager
   function deposit(
     uint256 id,
     address vault,
@@ -106,7 +102,6 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     external isValidDNft(id)
   {
-    uint256 extensionFlags = _systemExtensions[msg.sender];
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, vault, amount);
     _vault.deposit(id, amount);
@@ -116,15 +111,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     }
   }
 
-  /// @notice Withdraws collateral from the specified vault.
-  /// @dev Cannot withdraw exogenous collateral such that remaining value of exogenous collateral is
-  ///      below the amount of minted dyad. Caller must be note owner or an extension authorized by
-  ///      the note owner. If the caller is an authorized extension, may call back to the extension
-  ///      before checking collateral ratio.
-  /// @param id The note id
-  /// @param vault The vault address
-  /// @param amount The amount to withdraw
-  /// @param to The address to send the withdrawn collateral to
+  /// @inheritdoc IVaultManager
   function withdraw(
     uint256 id,
     address vault,
@@ -154,14 +141,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     _checkExoValueAndCollatRatio(id);
   }
 
-  /// @notice Mints dyad for the specified note.
-  /// @dev Total minted dyad must be less than total value of all exogenous collateral for the note,
-  ///      and collateral ratio must be above the minimum. Caller must be note owner or an extension
-  ///      authorized by the note owner. If the caller is an authorized extension, may call back to
-  ///      the extension before checking collateral ratio.
-  /// @param id The note id
-  /// @param amount The amount of dyad to mint
-  /// @param to The address to send the minted dyad to
+  //// @inheritdoc IVaultManager
   function mintDyad(
     uint256 id,
     uint256 amount,
@@ -199,51 +179,20 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     }
   }
 
-  /// @notice Burns dyad for the specified note, repaying debt.
-  /// @dev If the caller is an authorized system extension, may call back to the extension after
-  ///      dyad is burned
-  /// @param id The note id
-  /// @param amount The amount of dyad to burn
+  /// @inheritdoc IVaultManager
   function burnDyad(
     uint256 id,
     uint256 amount
   ) 
     public isValidDNft(id)
   {
-    uint256 extensionFlags = _systemExtensions[msg.sender];
-    _burnDyad(id, amount, extensionFlags);
+    _burnDyad(id, amount);
   }
 
-  function _burnDyad(uint256 id, uint256 amount, uint256 extensionFlags) internal {
+  function _burnDyad(uint256 id, uint256 amount) internal {
     dyad.burn(id, msg.sender, amount);
     dyadXP.afterDyadBurned(id);
     emit BurnDyad(id, amount, msg.sender);
-  }
-
-  /// @notice Redeems dyad against the specified note, withdrawing collateral.
-  /// @dev Caller must be note owner or an extension authorized by the note owner. If the caller is
-  ///      an authorized extension, may call back to the extension after dyad is burned. If the caller
-  ///      is an authorized system extension, may call back to the extension after burn, withdraw, 
-  ///      or redeem steps.
-  /// @param id The note id
-  function redeemDyad(
-    uint256    id,
-    address vault,
-    uint256    amount,
-    address to
-  )
-    external 
-    returns (uint256) { 
-      uint256 extensionFlags = _authorizeCall(id);
-      _burnDyad(id, amount, extensionFlags);
-      Vault _vault = Vault(vault);
-      uint256 asset = amount 
-                    * (10**(_vault.oracle().decimals() + _vault.asset().decimals())) 
-                    / _vault.assetPrice() 
-                    / 1e18;
-      _withdraw(id, vault, asset, to, extensionFlags);
-      emit RedeemDyad(id, vault, amount, to);
-      return asset;
   }
 
   /// @notice Liquidates the specified note, transferring collateral to the specified note.
