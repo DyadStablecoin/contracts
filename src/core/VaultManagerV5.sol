@@ -114,12 +114,6 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     if (vault == KEROSENE_VAULT) {
       dyadXP.afterKeroseneDeposited(id, amount);
     }
-
-    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.EXTENSION_ENABLED)) {
-      if(DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_DEPOSIT)) {
-        IAfterDepositHook(msg.sender).afterDeposit(id, vault, amount);
-      }
-    }
   }
 
   /// @notice Withdraws collateral from the specified vault.
@@ -223,11 +217,6 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   function _burnDyad(uint256 id, uint256 amount, uint256 extensionFlags) internal {
     dyad.burn(id, msg.sender, amount);
     dyadXP.afterDyadBurned(id);
-    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.EXTENSION_ENABLED)) {
-      if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_BURN)) {
-        IAfterBurnHook(msg.sender).afterBurn(id, amount);
-      }
-    }
     emit BurnDyad(id, amount, msg.sender);
   }
 
