@@ -23,7 +23,3 @@ interface IAfterBurnHook is IExtension {
     function afterBurn(uint256 id, uint256 amount) external;
 }
 
-interface IAfterRedeemHook is IExtension{
-    function afterRedeem(uint256 id, address vault, uint256 amount, address to, uint256 assetAmount) external;
-}
-
