@@ -244,11 +244,11 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     address to
   )
     external 
-    returns (uint) { 
+    returns (uint256) { 
       uint256 extensionFlags = _authorizeCall(id);
       _burnDyad(id, amount, extensionFlags);
       Vault _vault = Vault(vault);
-      uint asset = amount 
+      uint256 asset = amount 
                     * (10**(_vault.oracle().decimals() + _vault.asset().decimals())) 
                     / _vault.assetPrice() 
                     / 1e18;
@@ -271,40 +271,40 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isValidDNft(to)
       returns (address[] memory, uint[] memory)
     {
-      uint cr = collatRatio(id);
+      uint256 cr = collatRatio(id);
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
-      uint debt = dyad.mintedDyad(id);
+      uint256 debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
-      uint numberOfVaults = vaults[id].length();
+      uint256 numberOfVaults = vaults[id].length();
       address[] memory vaultAddresses = new address[](numberOfVaults);
       uint[] memory vaultAmounts = new uint[](numberOfVaults);
 
-      uint totalValue = getTotalValue(id);
+      uint256 totalValue = getTotalValue(id);
       if (totalValue == 0) return (vaultAddresses, vaultAmounts);
 
-      for (uint i = 0; i < numberOfVaults; i++) {
+      for (uint256 i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[id].at(i));
         vaultAddresses[i] = address(vault);
         if (vaultLicenser.isLicensed(address(vault))) {
           uint256 depositAmount = vault.id2asset(id);
           if (depositAmount == 0) continue;
-          uint value = vault.getUsdValue(id);
-          uint asset;
+          uint256 value = vault.getUsdValue(id);
+          uint256 asset;
           if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
-            uint cappedCr               = cr < 1e18 ? 1e18 : cr;
-            uint liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
-            uint liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
-            uint allAsset = depositAmount.mulWadUp(liquidationAssetShare);
+            uint256 cappedCr               = cr < 1e18 ? 1e18 : cr;
+            uint256 liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
+            uint256 liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
+            uint256 allAsset = depositAmount.mulWadUp(liquidationAssetShare);
             asset = allAsset.mulWadDown(amount).divWadDown(debt);
           } else {
-            uint share       = value.divWadDown(totalValue);
-            uint amountShare = share.mulWadUp(amount);
-            uint reward_rate = amount
+            uint256 share       = value.divWadDown(totalValue);
+            uint256 amountShare = share.mulWadUp(amount);
+            uint256 reward_rate = amount
                                 .divWadDown(debt)
                                 .mulWadDown(LIQUIDATION_REWARD);
-            uint valueToMove = amountShare + amountShare.mulWadUp(reward_rate);
-            uint cappedValue = valueToMove > value ? value : valueToMove;
+            uint256 valueToMove = amountShare + amountShare.mulWadUp(reward_rate);
+            uint256 cappedValue = valueToMove > value ? value : valueToMove;
             asset = cappedValue 
                       * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
                       / vault.assetPrice() 
@@ -334,7 +334,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   )
     public 
     view
-    returns (uint) {
+    returns (uint256) {
       uint256 mintedDyad = dyad.mintedDyad(id);
       uint256 totalValue = getTotalValue(id);
       return _collatRatio(mintedDyad, totalValue);
@@ -350,8 +350,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   )
     internal 
     pure
-    returns (uint) {
-      if (mintedDyad == 0) return type(uint).max;
+    returns (uint256) {
+      if (mintedDyad == 0) return type(uint256).max;
       return totalValue.divWadDown(mintedDyad);
   }
 
@@ -363,7 +363,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     public 
     view
     returns (uint256) {
-      (uint exoValue, uint keroValue) = getVaultsValues(id);
+      (uint256 exoValue, uint256 keroValue) = getVaultsValues(id);
       return exoValue + keroValue;
   }
 
@@ -375,12 +375,12 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     public 
     view
     returns (
-      uint exoValue, // exo := exogenous (non-kerosene)
-      uint keroValue
+      uint256 exoValue, // exo := exogenous (non-kerosene)
+      uint256 keroValue
     ) {
-      uint numberOfVaults = vaults[id].length(); 
+      uint256 numberOfVaults = vaults[id].length(); 
 
-      for (uint i = 0; i < numberOfVaults; i++) {
+      for (uint256 i = 0; i < numberOfVaults; i++) {
         Vault vault = Vault(vaults[id].at(i));
         if (vaultLicenser.isLicensed(address(vault))) {
           if (vaultLicenser.isKerosene(address(vault))) {
@@ -396,7 +396,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @notice Returns the registered vaults for the specified note
   /// @param id The note id
   function getVaults(
-    uint id
+    uint256 id
   ) 
     external 
     view 
@@ -408,7 +408,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @param id The note id
   /// @param vault The vault address
   function hasVault(
-    uint    id,
+    uint256    id,
     address vault
   ) 
     external 
