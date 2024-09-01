@@ -226,7 +226,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
         if (vaultLicenser.isLicensed(address(vault))) {
           uint256 depositAmount = vault.id2asset(id);
           if (depositAmount == 0) continue;
-          uint value = vault.getUsdValue(id);
+          uint value = _getVaultUsdValue(address(vault), id);
           uint asset;
           if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
             uint cappedCr               = cr < 1e18 ? 1e18 : cr;
@@ -308,12 +308,12 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       uint numberOfVaults = vaults[id].length(); 
 
       for (uint i = 0; i < numberOfVaults; i++) {
-        Vault vault = Vault(vaults[id].at(i));
-        if (vaultLicenser.isLicensed(address(vault))) {
-          if (vaultLicenser.isKerosene(address(vault))) {
-            keroValue += vault.getUsdValue(id);
+        address vault = vaults[id].at(i);
+        if (vaultLicenser.isLicensed(vault)) {
+          if (vaultLicenser.isKerosene(vault)) {
+            keroValue += _getVaultUsdValue(vault, id);
           } else {
-            exoValue  += vault.getUsdValue(id);
+            exoValue += _getVaultUsdValue(vault, id);
           }
         }
       }
@@ -395,6 +395,11 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     return 0;
   }
 
+  /// @notice Gets the asset price for the specified vault
+  /// @dev This function is used to get the asset price of the vault - if it is the Kerosene vault,
+  ///      we use the cached value of the Kerosene vault or cache it for the block
+  ///      Otherwise, we use the `assetPrice` function of the vault.
+  /// @param vault The address of the vault.
   function _getAssetPriceCacheKerosene(address vault) private returns (uint256) {
     if (vault == KEROSENE_VAULT) {
       uint256 dv = cachedKeroDV[block.number];
@@ -407,5 +412,21 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       }
     }
     return Vault(vault).assetPrice();
+  }
+
+  /// @notice Gets the USD value of the assets in the vault for the specified note
+  /// @dev This function is used to get the USD value of the asset in the vault.
+  ///      If the vault is a Kerosene vault, we use the cached value of the Kerosene vault.
+  ///      Otherwise, we use the `getUsdValue` function of the vault.
+  /// @param vault The address of the vault.
+  /// @param id The id of the asset.
+  function _getVaultUsdValue(address vault, uint id) private view returns (uint256) {
+    if (vault == KEROSENE_VAULT) {
+      uint256 dv = cachedKeroDV[block.number];
+      if (dv > 0) {
+        return dv * Vault(vault).id2asset(id) / 1e8;
+      }
+    }
+    return Vault(vault).getUsdValue(id);
   }
 }
