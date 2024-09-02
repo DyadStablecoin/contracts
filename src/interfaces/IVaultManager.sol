@@ -8,6 +8,8 @@ interface IVaultManager {
   event BurnDyad  (uint indexed id, uint amount, address indexed from);
   event RedeemDyad(uint indexed id, address indexed vault, uint amount, address indexed to);
   event Liquidate (uint indexed id, address indexed from, uint indexed to);
+  event SystemExtensionAuthorized(address indexed extension, uint256 hooks);
+  event UserExtensionAuthorized(address indexed user, address indexed extension, bool indexed authorized);
 
   error NotOwner();
   error NotLicensed();

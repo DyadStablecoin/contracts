@@ -369,18 +369,21 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     } else {
       _authorizedExtensions[msg.sender].remove(extension);
     }
+    emit UserExtensionAuthorized(msg.sender, extension, isAuthorized);
   }
 
   /// @notice Authorizes an extension for use in the system
   /// @param extension The extension address
   /// @param isAuthorized Whether the extension is authorized
   function authorizeSystemExtension(address extension, bool isAuthorized) external onlyOwner {
+    uint256 hooks;
     if (isAuthorized) {
-      uint256 hooks = IExtension(extension).getHookFlags();
-      _systemExtensions[extension] = hooks | DyadHooks.EXTENSION_ENABLED;
+      hooks = IExtension(extension).getHookFlags() | DyadHooks.EXTENSION_ENABLED;
     } else {
-      _systemExtensions[extension] = DyadHooks.disableExtension(_systemExtensions[extension]);
+      hooks = DyadHooks.disableExtension(_systemExtensions[extension]);
     }
+    _systemExtensions[extension] = hooks;
+    emit SystemExtensionAuthorized(extension, hooks);
   }
 
   /// @notice Returns whether the specified extension is authorized for use in the system
