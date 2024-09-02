@@ -36,14 +36,14 @@ contract RedeemCollateralExtension is IExtension {
     }
 
     /**
-    * @notice Redeem DYAD through a dNFT
-    * @param id The ID of the dNFT for which the DYAD is being redeemed.
-    * @param vault Address of the vault through which the DYAD is being redeemed
-    *        for its underlying collateral.
-    * @param amount The amount of DYAD to be redeemed.
-    * @param to The address where the collateral will be sent.
-    * @return The amount of collateral that was redeemed.
-    */
+     * @notice Redeem DYAD through a dNFT
+     * @param id The ID of the dNFT for which the DYAD is being redeemed.
+     * @param vault Address of the vault through which the DYAD is being redeemed
+     *        for its underlying collateral.
+     * @param amount The amount of DYAD to be redeemed.
+     * @param to The address where the collateral will be sent.
+     * @return The amount of collateral that was redeemed.
+     */
     function redeemDyad(uint256 id, address vault, uint256 amount, address to) external returns (uint256) {
         if (dNft.ownerOf(id) != msg.sender) {
             revert NotDnftOwner();
@@ -52,10 +52,8 @@ contract RedeemCollateralExtension is IExtension {
         dyad.transferFrom(msg.sender, address(this), amount);
         vaultManager.burnDyad(id, amount);
         IVault _vault = IVault(vault);
-        uint256 redeemedAmount = amount 
-                    * (10**(_vault.oracle().decimals() + _vault.asset().decimals())) 
-                    / _vault.assetPrice() 
-                    / 1e18;
+        uint256 redeemedAmount =
+            amount * (10 ** (_vault.oracle().decimals() + _vault.asset().decimals())) / _vault.assetPrice() / 1e18;
         vaultManager.withdraw(id, vault, redeemedAmount, to);
 
         return redeemedAmount;

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.0;
 
 library DyadHooks {
-
     uint256 internal constant EXTENSION_ENABLED = 1;
     uint256 internal constant AFTER_WITHDRAW = 2;
     uint256 internal constant AFTER_MINT = 4;

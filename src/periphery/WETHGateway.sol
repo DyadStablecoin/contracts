@@ -70,10 +70,8 @@ contract WETHGateway is IExtension {
         dyad.transferFrom(msg.sender, address(this), amount);
         vaultManager.burnDyad(id, amount);
         IVault vault = IVault(wethVault);
-        uint256 redeemedAmount = amount 
-                    * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
-                    / vault.assetPrice() 
-                    / 1e18;
+        uint256 redeemedAmount =
+            amount * (10 ** (vault.oracle().decimals() + vault.asset().decimals())) / vault.assetPrice() / 1e18;
         vaultManager.withdraw(id, wethVault, redeemedAmount, address(this));
         weth.withdraw(redeemedAmount);
         (bool success,) = to.call{value: redeemedAmount}("");
