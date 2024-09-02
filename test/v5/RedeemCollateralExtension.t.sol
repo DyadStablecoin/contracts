@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import { BaseTestV5 } from "./BaseTestV5.sol";
+import {BaseTestV5} from "./BaseTestV5.sol";
 import {StdStorage, stdStorage} from "forge-std/StdStorage.sol";
 import {RedeemCollateralExtension} from "../../src/periphery/RedeemCollateralExtension.sol";
 
 contract RedeemCollateralExtensionTest is BaseTestV5 {
-    using stdStorage        for StdStorage;
+    using stdStorage for StdStorage;
 
     RedeemCollateralExtension redeemer;
 
     function setUp() public virtual override {
         super.setUp();
-        
+
         vm.prank(USER_1);
         vaultManager.add(0, address(wethVault));
 

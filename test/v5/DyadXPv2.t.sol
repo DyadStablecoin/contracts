@@ -4,10 +4,9 @@ pragma solidity ^0.8.20;
 import {BaseTestV5} from "./BaseTestV5.sol";
 
 contract DyadXPv2Test is BaseTestV5 {
-
     function setUp() public virtual override {
         super.setUp();
-        
+
         vm.startPrank(USER_1);
         vaultManager.add(0, address(wethVault));
         vaultManager.add(0, address(keroseneVault));
@@ -20,7 +19,7 @@ contract DyadXPv2Test is BaseTestV5 {
         vm.startPrank(USER_1);
         kerosene.approve(address(vaultManager), type(uint256).max);
         vaultManager.deposit(0, address(keroseneVault), 100_000 ether);
-        
+
         assertEq(dyadXP.balanceOfNote(0), 0);
         assertEq(dyadXP.accrualRate(0), 100_000 ether);
     }
@@ -30,7 +29,7 @@ contract DyadXPv2Test is BaseTestV5 {
         vm.deal(USER_1, 100 ether);
 
         _mockOracleResponse(address(wethVault.oracle()), 250000000000, 8);
-    
+
         vm.startPrank(USER_1);
         weth.deposit{value: 100 ether}();
         weth.approve(address(vaultManager), type(uint256).max);
@@ -38,7 +37,7 @@ contract DyadXPv2Test is BaseTestV5 {
         kerosene.approve(address(vaultManager), type(uint256).max);
         vaultManager.deposit(0, address(keroseneVault), 100_000 ether);
         vaultManager.mintDyad(0, 100_000 ether, USER_1);
-        
+
         assertEq(dyadXP.balanceOfNote(0), 0);
         assertEq(dyadXP.accrualRate(0), 150_000 ether);
     }
@@ -107,7 +106,7 @@ contract DyadXPv2Test is BaseTestV5 {
 
         skip(3.5 days);
         assertEq(dyadXP.balanceOfNote(0), 52_920_000_000 ether);
-        
+
         vm.stopPrank();
     }
 
@@ -142,7 +141,5 @@ contract DyadXPv2Test is BaseTestV5 {
         assertEq(dyadXP.balanceOfNote(0), 998.046875 ether);
     }
 
-    function text_XPHalving_initialBalanceGtRestingValue() public {
-
-    }
+    function text_XPHalving_initialBalanceGtRestingValue() public {}
 }
