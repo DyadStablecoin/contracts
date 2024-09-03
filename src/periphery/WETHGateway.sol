@@ -41,15 +41,19 @@ contract WETHGateway is IExtension {
         return 0;
     }
 
+    /// @notice Deposits native currency (ETH) into the WETH vault for a specific dNFT
+    /// @dev Converts ETH to WETH and then deposits it into the vault
+    /// @param id The ID of the dNFT to deposit for
     function depositNative(uint256 id) external payable {
-        if (dNft.ownerOf(id) != msg.sender) {
-            revert NotDnftOwner();
-        }
         weth.deposit{value: msg.value}();
-        //weth.approve(address(vaultManager), msg.value);
         vaultManager.deposit(id, wethVault, msg.value);
     }
 
+    /// @notice Withdraws native currency (ETH) from the WETH vault for a specific dNFT
+    /// @dev Converts WETH to ETH and transfers it to the specified address
+    /// @param id The ID of the dNFT to withdraw from
+    /// @param amount The amount of native currency to withdraw
+    /// @param to The address to receive the withdrawn native currency
     function withdrawNative(uint256 id, uint256 amount, address to) external {
         if (dNft.ownerOf(id) != msg.sender) {
             revert NotDnftOwner();
@@ -62,6 +66,11 @@ contract WETHGateway is IExtension {
         }
     }
 
+    /// @notice Redeems DYAD for native currency (ETH) from the WETH vault for a specific dNFT
+    /// @dev Burns DYAD, withdraws corresponding WETH from the vault, converts it to ETH, and transfers to the specified address
+    /// @param id The ID of the dNFT to redeem from
+    /// @param amount The amount of DYAD to redeem
+    /// @param to The address to receive the redeemed native currency
     function redeemNative(uint256 id, uint256 amount, address to) external {
         if (dNft.ownerOf(id) != msg.sender) {
             revert NotDnftOwner();
