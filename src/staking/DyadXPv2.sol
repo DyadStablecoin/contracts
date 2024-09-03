@@ -330,6 +330,16 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         return uint256(lastUpdate.lastXP + (block.timestamp - lastUpdate.lastAction) * rate);
     }
 
+    function nextHalving() public view returns (uint256) {
+        if (halvingCadence == 0 || halvingStart == 0 || block.timestamp < halvingStart) {
+            return 0; // Halving not configured or not started yet
+        }
+
+        uint256 elapsedTime = block.timestamp - halvingStart;
+        uint256 completedHalvings = elapsedTime / halvingCadence;
+        return halvingStart + (completedHalvings + 1) * halvingCadence;
+    }
+
     function _computeAccrualRate(
         uint256 keroDeposited,
         uint256 dyadMinted
