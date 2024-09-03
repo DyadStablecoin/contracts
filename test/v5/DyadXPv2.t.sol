@@ -179,4 +179,23 @@ contract DyadXPv2Test is BaseTestV5 {
         // user accrued additional 30,240,000,000 XP, cut total balance in half
         assertEq(dyadXP.balanceOfNote(0), 32_420_000_000 ether);
     }
+
+    function test_nextHalving() public {
+        assertEq(dyadXP.nextHalving(), 0);
+
+        dyadXP.setHalvingConfiguration(uint40(block.timestamp), 7 days);
+        assertEq(dyadXP.nextHalving(), dyadXP.halvingStart() + 7 days);
+
+        skip(7 days);
+        assertEq(dyadXP.nextHalving(), dyadXP.halvingStart() + 14 days);
+
+        skip(7 days);
+        assertEq(dyadXP.nextHalving(), dyadXP.halvingStart() + 21 days);
+
+        skip(7 days);
+        assertEq(dyadXP.nextHalving(), dyadXP.halvingStart() + 28 days);
+
+        skip(7 days);
+        assertEq(dyadXP.nextHalving(), dyadXP.halvingStart() + 35 days);
+    }
 }
