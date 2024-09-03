@@ -307,11 +307,11 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 if (lastUpdate.lastAction < mostRecentHalvingStart) {
                     
                     uint256 halvingsAlreadyProcessed = 1 + (lastUpdate.lastAction - start) / halvingCadence;
-                    uint256 nextHalving = start + (halvingsAlreadyProcessed) * halvingCadence;
+                    uint256 _nextHalving = start + (halvingsAlreadyProcessed) * halvingCadence;
 
                     // catch up the XP balance to the first halving after the last action
-                    if (nextHalving <= mostRecentHalvingStart) {
-                        uint256 elapsed = (nextHalving - lastUpdate.lastAction);
+                    if (_nextHalving <= mostRecentHalvingStart) {
+                        uint256 elapsed = (_nextHalving - lastUpdate.lastAction);
                         lastUpdate.lastXP = uint120(lastUpdate.lastXP + elapsed * rate >> 1);
                     }
                     
