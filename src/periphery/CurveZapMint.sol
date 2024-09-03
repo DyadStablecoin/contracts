@@ -1,6 +1,6 @@
 import {IExtension} from "../interfaces/IExtension.sol";
 import {Dyad} from "../core/Dyad.sol";
-import {IERC721} from "forge-std/interfaces/IERC721.sol";
+import {DNFt} from "../core/DNFt.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
@@ -20,13 +20,14 @@ contract CurveZap is IExtension {
 
     error NotDnftOwner();
     error OnlyVaultManager();
-
-    IERC721 public immutable dnft;
+    error NoDyadMinted();
+    
+    DNft public immutable dnft;
     IVaultManager public immutable vaultManager;
     Dyad public immutable dyad;
 
     constructor(address _dnft, address _vaultManager, address _dyad) {
-        dnft = IERC721(_dnft);
+        dnft = DNft(_dnft);
         vaultManager = IVaultManager(_vaultManager);
         dyad = Dyad(_dyad);
     }
@@ -58,11 +59,10 @@ contract CurveZap is IExtension {
     }
 
     function repayZap(uint256 id, uint256 lpAmount, address pool, int128 dyadIndex, uint256 minAmountOut) external {
-        if (dnft.ownerOf(id) != msg.sender) {
-            revert NotDnftOwner();
-        }
-
         uint256 mintedDyad = dyad.mintedDyad(id);
+        if (mintedDyad == 0) {
+            revert NoDyadMinted();
+        }
         ERC20(pool).safeTransferFrom(msg.sender, address(this), lpAmount);
         uint256 amountOut = ICurvePool(pool).remove_liquidity_one_coin(lpAmount, dyadIndex, minAmountOut, address(this));
         if (amountOut > mintedDyad) {
