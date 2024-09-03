@@ -141,5 +141,42 @@ contract DyadXPv2Test is BaseTestV5 {
         assertEq(dyadXP.balanceOfNote(0), 998.046875 ether);
     }
 
-    function text_XPHalving_initialBalanceGtRestingValue() public {}
+    function test_XPHalving_initialBalanceGtRestingValue() public {
+        kerosene.transfer(USER_1, 50_000 ether);
+
+        vm.startPrank(USER_1);
+        kerosene.approve(address(vaultManager), type(uint256).max);
+        vaultManager.deposit(0, address(keroseneVault), 50_000 ether);
+        vm.stopPrank();
+
+        skip(2_000_000);
+        // verify initial balance
+        assertEq(dyadXP.balanceOfNote(0), 100_000_000_000 ether);
+
+        dyadXP.setHalvingConfiguration(uint40(block.timestamp), 7 days);
+        // Skip to first halving
+        skip(7 days);
+        // user accrued additional30,240,000,000 XP, cut total balance in half
+        assertEq(dyadXP.balanceOfNote(0), 65_120_000_000 ether);
+
+        // Skip to second halving
+        skip(7 days);
+        // user accrued additional 30,240,000,000 XP, cut total balance in half
+        assertEq(dyadXP.balanceOfNote(0), 47_680_000_000 ether);
+
+        // Skip to third halving
+        skip(7 days);
+        // user accrued additional 30,240,000,000 XP, cut total balance in half
+        assertEq(dyadXP.balanceOfNote(0), 38_960_000_000 ether);
+
+        // Skip to fourth halving
+        skip(7 days);
+        // user accrued additional 30,240,000,000 XP, cut total balance in half
+        assertEq(dyadXP.balanceOfNote(0), 34_600_000_000 ether);
+
+        // Skip to fifth halving
+        skip(7 days);
+        // user accrued additional 30,240,000,000 XP, cut total balance in half
+        assertEq(dyadXP.balanceOfNote(0), 32_420_000_000 ether);
+    }
 }
