@@ -33,7 +33,7 @@ interface IXPContract {
 contract UniswapV3StakingWithXPBoost is Ownable {
     IUniswapV3PositionsNFT public uniswapNFT;
     IERC20 public rewardToken;
-    IXPContract public xpContract;
+    IERC20 public xpContract; // Updated to IERC20
     uint256 public rewardRate; // Tokens rewarded per second per NFT staked
 
     struct StakeInfo {
@@ -46,10 +46,15 @@ contract UniswapV3StakingWithXPBoost is Ownable {
     mapping(address => uint256) public rewards;
     mapping(address => uint256) public lastUpdateTime;
 
-    constructor(address _uniswapNFT, address _rewardToken, address _xpContract, uint256 _rewardRate) {
+    constructor(
+        address _uniswapNFT,
+        address _rewardToken,
+        address _xpContract,
+        uint256 _rewardRate
+    ) {
         uniswapNFT = IUniswapV3PositionsNFT(_uniswapNFT);
         rewardToken = IERC20(_rewardToken);
-        xpContract = IXPContract(_xpContract);
+        xpContract = IERC20(_xpContract); // Initialize as IERC20
         rewardRate = _rewardRate;
     }
 
@@ -70,7 +75,7 @@ contract UniswapV3StakingWithXPBoost is Ownable {
 
     function unstake(uint256 tokenId) external {
         require(stakes[tokenId].owner == msg.sender, "Not the staker");
-        
+
         updateReward(msg.sender);
 
         uniswapNFT.transferFrom(address(this), msg.sender, tokenId);
@@ -88,30 +93,40 @@ contract UniswapV3StakingWithXPBoost is Ownable {
     }
 
     function updateReward(address account) internal {
-        if (lastUpdateTime[account] == 0) {
+        uint256 lastTime = lastUpdateTime[account];
+        if (lastTime == 0) {
             lastUpdateTime[account] = block.timestamp;
             return;
         }
 
-        uint256 timeDiff = block.timestamp - lastUpdateTime[account];
+        uint256 timeDiff = block.timestamp - lastTime;
         uint256 baseReward = timeDiff * rewardRate;
 
-        // Get XP and total XP supply for boosting rewards
-        uint256 xp = xpContract.getXP(account);
+        // Get user's XP balance and total XP supply from the XP contract
+        uint256 userXP = xpContract.balanceOf(account);
         uint256 totalXP = xpContract.totalSupply();
 
-        // Boost the reward based on XP relative to the total supply of XP
-        uint256 boostedReward = baseReward * (1 + (xp * 1e18 / totalXP)); // Assuming boost factor in 1e18 scale
+        // Prevent division by zero
+        if (totalXP == 0) {
+            totalXP = 1;
+        }
+
+        // Calculate boost factor (scaled by 1e18 for precision)
+        uint256 boostFactor = (userXP * 1e18) / totalXP;
+
+        // Apply boost to the base reward
+        uint256 boostedReward = baseReward + ((baseReward * boostFactor) / 1e18);
 
         rewards[account] += boostedReward;
         lastUpdateTime[account] = block.timestamp;
     }
 
+    // Owner functions to set parameters
     function setRewardRate(uint256 _rewardRate) external onlyOwner {
         rewardRate = _rewardRate;
     }
 
     function setXPContract(address _xpContract) external onlyOwner {
-        xpContract = IXPContract(_xpContract);
+        xpContract = IERC20(_xpContract);
     }
 }
