@@ -2,8 +2,12 @@
 pragma solidity ^0.8.20;
 
 import {BaseTestV5} from "./BaseTestV5.sol";
+import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 
 contract DyadXPv2Test is BaseTestV5 {
+    using FixedPointMathLib for uint256;
+
+
     function setUp() public virtual override {
         super.setUp();
 
@@ -40,6 +44,29 @@ contract DyadXPv2Test is BaseTestV5 {
 
         assertEq(dyadXP.balanceOfNote(0), 0);
         assertEq(dyadXP.accrualRate(0), 150_000 ether);
+    }
+
+    function testFuzz_XPAccrualWithDyad(uint256 keroseneAmount, uint256 dyadAmount) public {
+        vm.assume(dyadAmount <= type(uint96).max);
+        vm.assume(keroseneAmount <= 1_000_000_000 ether);
+
+        kerosene.transfer(address(keroseneVault), keroseneAmount);
+
+        vm.startPrank(address(vaultManager));
+        dyad.mint(0, address(this), dyadAmount);
+        dyadXP.afterDyadMinted(0);
+        keroseneVault.deposit(0, keroseneAmount);
+        dyadXP.afterKeroseneDeposited(0, keroseneAmount);
+        vm.stopPrank();
+
+        uint256 accrualRate = dyadXP.accrualRate(0);
+        assertLe(accrualRate, keroseneAmount * 2);
+        assertGe(accrualRate, keroseneAmount);
+
+        uint256 expectedBoost = keroseneAmount.mulWadDown((dyadAmount.divWadDown(dyadAmount + keroseneAmount)));
+        uint256 expectedAccrualRate = expectedBoost + keroseneAmount;
+
+        assertEq(accrualRate, expectedAccrualRate);
     }
 
     function test_XPHalving() public {
