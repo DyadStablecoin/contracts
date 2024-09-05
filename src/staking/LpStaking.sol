@@ -30,11 +30,12 @@ interface IXPContract {
     function totalSupply() external view returns (uint256);
 }
 
-contract UniswapV3StakingWithXPBoost is Ownable {
+contract UniswapV3StakingWithTimeWeightedXPBoost is Ownable {
     IUniswapV3PositionsNFT public uniswapNFT;
     IERC20 public rewardToken;
-    IERC20 public xpContract; // Updated to IERC20
-    uint256 public rewardRate; // Tokens rewarded per second per NFT staked
+    IDyadXP public xpContract;  // Reference to the DyadXP contract
+    uint256 public rewardRate;  // Tokens rewarded per second per NFT staked
+    uint256 public decayRate = 1e18; // Decay rate factor for older XP
 
     struct StakeInfo {
         uint256 stakedAt;
@@ -46,15 +47,10 @@ contract UniswapV3StakingWithXPBoost is Ownable {
     mapping(address => uint256) public rewards;
     mapping(address => uint256) public lastUpdateTime;
 
-    constructor(
-        address _uniswapNFT,
-        address _rewardToken,
-        address _xpContract,
-        uint256 _rewardRate
-    ) {
+    constructor(address _uniswapNFT, address _rewardToken, address _xpContract, uint256 _rewardRate) {
         uniswapNFT = IUniswapV3PositionsNFT(_uniswapNFT);
         rewardToken = IERC20(_rewardToken);
-        xpContract = IERC20(_xpContract); // Initialize as IERC20
+        xpContract = IDyadXP(_xpContract);
         rewardRate = _rewardRate;
     }
 
@@ -93,40 +89,49 @@ contract UniswapV3StakingWithXPBoost is Ownable {
     }
 
     function updateReward(address account) internal {
-        uint256 lastTime = lastUpdateTime[account];
-        if (lastTime == 0) {
+        if (lastUpdateTime[account] == 0) {
             lastUpdateTime[account] = block.timestamp;
             return;
         }
 
-        uint256 timeDiff = block.timestamp - lastTime;
+        uint256 timeDiff = block.timestamp - lastUpdateTime[account];
         uint256 baseReward = timeDiff * rewardRate;
 
-        // Get user's XP balance and total XP supply from the XP contract
-        uint256 userXP = xpContract.balanceOf(account);
+        // Fetch XP from DyadXP contract
+        uint256 xp = xpContract.balanceOf(account);
         uint256 totalXP = xpContract.totalSupply();
 
-        // Prevent division by zero
-        if (totalXP == 0) {
-            totalXP = 1;
-        }
+        // Calculate time since last XP action to apply a time-weighted decay
+        uint256 timeSinceLastAction = block.timestamp - xpContract.lastAction(account);
 
-        // Calculate boost factor (scaled by 1e18 for precision)
-        uint256 boostFactor = (userXP * 1e18) / totalXP;
+        // Apply an exponential decay to older XP based on timeSinceLastAction
+        uint256 weightedXP = xp * expDecay(timeSinceLastAction);
 
-        // Apply boost to the base reward
-        uint256 boostedReward = baseReward + ((baseReward * boostFactor) / 1e18);
+        // Boost the reward based on weighted XP relative to the total supply of XP
+        uint256 boostedReward = baseReward * (1 + (weightedXP * 1e18 / totalXP));
 
         rewards[account] += boostedReward;
         lastUpdateTime[account] = block.timestamp;
     }
 
-    // Owner functions to set parameters
+    // Exponential decay function to make recently accrued XP more valuable
+    function expDecay(uint256 timeSinceLastAction) internal view returns (uint256) {
+        // Example decay formula: decayRate^time
+        // Where decayRate < 1, e.g. decayRate = 0.99^seconds since last action
+        // The longer the timeSinceLastAction, the smaller the decay factor.
+        return decayRate ** timeSinceLastAction / 1e18;
+    }
+
     function setRewardRate(uint256 _rewardRate) external onlyOwner {
         rewardRate = _rewardRate;
     }
 
+    function setDecayRate(uint256 _decayRate) external onlyOwner {
+        require(_decayRate <= 1e18, "Decay rate should be <= 1");
+        decayRate = _decayRate;
+    }
+
     function setXPContract(address _xpContract) external onlyOwner {
-        xpContract = IERC20(_xpContract);
+        xpContract = IDyadXP(_xpContract);
     }
 }
