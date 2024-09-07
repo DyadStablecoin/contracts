@@ -19,7 +19,9 @@ struct NoteXPData {
     // uint120 supports deposit of entire kerosene supply by a single note for ~42 years before overflow
     uint120 lastXP;
     // New field to store total XP earned by the note
-    uint256 totalXP; // New field added
+    uint256 totalXP;
+    // New field to store the amount of dyad minted for the note
+    uint256 dyadMinted; // New field added
 }
 
 /// @custom:oz-upgrades-from src/staking/DyadXP.sol:DyadXP
@@ -71,7 +73,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 lastAction: uint40(block.timestamp),
                 keroseneDeposited: uint96(depositedKero),
                 lastXP: 0,
-                totalXP: 0 // Initialize totalXP to 0
+                totalXP: 0,
+                dyadMinted: 0 
             });
         }
     }
@@ -146,7 +149,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
             lastXP: uint120(newXP),
-            totalXP: lastUpdate.totalXP + newXP // Update totalXP when new XP is earned
+            totalXP: lastUpdate.totalXP + newXP, // Update totalXP when new XP is earned
+            dyadMinted: 0 // Initialize dyadMinted to 0
         });
 
         globalLastXP += uint192(
@@ -185,7 +189,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 lastUpdate.keroseneDeposited - amountWithdrawn
             ),
             lastXP: uint120(xp - slashedXP),
-            totalXP: lastUpdate.totalXP // Keep totalXP unchanged on withdrawal
+            totalXP: lastUpdate.totalXP, // Keep totalXP unchanged on withdrawal
+            dyadMinted: lastUpdate.dyadMinted
         });
 
         globalLastXP = uint192(
@@ -214,7 +219,20 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     ) internal view returns (uint256) {
         uint256 elapsed = block.timestamp - lastUpdate.lastAction;
         uint256 deposited = lastUpdate.keroseneDeposited;
+        uint256 dyadMinted = lastUpdate.dyadMinted;
 
-        return uint256(lastUpdate.lastXP + elapsed * deposited);
+        uint256 totalXP = lastUpdate.totalXP;
+        uint256 accrualRateModifier = totalXP > 0 ? 1e18 / totalXP.sqrt() : 1e18;
+
+        uint256 adjustedAccrualRate = accrualRateModifier * 1e7;
+
+        uint256 bonus;
+
+        if (dyadMinted + deposited != 0) {
+            bonus = deposited * dyadMinted / (dyadMinted + deposited);
+        }
+
+
+        return uint256(lastUpdate.lastXP + (elapsed * deposited * adjustedAccrualRate) / 1e18);
     }
 }
