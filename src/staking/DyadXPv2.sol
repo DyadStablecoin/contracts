@@ -7,6 +7,7 @@ import {IERC721Enumerable} from "forge-std/interfaces/IERC721.sol";
 
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IVault} from "../interfaces/IVault.sol";
+import {Dyad} from "../core/Dyad.sol";
 import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
@@ -47,12 +48,15 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     mapping(uint256 => NoteXPData) public noteData;
 
+    Dyad public immutable DYAD;
+
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address vaultManager, address keroseneVault, address dnft) {
+    constructor(address vaultManager, address keroseneVault, address dnft, address dyad) {
         VAULT_MANAGER = IVaultManager(vaultManager);
         DNFT = IERC721Enumerable(dnft);
         KEROSENE_VAULT = IVault(keroseneVault);
         KEROSENE = ERC20(KEROSENE_VAULT.asset());
+        DYAD = Dyad(dyad);
         _disableInitializers();
     }
 
@@ -68,7 +72,6 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             if (depositedKero == 0) {
                 continue;
             }
-            totalKeroseneInVault += depositedKero;
             noteData[i] = NoteXPData({
                 lastAction: uint40(block.timestamp),
                 keroseneDeposited: uint96(depositedKero),
@@ -132,8 +135,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function afterKeroseneDeposited(
-      uint256 noteId,
-      uint256 amountDeposited
+      uint256 noteId
     ) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
@@ -143,20 +145,39 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
         uint256 newXP = _computeXP(lastUpdate);
 
-        totalKeroseneInVault += amountDeposited;
+        noteData[noteId] = NoteXPData({
+            lastAction: uint40(block.timestamp),
+            keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
+            lastXP: uint120(newXP),
+            totalXP: lastUpdate.totalXP + newXP, // Update totalXP when new XP is earned
+            dyadMinted: lastUpdate.dyadMinted
+        });
+
+        emit Transfer(
+            address(0),
+            address(DNFT.ownerOf(noteId)),
+            newXP - lastUpdate.lastXP
+        );
+    }
+
+    function afterDyadMinted(
+      uint256 noteId
+    ) external {
+        if (msg.sender != address(VAULT_MANAGER)) {
+            revert NotVaultManager();
+        }
+
+        NoteXPData memory lastUpdate = noteData[noteId];
+
+        uint256 newXP = _computeXP(lastUpdate);
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
             lastXP: uint120(newXP),
             totalXP: lastUpdate.totalXP + newXP, // Update totalXP when new XP is earned
-            dyadMinted: 0 // Initialize dyadMinted to 0
+            dyadMinted: DYAD.mintedDyad(noteId)
         });
-
-        globalLastXP += uint192(
-            (block.timestamp - globalLastUpdate) * (totalKeroseneInVault - amountDeposited)
-        );
-        globalLastUpdate = uint40(block.timestamp);
 
         emit Transfer(
             address(0),
@@ -192,15 +213,6 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             totalXP: lastUpdate.totalXP, // Keep totalXP unchanged on withdrawal
             dyadMinted: lastUpdate.dyadMinted
         });
-
-        globalLastXP = uint192(
-            globalLastXP +
-                (block.timestamp - globalLastUpdate) *
-                totalKeroseneInVault -
-                slashedXP
-        );
-        globalLastUpdate = uint40(block.timestamp);
-        totalKeroseneInVault -= amountWithdrawn;
 
         emit Transfer(
             address(0),
