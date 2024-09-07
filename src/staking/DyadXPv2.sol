@@ -82,8 +82,11 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     /// @notice Returns the amount of tokens in existence.
     function totalSupply() public view returns (uint256) {
-        uint256 timeElapsed = block.timestamp - globalLastUpdate;
-        return uint256(globalLastXP + timeElapsed * totalKeroseneInVault);
+        uint256 totalXP;
+        for (uint256 i = 0; i < DNFT.totalSupply(); i++) {
+            totalXP += _computeXP(noteData[i]);
+        }
+        return totalXP;
     }
 
     /// @notice Returns the amount of tokens owned by `account`.
