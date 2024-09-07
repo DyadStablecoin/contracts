@@ -149,7 +149,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
             lastXP: uint120(newXP),
-            totalXP: lastUpdate.totalXP + newXP, // Update totalXP when new XP is earned
+            totalXP: lastUpdate.totalXP + newXP, 
             dyadMinted: lastUpdate.dyadMinted
         });
 
@@ -158,6 +158,32 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             address(DNFT.ownerOf(noteId)),
             newXP - lastUpdate.lastXP
         );
+    }
+
+    function beforeKeroseneWithdrawn(
+        uint256 noteId
+    ) external {
+        if (msg.sender != address(VAULT_MANAGER)) {
+            revert NotVaultManager();
+        }
+
+        NoteXPData memory lastUpdate = noteData[noteId];
+        uint256 newXp = _computeXP(lastUpdate);
+
+        noteData[noteId] = NoteXPData({
+            lastAction: uint40(block.timestamp),
+            keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
+            lastXP: uint120(newXp),
+            totalXP: lastUpdate.totalXP, 
+            dyadMinted: lastUpdate.dyadMinted
+        });
+
+        emit Transfer(
+            address(0),
+            address(DNFT.ownerOf(noteId)),
+            newXp - lastUpdate.lastXP
+        );
+        emit Transfer(DNFT.ownerOf(noteId), address(0), newXp);
     }
 
     function afterDyadMinted(
@@ -175,7 +201,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
             lastXP: uint120(newXP),
-            totalXP: lastUpdate.totalXP + newXP, // Update totalXP when new XP is earned
+            totalXP: lastUpdate.totalXP + newXP, 
             dyadMinted: DYAD.mintedDyad(noteId)
         });
 
@@ -186,41 +212,56 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         );
     }
 
-    function beforeKeroseneWithdrawn(
-        uint256 noteId,
-        uint256 amountWithdrawn
+    function beforeDyadBurned(
+        uint256 noteId
     ) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
 
         NoteXPData memory lastUpdate = noteData[noteId];
-        uint256 xp = _computeXP(lastUpdate);
-        uint256 slashedXP = xp.mulDivUp(
-            amountWithdrawn,
-            lastUpdate.keroseneDeposited
-        );
-        if (slashedXP > xp) {
-            slashedXP = xp;
-        }
+        uint256 newXP = _computeXP(lastUpdate);
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
-            keroseneDeposited: uint96(
-                lastUpdate.keroseneDeposited - amountWithdrawn
-            ),
-            lastXP: uint120(xp - slashedXP),
-            totalXP: lastUpdate.totalXP, // Keep totalXP unchanged on withdrawal
-            dyadMinted: lastUpdate.dyadMinted
+            keroseneDeposited: lastUpdate.keroseneDeposited,
+            lastXP: uint120(newXP),
+            totalXP: lastUpdate.totalXP, 
+            dyadMinted: DYAD.mintedDyad(noteId)
         });
 
         emit Transfer(
             address(0),
             address(DNFT.ownerOf(noteId)),
-            xp - lastUpdate.lastXP
+            newXP - lastUpdate.lastXP
         );
-        emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
+        emit Transfer(DNFT.ownerOf(noteId), address(0), newXP - lastUpdate.lastXP);
     }
+
+    function updateXP(uint256 noteId) external {
+        if (msg.sender != address(VAULT_MANAGER)) {
+            revert NotVaultManager();
+        }
+
+        NoteXPData memory lastUpdate = noteData[noteId];
+        uint256 newXP = _computeXP(lastUpdate);
+
+        noteData[noteId] = NoteXPData({
+            lastAction: uint40(block.timestamp),
+            keroseneDeposited: lastUpdate.keroseneDeposited,
+            lastXP: uint120(newXP),
+            totalXP: lastUpdate.totalXP, 
+            dyadMinted: DYAD.mintedDyad(noteId)
+        });
+
+        emit Transfer(
+            address(0),
+            address(DNFT.ownerOf(noteId)),
+            newXP - lastUpdate.lastXP
+        );
+        emit Transfer(DNFT.ownerOf(noteId), address(0), newXP - lastUpdate.lastXP);
+    }
+
 
     function _authorizeUpgrade(
         address
