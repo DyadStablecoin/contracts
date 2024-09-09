@@ -76,19 +76,17 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 lastAction: uint40(block.timestamp),
                 keroseneDeposited: uint96(depositedKero),
                 lastXP: noteData[i].lastXP,
-                totalXP: noteData[i].totalXP,
+                totalXP: noteData[i].lastXP,
                 dyadMinted: dyadMinted
             });
         }
     }
 
     /// @notice Returns the amount of tokens in existence.
-    function totalSupply() public view returns (uint256) {
-        uint256 totalXP;
+    function totalSupply() public view returns (uint256 totalXP) {
         for (uint256 i = 0; i < DNFT.totalSupply(); i++) {
             totalXP += _computeXP(noteData[i]);
         }
-        return totalXP;
     }
 
     /// @notice Returns the amount of tokens owned by `account`.
