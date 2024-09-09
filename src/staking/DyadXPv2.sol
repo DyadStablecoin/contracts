@@ -137,6 +137,43 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         revert TransferNotAllowed();
     }
 
+    function beforeKeroseneWithdrawn(
+        uint256 noteId,
+        uint256 amountWithdrawn
+    ) external {
+        if (msg.sender != address(VAULT_MANAGER)) {
+            revert NotVaultManager();
+        }
+
+        NoteXPData memory lastUpdate = noteData[noteId];
+
+        uint256 xp = _computeXP(lastUpdate);
+
+        uint256 slashedXP = xp.mulDivUp(
+            amountWithdrawn,
+            lastUpdate.keroseneDeposited
+        );
+
+        if (slashedXP > xp) {
+            slashedXP = xp;
+        }       
+
+        noteData[noteId] = NoteXPData({
+            lastAction: uint40(block.timestamp),
+            keroseneDeposited: uint96(lastUpdate.keroseneDeposited - amountWithdrawn),
+            lastXP: uint120(xp - slashedXP),
+            totalXP: lastUpdate.totalXP + slashedXP, 
+            dyadMinted: DYAD.mintedDyad(noteId)
+        });
+
+        emit Transfer(
+            address(0),
+            address(DNFT.ownerOf(noteId)),
+            xp - lastUpdate.lastXP
+        );
+        emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
+    }
+
     function updateXP(uint256 noteId) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();

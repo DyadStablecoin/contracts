@@ -108,12 +108,9 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       isDNftOwner(id)
   {
     if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
+    if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     _checkExoValueAndCollatRatio(id);
-
-    if (vault == KEROSENE_VAULT) {
-      dyadXP.updateXP(id);
-    }
   }
 
   function mintDyad(
