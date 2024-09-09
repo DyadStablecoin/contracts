@@ -185,11 +185,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             dyadMinted: DYAD.mintedDyad(noteId)
         });
 
-        if (newXP > lastUpdate.lastXP) {
-            emit Transfer(address(0), DNFT.ownerOf(noteId), newXP - lastUpdate.lastXP );
-        } else {
-            emit Transfer(DNFT.ownerOf(noteId), address(0), lastUpdate.lastXP - newXP);
-        }
+        emit Transfer(address(0), DNFT.ownerOf(noteId), newXP - lastUpdate.lastXP );
     }
 
     function _authorizeUpgrade(
