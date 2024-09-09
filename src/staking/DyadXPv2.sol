@@ -127,18 +127,11 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     /// @notice Moves `amount` tokens from `from` to `to` using the allowance mechanism.
     /// `amount` is then deducted from the caller's allowance.
-    function transferFrom(
-        address,
-        address,
-        uint256
-    ) external pure returns (bool) {
+    function transferFrom(address, address, uint256) external pure returns (bool) {
         revert TransferNotAllowed();
     }
 
-    function beforeKeroseneWithdrawn(
-        uint256 noteId,
-        uint256 amountWithdrawn
-    ) external {
+    function beforeKeroseneWithdrawn(uint256 noteId, uint256 amountWithdrawn) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
@@ -147,20 +140,17 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
         uint256 xp = _computeXP(lastUpdate);
 
-        uint256 slashedXP = xp.mulDivUp(
-            amountWithdrawn,
-            lastUpdate.keroseneDeposited
-        );
+        uint256 slashedXP = xp.mulDivUp(amountWithdrawn, lastUpdate.keroseneDeposited);
 
         if (slashedXP > xp) {
             slashedXP = xp;
-        }       
+        }
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(lastUpdate.keroseneDeposited - amountWithdrawn),
             lastXP: uint120(xp - slashedXP),
-            totalXP: xp, 
+            totalXP: xp,
             dyadMinted: DYAD.mintedDyad(noteId)
         });
 
@@ -179,20 +169,16 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
             lastXP: uint120(newXP),
-            totalXP: lastUpdate.totalXP, 
+            totalXP: lastUpdate.totalXP,
             dyadMinted: DYAD.mintedDyad(noteId)
         });
 
-        emit Transfer(address(0), DNFT.ownerOf(noteId), newXP - lastUpdate.lastXP );
+        emit Transfer(address(0), DNFT.ownerOf(noteId), newXP - lastUpdate.lastXP);
     }
 
-    function _authorizeUpgrade(
-        address
-    ) internal view override onlyOwner {}
+    function _authorizeUpgrade(address) internal view override onlyOwner {}
 
-    function _computeXP(
-        NoteXPData memory lastUpdate
-    ) internal view returns (uint256) {
+    function _computeXP(NoteXPData memory lastUpdate) internal view returns (uint256) {
         uint256 elapsed = block.timestamp - lastUpdate.lastAction;
         uint256 deposited = lastUpdate.keroseneDeposited;
         uint256 dyadMinted = lastUpdate.dyadMinted;
