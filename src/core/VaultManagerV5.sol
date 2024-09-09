@@ -220,11 +220,9 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
                       / vault.assetPrice() 
                       / 1e18;
           }
-          if (address(vault) == KEROSENE_VAULT) {
-            dyadXP.updateXP(id);
-          }
           vault.move(id, to, asset);
           if (address(vault) == KEROSENE_VAULT) {
+            dyadXP.updateXP(id);
             dyadXP.updateXP(to);
           } 
         }

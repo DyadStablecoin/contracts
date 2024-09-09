@@ -11,6 +11,7 @@ import {Dyad} from "../core/Dyad.sol";
 import {FixedPointMathLib} from "solmate/utils/FixedPointMathLib.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
+import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 
 struct NoteXPData {
     // uint40 supports 34,000 years before overflow
@@ -28,6 +29,7 @@ struct NoteXPData {
 /// @custom:oz-upgrades-from src/staking/DyadXP.sol:DyadXP
 contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     using FixedPointMathLib for uint256;
+    using Math for uint256;
 
     error TransferNotAllowed();
     error ApproveNotAllowed();
@@ -170,8 +172,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         uint256 dyadMinted = lastUpdate.dyadMinted;
 
         uint256 totalXP = lastUpdate.totalXP;
-        // TODO: replace with log
-        uint256 accrualRateModifier = totalXP > 0 ? 1e18 / totalXP.sqrt() : 1e18;
+        uint256 accrualRateModifier = totalXP > 0 ? 1e18 / totalXP.log10() : 1e18;
 
         uint256 adjustedAccrualRate = accrualRateModifier * 1e7;
 
