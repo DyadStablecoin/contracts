@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IDyadXP.sol"; 
+import "../interfaces/IDNft.sol"; 
 
 interface INonfungiblePositionManager {
     function ownerOf(uint256 tokenId) external view returns (address);
@@ -32,12 +33,14 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
     IERC20 public rewardsToken;
     INonfungiblePositionManager public positionManager;
     IDyadXP public dyadXP; 
+    IDNft public dnft;
 
     struct StakeInfo {
         address staker;
         uint256 rewardDebt;
         uint256 liquidity;
         uint256 lastRewardTime;
+        uint256 noteId;
     }
 
     mapping(uint256 => StakeInfo) public stakes; 
@@ -48,14 +51,15 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
     event Unstaked(address indexed user, uint256 tokenId);
     event RewardClaimed(address indexed user, uint256 reward);
 
-    constructor(IERC20 _rewardsToken, INonfungiblePositionManager _positionManager, IDyadXP _dyadXP, uint256 _rewardsRate) {
+    constructor(IERC20 _rewardsToken, INonfungiblePositionManager _positionManager, IDyadXP _dyadXP, uint256 _rewardsRate, IDNft _dnft) {
         rewardsToken = _rewardsToken;
         positionManager = _positionManager;
         dyadXP = _dyadXP; 
         rewardsRate = _rewardsRate;
+        dnft = _dnft;
     }
 
-    function stake(uint256 tokenId) external {
+    function stake(uint256 tokenId, uint256 noteId) external {
         require(positionManager.ownerOf(tokenId) == msg.sender, "You don't own this token");
 
         (,,,,,,, uint128 liquidity,,,,) = positionManager.positions(tokenId);
@@ -65,7 +69,7 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
         positionManager.safeTransferFrom(msg.sender, address(this), tokenId);
 
         stakes[tokenId] =
-            StakeInfo({staker: msg.sender, rewardDebt: 0, liquidity: liquidity, lastRewardTime: block.timestamp});
+            StakeInfo({staker: msg.sender, rewardDebt: 0, liquidity: liquidity, lastRewardTime: block.timestamp, noteId: noteId});
         userStakes[msg.sender].push(tokenId);
 
         emit Staked(msg.sender, tokenId, liquidity);
@@ -109,10 +113,9 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
         StakeInfo storage stakeInfo = stakes[tokenId];
         uint256 timeDiff = block.timestamp - stakeInfo.lastRewardTime;
 
-        // Get XP from DyadXP contract
-        uint256 xp = dyadXP.balanceOfNote(tokenId); // Assuming tokenId corresponds to the noteId in DyadXP
+        uint256 xp = dyadXP.balanceOfNote(stakeInfo.noteId); 
 
-        return timeDiff * rewardsRate * stakeInfo.liquidity * xp; // Modify reward calculation to include XP
+        return timeDiff * rewardsRate * stakeInfo.liquidity * xp;
     }
 
     function _removeUserStake(address user, uint256 tokenId) internal {
