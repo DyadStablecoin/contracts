@@ -31,7 +31,7 @@ interface INonfungiblePositionManager {
 contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813) {
     IERC20 public rewardsToken;
     INonfungiblePositionManager public positionManager;
-    IDyadXP public dyadXP; // Reference to DyadXP contract
+    IDyadXP public dyadXP; 
 
     struct StakeInfo {
         address staker;
@@ -51,7 +51,7 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
     constructor(IERC20 _rewardsToken, INonfungiblePositionManager _positionManager, IDyadXP _dyadXP, uint256 _rewardsRate) {
         rewardsToken = _rewardsToken;
         positionManager = _positionManager;
-        dyadXP = _dyadXP; // Initialize DyadXP reference
+        dyadXP = _dyadXP; 
         rewardsRate = _rewardsRate;
     }
 
@@ -64,7 +64,6 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
         // Transfer NFT to the contract
         positionManager.safeTransferFrom(msg.sender, address(this), tokenId);
 
-        // Store stake information
         stakes[tokenId] =
             StakeInfo({staker: msg.sender, rewardDebt: 0, liquidity: liquidity, lastRewardTime: block.timestamp});
         userStakes[msg.sender].push(tokenId);
