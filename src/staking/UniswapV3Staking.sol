@@ -4,9 +4,30 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol";
 
-contract UniswapV3Staking is Ownable {
+interface INonfungiblePositionManager {
+    function ownerOf(uint256 tokenId) external view returns (address);
+    function safeTransferFrom(address from, address to, uint256 tokenId) external;
+    function positions(uint256 tokenId)
+        external
+        view
+        returns (
+            uint96 nonce,
+            address operator,
+            address token0,
+            address token1,
+            uint24 fee,
+            int24 tickLower,
+            int24 tickUpper,
+            uint128 liquidity,
+            uint256 feeGrowthInside0LastX128,
+            uint256 feeGrowthInside1LastX128,
+            uint128 tokensOwed0,
+            uint128 tokensOwed1
+        );
+}
+
+contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813) {
     IERC20 public rewardsToken;
     INonfungiblePositionManager public positionManager;
 
@@ -17,9 +38,9 @@ contract UniswapV3Staking is Ownable {
         uint256 lastRewardTime;
     }
 
-    mapping(uint256 => StakeInfo) public stakes; // mapping from tokenId to StakeInfo
-    mapping(address => uint256[]) public userStakes; // mapping from staker to tokenIds
-    uint256 public rewardsRate; // rewards per second
+    mapping(uint256 => StakeInfo) public stakes; 
+    mapping(address => uint256[]) public userStakes; 
+    uint256 public rewardsRate; 
 
     event Staked(address indexed user, uint256 tokenId, uint256 liquidity);
     event Unstaked(address indexed user, uint256 tokenId);
@@ -33,20 +54,16 @@ contract UniswapV3Staking is Ownable {
 
     function stake(uint256 tokenId) external {
         require(positionManager.ownerOf(tokenId) == msg.sender, "You don't own this token");
-        
-        (, , , , , , , uint128 liquidity, , , , ) = positionManager.positions(tokenId);
+
+        (,,,,,,, uint128 liquidity,,,,) = positionManager.positions(tokenId);
         require(liquidity > 0, "Invalid liquidity");
 
         // Transfer NFT to the contract
         positionManager.safeTransferFrom(msg.sender, address(this), tokenId);
 
         // Store stake information
-        stakes[tokenId] = StakeInfo({
-            staker: msg.sender,
-            rewardDebt: 0,
-            liquidity: liquidity,
-            lastRewardTime: block.timestamp
-        });
+        stakes[tokenId] =
+            StakeInfo({staker: msg.sender, rewardDebt: 0, liquidity: liquidity, lastRewardTime: block.timestamp});
         userStakes[msg.sender].push(tokenId);
 
         emit Staked(msg.sender, tokenId, liquidity);
@@ -103,4 +120,3 @@ contract UniswapV3Staking is Ownable {
         }
     }
 }
-
