@@ -4,6 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "../interfaces/IDyadXP.sol"; 
 
 interface INonfungiblePositionManager {
     function ownerOf(uint256 tokenId) external view returns (address);
@@ -30,6 +31,7 @@ interface INonfungiblePositionManager {
 contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813) {
     IERC20 public rewardsToken;
     INonfungiblePositionManager public positionManager;
+    IDyadXP public dyadXP; // Reference to DyadXP contract
 
     struct StakeInfo {
         address staker;
@@ -46,9 +48,10 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
     event Unstaked(address indexed user, uint256 tokenId);
     event RewardClaimed(address indexed user, uint256 reward);
 
-    constructor(IERC20 _rewardsToken, INonfungiblePositionManager _positionManager, uint256 _rewardsRate) {
+    constructor(IERC20 _rewardsToken, INonfungiblePositionManager _positionManager, IDyadXP _dyadXP, uint256 _rewardsRate) {
         rewardsToken = _rewardsToken;
         positionManager = _positionManager;
+        dyadXP = _dyadXP; // Initialize DyadXP reference
         rewardsRate = _rewardsRate;
     }
 
@@ -106,7 +109,11 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
     function _calculateRewards(uint256 tokenId) internal view returns (uint256) {
         StakeInfo storage stakeInfo = stakes[tokenId];
         uint256 timeDiff = block.timestamp - stakeInfo.lastRewardTime;
-        return timeDiff * rewardsRate * stakeInfo.liquidity;
+
+        // Get XP from DyadXP contract
+        uint256 xp = dyadXP.balanceOfNote(tokenId); // Assuming tokenId corresponds to the noteId in DyadXP
+
+        return timeDiff * rewardsRate * stakeInfo.liquidity * xp; // Modify reward calculation to include XP
     }
 
     function _removeUserStake(address user, uint256 tokenId) internal {
