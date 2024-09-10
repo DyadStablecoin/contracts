@@ -46,6 +46,7 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
     mapping(uint256 => StakeInfo) public stakes; 
     mapping(address => uint256[]) public userStakes; 
     uint256 public rewardsRate; 
+    mapping(address => mapping(uint256 => bool)) public usedNoteIds; // Track used noteIds for each user
 
     event Staked(address indexed user, uint256 tokenId, uint256 liquidity);
     event Unstaked(address indexed user, uint256 tokenId);
@@ -61,6 +62,7 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
 
     function stake(uint256 tokenId, uint256 noteId) external {
         require(positionManager.ownerOf(tokenId) == msg.sender, "You don't own this token");
+        require(!usedNoteIds[msg.sender][noteId], "noteId already used"); // Check if noteId is already used
 
         (,,,,,,, uint128 liquidity,,,,) = positionManager.positions(tokenId);
         require(liquidity > 0, "Invalid liquidity");
@@ -71,6 +73,7 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
         stakes[tokenId] =
             StakeInfo({staker: msg.sender, rewardDebt: 0, liquidity: liquidity, lastRewardTime: block.timestamp, noteId: noteId});
         userStakes[msg.sender].push(tokenId);
+        usedNoteIds[msg.sender][noteId] = true; // Mark noteId as used
 
         emit Staked(msg.sender, tokenId, liquidity);
     }
