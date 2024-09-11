@@ -19,11 +19,11 @@ contract UniswapV3Staking {
         address staker;
         uint256 liquidity;
         uint256 lastRewardTime;
-        uint256 noteId;
+        uint256 tokenId;
+        bool isStaked;
     }
 
     mapping(uint256 => StakeInfo) public stakes; 
-    mapping(address => uint256[]) public userStakes; 
     mapping(uint256 => bool) public usedNoteIds; 
 
     uint256 public rewardsRate; 
@@ -46,11 +46,11 @@ contract UniswapV3Staking {
         dnft = _dnft;
     }
 
-    function stake(uint256 tokenId, uint256 noteId) external {
-        require(positionManager.ownerOf(tokenId) == msg.sender, "You are not the LP owner");
+    function stake(uint256 noteId, uint256 tokenId) external {
         require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
-        require(userStakes[msg.sender].length < MAX_STAKES, "Maximum of stakes reached");
-        require(!usedNoteIds[noteId], "Note already used for staking"); 
+
+        StakeInfo storage stakeInfo = stakes[noteId];
+        require(!stakeInfo.isStaked, "Note already used for staking"); 
 
         (,,,,,,, uint128 liquidity,,,,) = positionManager.positions(tokenId);
         require(liquidity > 0, "No liquidity");
@@ -61,41 +61,35 @@ contract UniswapV3Staking {
           staker: msg.sender,
           liquidity: liquidity,
           lastRewardTime: block.timestamp,
-          noteId: noteId
+          tokenId: tokenId,
+          isStaked: true
         });
-        userStakes[msg.sender].push(tokenId);
-        usedNoteIds[noteId] = true;
 
         emit Staked(msg.sender, tokenId, liquidity);
     }
 
-    function unstake(uint256 tokenId) external {
-        StakeInfo storage stakeInfo = stakes[tokenId];
-        require(stakeInfo.staker == msg.sender, "Not your token");
-        require(dnft.ownerOf(stakeInfo.noteId) == msg.sender, "You are not the Note owner");
+    function unstake(uint256 noteId) external {
+        require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
+        StakeInfo storage stakeInfo = stakes[noteId];
 
-        _claimRewards(tokenId);
+        _claimRewards(noteId, stakeInfo);
 
-        positionManager.safeTransferFrom(address(this), msg.sender, tokenId);
+        positionManager.safeTransferFrom(address(this), msg.sender, stakeInfo.tokenId);
 
-        // Clean up storage
-        delete stakes[tokenId];
-        _removeUserStake(msg.sender, tokenId);
-        usedNoteIds[stakeInfo.noteId] = false;
+        delete stakes[noteId];
 
-        emit Unstaked(msg.sender, tokenId);
+        emit Unstaked(msg.sender, stakeInfo.tokenId);
     }
 
-    function claimRewards(uint256 tokenId) external {
-        StakeInfo storage stakeInfo = stakes[tokenId];
-        require(stakeInfo.staker == msg.sender, "Not your token");
+    function claimRewards(uint256 noteId) external {
+        StakeInfo storage stakeInfo = stakes[noteId];
+        require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
 
-        _claimRewards(tokenId);
+        _claimRewards(noteId, stakeInfo);
     }
 
-    function _claimRewards(uint256 tokenId) internal {
-        StakeInfo storage stakeInfo = stakes[tokenId];
-        uint256 rewards = _calculateRewards(tokenId);
+    function _claimRewards(uint256 noteId, StakeInfo storage stakeInfo) internal {
+        uint256 rewards = _calculateRewards(noteId, stakeInfo);
         stakeInfo.lastRewardTime = block.timestamp;
 
         if (rewards > 0) {
@@ -104,23 +98,11 @@ contract UniswapV3Staking {
         }
     }
 
-    function _calculateRewards(uint256 tokenId) internal view returns (uint256) {
-        StakeInfo storage stakeInfo = stakes[tokenId];
+    function _calculateRewards(uint256 noteId, StakeInfo storage stakeInfo) internal view returns (uint256) {
         uint256 timeDiff = block.timestamp - stakeInfo.lastRewardTime;
 
-        uint256 xp = dyadXP.balanceOfNote(stakeInfo.noteId); 
+        uint256 xp = dyadXP.balanceOfNote(noteId); 
 
         return timeDiff * rewardsRate * stakeInfo.liquidity * xp;
-    }
-
-    function _removeUserStake(address user, uint256 tokenId) internal {
-        uint256[] storage stakesArray = userStakes[user];
-        for (uint256 i = 0; i < stakesArray.length; i++) {
-            if (stakesArray[i] == tokenId) {
-                stakesArray[i] = stakesArray[stakesArray.length - 1];
-                stakesArray.pop();
-                break;
-            }
-        }
     }
 }
