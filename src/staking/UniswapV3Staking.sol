@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol"; 
 import "../interfaces/IDyadXP.sol"; 
 import "../interfaces/INonfungiblePositionManager.sol";
 import {DNft} from "../core/DNft.sol";
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol"; 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
@@ -14,7 +15,6 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     INonfungiblePositionManager public positionManager;
     IDyadXP public dyadXP; 
     DNft public dnft;
-
     uint256 public rewardsRate; 
 
     struct StakeInfo {
@@ -26,7 +26,6 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     mapping(uint256 => StakeInfo) public stakes; 
-    mapping(uint256 => bool) public usedNoteIds; 
 
     event Staked(address indexed user, uint256 noteId, uint256 tokenId, uint256 liquidity);
     event Unstaked(address indexed user, uint256 noteId, uint256 tokenId);
