@@ -5,7 +5,7 @@ import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
-import {DyadXPv2}      from "../staking/DyadXPv2.sol";
+import {DyadXP}      from "../staking/DyadXP.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {DyadHooks}     from "./DyadHooks.sol";
 import "../interfaces/IExtension.sol";
@@ -37,9 +37,9 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   VaultLicenser public vaultLicenser;
 
   mapping (uint256 id => EnumerableSet.AddressSet vaults) internal vaults; 
-  mapping (uint256 id => uint256 block)  private lastDeposit; // not used anymore
+  mapping (uint256 id => uint256 block)  private lastDeposit;
 
-  DyadXPv2 public dyadXP;
+  DyadXP public dyadXP;
 
   /// @notice Extensions authorized for use in the system, with bitmap of enabled hooks
   mapping(address => uint256) private _systemExtensions;
@@ -85,13 +85,12 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       address vault
   )
     external
-      isDNftOwner(id)
   {
     _authorizeCall(id);
-    if (Vault(vault).id2asset(id) > 0) revert VaultHasAssets();
     if (vaults[id].remove(vault)) {
       emit Removed(id, vault);
     }
+    _checkExoValueAndCollatRatio(id);
   }
 
   /// @inheritdoc IVaultManager
@@ -102,6 +101,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     external isValidDNft(id)
   {
+    _authorizeCall(id);
+    lastDeposit[id] = block.number;
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, vault, amount);
     _vault.deposit(id, amount);
@@ -121,18 +122,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     public
   {
     uint256 extensionFlags = _authorizeCall(id);
-    _withdraw(id, vault, amount, to, extensionFlags);
-  }
-
-  function _withdraw(
-    uint256 id,
-    address vault,
-    uint256 amount,
-    address to,
-    uint256 extensionFlags
-  ) 
-    internal
-  {
+    if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
     if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_WITHDRAW)) {
@@ -151,7 +141,6 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   {
     uint256 extensionFlags = _authorizeCall(id);
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
-    dyadXP.afterDyadMinted(id);
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_MINT)) {
       IAfterMintHook(msg.sender).afterMint(id, amount, to);
     }
@@ -186,12 +175,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   ) 
     public isValidDNft(id)
   {
-    _burnDyad(id, amount);
-  }
-
-  function _burnDyad(uint256 id, uint256 amount) internal {
     dyad.burn(id, msg.sender, amount);
-    dyadXP.afterDyadBurned(id);
     emit BurnDyad(id, amount, msg.sender);
   }
 
@@ -213,6 +197,8 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint256 debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
+
+      lastDeposit[to] = block.number; // `move` acts like a deposit
 
       uint256 numberOfVaults = vaults[id].length();
       address[] memory vaultAddresses = new address[](numberOfVaults);
@@ -259,7 +245,6 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
         }
       }
 
-      dyadXP.afterDyadBurned(id);
       emit Liquidate(id, msg.sender, to);
 
       return (vaultAddresses, vaultAmounts);
