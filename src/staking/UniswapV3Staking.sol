@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol"; 
 import "../interfaces/IDyadXP.sol"; 
 import "../interfaces/INonfungiblePositionManager.sol";
 import {DNft} from "../core/DNft.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-contract UniswapV3Staking is Ownable { 
-    IERC20 public immutable rewardsToken;
-    INonfungiblePositionManager public immutable positionManager;
-    IDyadXP public immutable dyadXP; 
-    DNft public immutable dnft;
+contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable { 
+    IERC20 public rewardsToken;
+    INonfungiblePositionManager public positionManager;
+    IDyadXP public dyadXP; 
+    DNft public dnft;
 
     uint256 public rewardsRate; 
 
@@ -31,14 +32,20 @@ contract UniswapV3Staking is Ownable {
     event Unstaked(address indexed user, uint256 noteId, uint256 tokenId);
     event RewardClaimed(address indexed user, uint256 reward);
 
-    constructor(
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() { _disableInitializers(); }
+
+    function initialize(
         address _owner, 
         IERC20 _rewardsToken,
         INonfungiblePositionManager _positionManager,
         IDyadXP _dyadXP,
         DNft _dnft, 
         uint256 _rewardsRate
-    ) Ownable(_owner) {
+    ) public initializer {
+        __UUPSUpgradeable_init();
+        __Ownable_init(msg.sender);
+
         rewardsToken = _rewardsToken;
         positionManager = _positionManager;
         dyadXP = _dyadXP; 
@@ -109,4 +116,6 @@ contract UniswapV3Staking is Ownable {
     function setRewardsRate(uint256 _rewardsRate) external onlyOwner { 
         rewardsRate = _rewardsRate; 
     }
+
+    function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
 }
