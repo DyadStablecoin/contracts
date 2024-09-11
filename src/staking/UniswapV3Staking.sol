@@ -3,15 +3,18 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol"; 
 import "../interfaces/IDyadXP.sol"; 
 import "../interfaces/INonfungiblePositionManager.sol";
 import {DNft} from "../core/DNft.sol";
 
-contract UniswapV3Staking {
-    IERC20 public rewardsToken;
-    INonfungiblePositionManager public positionManager;
-    IDyadXP public dyadXP; 
-    DNft public dnft;
+contract UniswapV3Staking is Ownable { 
+    IERC20 public immutable rewardsToken;
+    INonfungiblePositionManager public immutable positionManager;
+    IDyadXP public immutable dyadXP; 
+    DNft public immutable dnft;
+
+    uint256 public rewardsRate; 
 
     struct StakeInfo {
         address staker;
@@ -24,24 +27,23 @@ contract UniswapV3Staking {
     mapping(uint256 => StakeInfo) public stakes; 
     mapping(uint256 => bool) public usedNoteIds; 
 
-    uint256 public rewardsRate; 
-
     event Staked(address indexed user, uint256 noteId, uint256 tokenId, uint256 liquidity);
     event Unstaked(address indexed user, uint256 noteId, uint256 tokenId);
     event RewardClaimed(address indexed user, uint256 reward);
 
     constructor(
+        address _owner, 
         IERC20 _rewardsToken,
         INonfungiblePositionManager _positionManager,
         IDyadXP _dyadXP,
-        uint256 _rewardsRate,
-        DNft _dnft
-    ) {
+        DNft _dnft, 
+        uint256 _rewardsRate
+    ) Ownable(_owner) {
         rewardsToken = _rewardsToken;
         positionManager = _positionManager;
         dyadXP = _dyadXP; 
-        rewardsRate = _rewardsRate;
         dnft = _dnft;
+        rewardsRate = _rewardsRate;
     }
 
     function stake(uint256 noteId, uint256 tokenId) external {
@@ -102,5 +104,9 @@ contract UniswapV3Staking {
         uint256 xp = dyadXP.balanceOfNote(noteId); 
 
         return timeDiff * rewardsRate * stakeInfo.liquidity * xp;
+    }
+
+    function setRewardsRate(uint256 _rewardsRate) external onlyOwner { 
+        rewardsRate = _rewardsRate; 
     }
 }
