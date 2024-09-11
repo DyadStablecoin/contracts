@@ -346,15 +346,18 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   /// @param extension The extension address
   /// @param isAuthorized Whether the extension is authorized
   function authorizeExtension(address extension, bool isAuthorized) external {
+    bool authorizationChanged = false;
     if (isAuthorized) {
       if (!DyadHooks.hookEnabled(_systemExtensions[extension], DyadHooks.EXTENSION_ENABLED)) {
         revert Unauthorized();
       }
-      _authorizedExtensions[msg.sender].add(extension);
+      authorizationChanged = _authorizedExtensions[msg.sender].add(extension);
     } else {
-      _authorizedExtensions[msg.sender].remove(extension);
+      authorizationChanged = _authorizedExtensions[msg.sender].remove(extension);
     }
-    emit UserExtensionAuthorized(msg.sender, extension, isAuthorized);
+    if (authorizationChanged) {
+      emit UserExtensionAuthorized(msg.sender, extension, isAuthorized);
+    }
   }
 
   /// @notice Authorizes an extension for use in the system
