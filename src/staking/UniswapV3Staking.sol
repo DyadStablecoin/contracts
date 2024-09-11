@@ -3,41 +3,20 @@ pragma solidity ^0.8.0;
 
 import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "../interfaces/IDyadXP.sol"; 
-import "../interfaces/IDNft.sol"; 
+import "../interfaces/INonfungiblePositionManager.sol";
+import {DNft} from "../core/DNft.sol";
 
-interface INonfungiblePositionManager {
-    function ownerOf(uint256 tokenId) external view returns (address);
-    function safeTransferFrom(address from, address to, uint256 tokenId) external;
-    function positions(uint256 tokenId)
-        external
-        view
-        returns (
-            uint96 nonce,
-            address operator,
-            address token0,
-            address token1,
-            uint24 fee,
-            int24 tickLower,
-            int24 tickUpper,
-            uint128 liquidity,
-            uint256 feeGrowthInside0LastX128,
-            uint256 feeGrowthInside1LastX128,
-            uint128 tokensOwed0,
-            uint128 tokensOwed1
-        );
-}
+contract UniswapV3Staking {
+    uint256 public constant MAX_STAKES = 10;
 
-contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813) {
     IERC20 public rewardsToken;
     INonfungiblePositionManager public positionManager;
     IDyadXP public dyadXP; 
-    IDNft public dnft;
+    DNft public dnft;
 
     struct StakeInfo {
         address staker;
-        uint256 rewardDebt;
         uint256 liquidity;
         uint256 lastRewardTime;
         uint256 noteId;
@@ -45,14 +24,21 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
 
     mapping(uint256 => StakeInfo) public stakes; 
     mapping(address => uint256[]) public userStakes; 
+    mapping(uint256 => bool) public usedNoteIds; 
+
     uint256 public rewardsRate; 
-    mapping(address => mapping(uint256 => bool)) public usedNoteIds; // Track used noteIds for each user
 
     event Staked(address indexed user, uint256 tokenId, uint256 liquidity);
     event Unstaked(address indexed user, uint256 tokenId);
     event RewardClaimed(address indexed user, uint256 reward);
 
-    constructor(IERC20 _rewardsToken, INonfungiblePositionManager _positionManager, IDyadXP _dyadXP, uint256 _rewardsRate, IDNft _dnft) {
+    constructor(
+        IERC20 _rewardsToken,
+        INonfungiblePositionManager _positionManager,
+        IDyadXP _dyadXP,
+        uint256 _rewardsRate,
+        DNft _dnft
+    ) {
         rewardsToken = _rewardsToken;
         positionManager = _positionManager;
         dyadXP = _dyadXP; 
@@ -61,19 +47,24 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
     }
 
     function stake(uint256 tokenId, uint256 noteId) external {
-        require(positionManager.ownerOf(tokenId) == msg.sender, "You don't own this token");
-        require(!usedNoteIds[msg.sender][noteId], "noteId already used"); // Check if noteId is already used
+        require(positionManager.ownerOf(tokenId) == msg.sender, "You are not the LP owner");
+        require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
+        require(userStakes[msg.sender].length < MAX_STAKES, "Maximum of stakes reached");
+        require(!usedNoteIds[noteId], "Note already used for staking"); 
 
         (,,,,,,, uint128 liquidity,,,,) = positionManager.positions(tokenId);
-        require(liquidity > 0, "Invalid liquidity");
+        require(liquidity > 0, "No liquidity");
 
-        // Transfer NFT to the contract
         positionManager.safeTransferFrom(msg.sender, address(this), tokenId);
 
-        stakes[tokenId] =
-            StakeInfo({staker: msg.sender, rewardDebt: 0, liquidity: liquidity, lastRewardTime: block.timestamp, noteId: noteId});
+        stakes[tokenId] = StakeInfo({
+          staker: msg.sender,
+          liquidity: liquidity,
+          lastRewardTime: block.timestamp,
+          noteId: noteId
+        });
         userStakes[msg.sender].push(tokenId);
-        usedNoteIds[msg.sender][noteId] = true; // Mark noteId as used
+        usedNoteIds[noteId] = true;
 
         emit Staked(msg.sender, tokenId, liquidity);
     }
@@ -81,15 +72,16 @@ contract UniswapV3Staking is Ownable(0xDeD796De6a14E255487191963dEe436c45995813)
     function unstake(uint256 tokenId) external {
         StakeInfo storage stakeInfo = stakes[tokenId];
         require(stakeInfo.staker == msg.sender, "Not your token");
+        require(dnft.ownerOf(stakeInfo.noteId) == msg.sender, "You are not the Note owner");
 
         _claimRewards(tokenId);
 
-        // Transfer the NFT back to the user
         positionManager.safeTransferFrom(address(this), msg.sender, tokenId);
 
         // Clean up storage
         delete stakes[tokenId];
         _removeUserStake(msg.sender, tokenId);
+        usedNoteIds[stakeInfo.noteId] = false;
 
         emit Unstaked(msg.sender, tokenId);
     }
