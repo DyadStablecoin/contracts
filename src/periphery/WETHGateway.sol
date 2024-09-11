@@ -45,6 +45,9 @@ contract WETHGateway is IExtension {
     /// @dev Converts ETH to WETH and then deposits it into the vault
     /// @param id The ID of the dNFT to deposit for
     function depositNative(uint256 id) external payable {
+        if (dNft.ownerOf(id) != msg.sender) {
+            revert NotDnftOwner();
+        }
         weth.deposit{value: msg.value}();
         vaultManager.deposit(id, wethVault, msg.value);
     }
