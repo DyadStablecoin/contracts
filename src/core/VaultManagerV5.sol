@@ -88,9 +88,11 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   {
     _authorizeCall(id);
     if (vaults[id].remove(vault)) {
+      if (Vault(vault).id2asset(id) > 0) {
+        _checkExoValueAndCollatRatio(id);
+      }
       emit Removed(id, vault);
     }
-    _checkExoValueAndCollatRatio(id);
   }
 
   /// @inheritdoc IVaultManager
