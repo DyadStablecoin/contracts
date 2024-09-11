@@ -8,8 +8,6 @@ import "../interfaces/INonfungiblePositionManager.sol";
 import {DNft} from "../core/DNft.sol";
 
 contract UniswapV3Staking {
-    uint256 public constant MAX_STAKES = 10;
-
     IERC20 public rewardsToken;
     INonfungiblePositionManager public positionManager;
     IDyadXP public dyadXP; 
@@ -28,8 +26,8 @@ contract UniswapV3Staking {
 
     uint256 public rewardsRate; 
 
-    event Staked(address indexed user, uint256 tokenId, uint256 liquidity);
-    event Unstaked(address indexed user, uint256 tokenId);
+    event Staked(address indexed user, uint256 noteId, uint256 tokenId, uint256 liquidity);
+    event Unstaked(address indexed user, uint256 noteId, uint256 tokenId);
     event RewardClaimed(address indexed user, uint256 reward);
 
     constructor(
@@ -57,7 +55,7 @@ contract UniswapV3Staking {
 
         positionManager.safeTransferFrom(msg.sender, address(this), tokenId);
 
-        stakes[tokenId] = StakeInfo({
+        stakes[noteId] = StakeInfo({
           staker: msg.sender,
           liquidity: liquidity,
           lastRewardTime: block.timestamp,
@@ -65,7 +63,7 @@ contract UniswapV3Staking {
           isStaked: true
         });
 
-        emit Staked(msg.sender, tokenId, liquidity);
+        emit Staked(msg.sender, noteId, tokenId, liquidity);
     }
 
     function unstake(uint256 noteId) external {
@@ -78,7 +76,7 @@ contract UniswapV3Staking {
 
         delete stakes[noteId];
 
-        emit Unstaked(msg.sender, stakeInfo.tokenId);
+        emit Unstaked(msg.sender, noteId, stakeInfo.tokenId);
     }
 
     function claimRewards(uint256 noteId) external {
