@@ -363,7 +363,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
   function authorizeSystemExtension(address extension, bool isAuthorized) external onlyOwner {
     uint256 hooks;
     if (isAuthorized) {
-      hooks = IExtension(extension).getHookFlags() | DyadHooks.EXTENSION_ENABLED;
+      hooks = DyadHooks.enableExtension(IExtension(extension).getHookFlags())
     } else {
       hooks = DyadHooks.disableExtension(_systemExtensions[extension]);
     }
