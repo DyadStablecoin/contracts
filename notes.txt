@@ -2,3 +2,4 @@
 
 - simplify liquidation
 - totalSupply in DyadXPv2 runs out of gas
+- claiming rewards will fail before tokens are approved

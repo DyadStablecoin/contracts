@@ -16,6 +16,7 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     IDyadXP public dyadXP; 
     DNft public dnft;
     uint256 public rewardsRate; 
+    address public rewardsTokenHolder;
 
     struct StakeInfo {
         uint256 liquidity;
@@ -39,7 +40,8 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         INonfungiblePositionManager _positionManager,
         IDyadXP _dyadXP,
         DNft _dnft, 
-        uint256 _rewardsRate
+        uint256 _rewardsRate,
+        address _rewardsTokenHolder
     ) public initializer {
         __UUPSUpgradeable_init();
         __Ownable_init(msg.sender);
@@ -49,6 +51,7 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         dyadXP = _dyadXP; 
         dnft = _dnft;
         rewardsRate = _rewardsRate;
+        rewardsTokenHolder = _rewardsTokenHolder;
     }
 
     function stake(uint256 noteId, uint256 tokenId) external {
@@ -97,7 +100,7 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         stakeInfo.lastRewardTime = block.timestamp;
 
         if (rewards > 0) {
-            rewardsToken.transfer(recipient, rewards);
+            rewardsToken.transferFrom(rewardsTokenHolder, recipient, rewards);
             emit RewardClaimed(recipient, rewards);
         }
     }
@@ -112,6 +115,10 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
 
     function setRewardsRate(uint256 _rewardsRate) external onlyOwner { 
         rewardsRate = _rewardsRate; 
+    }
+
+    function setRewardsTokenHolder(address _rewardsTokenHolder) external onlyOwner { 
+        rewardsTokenHolder = _rewardsTokenHolder; 
     }
 
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
