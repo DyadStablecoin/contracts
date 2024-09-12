@@ -194,7 +194,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         uint256 bonus = deposited;
 
         if (dyadMinted + deposited != 0) {
-            bonus += deposited * dyadMinted / (dyadMinted + deposited);
+            // bonus = deposited + deposited * (dyadMinted / (dyadMinted + deposited))
+            bonus += deposited.mulWadDown(dyadMinted.divWadDown(dyadMinted + deposited));
         }
 
         return uint256(lastUpdate.lastXP + (elapsed * adjustedAccrualRate * bonus) / 1e18);
