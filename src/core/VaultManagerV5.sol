@@ -68,8 +68,9 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         _authorizeCall(id);
         if (!vaultLicenser.isLicensed(vault)) revert VaultNotLicensed();
         if (vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
-        if (!vaults[id].add(vault)) revert VaultAlreadyAdded();
-        emit Added(id, vault);
+        if (vaults[id].add(vault)) {
+            emit Added(id, vault);
+        }
     }
 
     function remove(uint256 id, address vault) external {
