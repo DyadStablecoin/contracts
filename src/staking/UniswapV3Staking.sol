@@ -18,7 +18,6 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     uint256 public rewardsRate; 
 
     struct StakeInfo {
-        address staker;
         uint256 liquidity;
         uint256 lastRewardTime;
         uint256 tokenId;
@@ -64,7 +63,6 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         positionManager.safeTransferFrom(msg.sender, address(this), tokenId);
 
         stakes[noteId] = StakeInfo({
-          staker: msg.sender,
           liquidity: liquidity,
           lastRewardTime: block.timestamp,
           tokenId: tokenId,
@@ -74,11 +72,11 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         emit Staked(msg.sender, noteId, tokenId, liquidity);
     }
 
-    function unstake(uint256 noteId) external {
+    function unstake(uint256 noteId, address recipient) external {
         require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
         StakeInfo storage stakeInfo = stakes[noteId];
 
-        _claimRewards(noteId, stakeInfo);
+        _claimRewards(noteId, stakeInfo, recipient);
 
         positionManager.safeTransferFrom(address(this), msg.sender, stakeInfo.tokenId);
 
@@ -87,20 +85,20 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         emit Unstaked(msg.sender, noteId, stakeInfo.tokenId);
     }
 
-    function claimRewards(uint256 noteId) external {
+    function claimRewards(uint256 noteId, address recipient) external {
         StakeInfo storage stakeInfo = stakes[noteId];
         require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
 
-        _claimRewards(noteId, stakeInfo);
+        _claimRewards(noteId, stakeInfo, recipient);
     }
 
-    function _claimRewards(uint256 noteId, StakeInfo storage stakeInfo) internal {
+    function _claimRewards(uint256 noteId, StakeInfo storage stakeInfo, address recipient) internal {
         uint256 rewards = _calculateRewards(noteId, stakeInfo);
         stakeInfo.lastRewardTime = block.timestamp;
 
         if (rewards > 0) {
-            rewardsToken.transfer(stakeInfo.staker, rewards);
-            emit RewardClaimed(stakeInfo.staker, rewards);
+            rewardsToken.transfer(recipient, rewards);
+            emit RewardClaimed(recipient, rewards);
         }
     }
 
