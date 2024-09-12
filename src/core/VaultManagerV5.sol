@@ -84,6 +84,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     }
 
     function deposit(uint256 id, address vault, uint256 amount) external isValidDNft(id) {
+        _authorizeCall(id);
         lastDeposit[id] = block.number;
         Vault _vault = Vault(vault);
         _vault.asset().safeTransferFrom(msg.sender, vault, amount);
