@@ -113,6 +113,11 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         return timeDiff * rewardsRate * stakeInfo.liquidity * xp;
     }
 
+    function currentRewards(uint256 noteId) external view returns (uint256) {
+        StakeInfo storage stakeInfo = stakes[noteId];
+        return _calculateRewards(noteId, stakeInfo);
+    }
+
     function setRewardsRate(uint256 _rewardsRate) external onlyOwner { 
         rewardsRate = _rewardsRate; 
     }
