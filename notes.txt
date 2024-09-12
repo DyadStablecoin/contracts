@@ -1,3 +1,4 @@
 ## Notes
 
-- [] simplify liquidation
+- simplify liquidation
+- totalSupply in DyadXPv2 runs out of gas
