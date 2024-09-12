@@ -5,9 +5,9 @@ import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
-import {DyadXP}      from "../staking/DyadXP.sol";
-import {IVaultManager} from "../interfaces/IVaultManager.sol";
-import {DyadHooks}     from "./DyadHooks.sol";
+import {DyadXP}          from "../staking/DyadXP.sol";
+import {IVaultManagerV5} from "../interfaces/IVaultManagerV5.sol";
+import {DyadHooks}       from "./DyadHooks.sol";
 import "../interfaces/IExtension.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
@@ -21,7 +21,7 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {UUPSUpgradeable}    from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
 /// @custom:oz-upgrades-from src/core/VaultManagerV4.sol:VaultManagerV4
-contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
+contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable {
   using EnumerableSet     for EnumerableSet.AddressSet;
   using FixedPointMathLib for uint;
   using SafeTransferLib   for ERC20;
@@ -64,7 +64,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     // Nothing to initialize right now
   }
 
-  /// @inheritdoc IVaultManager
+  /// @inheritdoc IVaultManagerV5
   function add(
       uint256 id,
       address vault
@@ -79,7 +79,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     }
   }
 
-  /// @inheritdoc IVaultManager
+  /// @inheritdoc IVaultManagerV5
   function remove(
       uint256 id,
       address vault
@@ -95,7 +95,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     }
   }
 
-  /// @inheritdoc IVaultManager
+  /// @inheritdoc IVaultManagerV5
   function deposit(
     uint256 id,
     address vault,
@@ -114,7 +114,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     }
   }
 
-  /// @inheritdoc IVaultManager
+  /// @inheritdoc IVaultManagerV5
   function withdraw(
     uint256 id,
     address vault,
@@ -133,7 +133,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     _checkExoValueAndCollatRatio(id);
   }
 
-  //// @inheritdoc IVaultManager
+  //// @inheritdoc IVaultManagerV5
   function mintDyad(
     uint256 id,
     uint256 amount,
@@ -170,7 +170,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
     }
   }
 
-  /// @inheritdoc IVaultManager
+  /// @inheritdoc IVaultManagerV5
   function burnDyad(
     uint256 id,
     uint256 amount
@@ -247,7 +247,7 @@ contract VaultManagerV5 is IVaultManager, UUPSUpgradeable, OwnableUpgradeable {
         }
       }
 
-      emit Liquidate(id, msg.sender, to);
+      emit Liquidate(id, msg.sender, to, amount);
 
       return (vaultAddresses, vaultAmounts);
   }

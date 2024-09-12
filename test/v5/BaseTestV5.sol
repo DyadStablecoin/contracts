@@ -115,7 +115,7 @@ contract BaseTestV5 is Test, Parameters {
         dNft.mintInsiderNft(USER_2);
         dNft.mintInsiderNft(USER_3);
 
-        dyadXP = vaultManager.dyadXP();
+        // dyadXP = vaultManager.dyadXP();
     }
 
     function _mockOracleResponse(address oracle, int256 price, uint8 decimals) public {
