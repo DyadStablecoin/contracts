@@ -52,6 +52,11 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     Dyad public immutable DYAD;
 
+    modifier onlyVaultManager() {
+        require(msg.sender == address(VAULT_MANAGER), "NotVaultManager");
+        _;
+    }
+
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address vaultManager, address keroseneVault, address dnft, address dyad) {
         VAULT_MANAGER = IVaultManager(vaultManager);
@@ -131,11 +136,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         revert TransferNotAllowed();
     }
 
-    function beforeKeroseneWithdrawn(uint256 noteId, uint256 amountWithdrawn) external {
-        if (msg.sender != address(VAULT_MANAGER)) {
-            revert NotVaultManager();
-        }
-
+    function beforeKeroseneWithdrawn(uint256 noteId, uint256 amountWithdrawn) external onlyVaultManager {
         NoteXPData memory lastUpdate = noteData[noteId];
 
         uint256 xp = _computeXP(lastUpdate);
@@ -163,11 +164,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         }
     }
 
-    function updateXP(uint256 noteId) external {
-        if (msg.sender != address(VAULT_MANAGER)) {
-            revert NotVaultManager();
-        }
-
+    function updateXP(uint256 noteId) external onlyVaultManager {
         NoteXPData memory lastUpdate = noteData[noteId];
         uint256 newXP = _computeXP(lastUpdate);
 
