@@ -81,10 +81,13 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     /// @notice Returns the amount of tokens in existence.
-    function totalSupply() public view returns (uint256 totalXP) {
+    /// @dev THIS WILL RUN OUT OF GAS. ONLY USED OFF-CHAIN.
+    function totalSupply() public view returns (uint256) {
+        uint256 totalXP;
         for (uint256 i = 0; i < DNFT.totalSupply(); i++) {
             totalXP += _computeXP(noteData[i]);
         }
+        return totalXP;
     }
 
     /// @notice Returns the amount of tokens owned by `account`.
@@ -191,10 +194,10 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
         uint256 adjustedAccrualRate = accrualRateModifier * 1e7;
 
+        // bonus = deposited + deposited * (dyadMinted / (dyadMinted + deposited))
         uint256 bonus = deposited;
 
         if (dyadMinted + deposited != 0) {
-            // bonus = deposited + deposited * (dyadMinted / (dyadMinted + deposited))
             bonus += deposited.mulWadDown(dyadMinted.divWadDown(dyadMinted + deposited));
         }
 
