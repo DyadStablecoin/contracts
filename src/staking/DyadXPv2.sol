@@ -44,9 +44,9 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     string public constant symbol = "dXP";
     uint8 public constant decimals = 18;
 
-    uint40 globalLastUpdate;
-    uint192 globalLastXP;
-    uint256 totalKeroseneInVault;
+    uint40 globalLastUpdate; // not used
+    uint192 globalLastXP; // not used
+    uint256 totalKeroseneInVault; // not used
 
     mapping(uint256 => NoteXPData) public noteData;
 
@@ -71,7 +71,6 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         __UUPSUpgradeable_init();
         __Ownable_init(msg.sender);
 
-        globalLastUpdate = uint40(block.timestamp);
         uint256 dnftSupply = DNFT.totalSupply();
 
         for (uint256 i = 0; i < dnftSupply; ++i) {
