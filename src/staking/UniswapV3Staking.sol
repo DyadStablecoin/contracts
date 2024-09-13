@@ -78,6 +78,7 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     function unstake(uint256 noteId, address recipient) external {
         require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
         StakeInfo storage stakeInfo = stakes[noteId];
+        require(stakeInfo.isStaked, "Note not staked");
 
         _claimRewards(noteId, stakeInfo, recipient);
 
@@ -91,6 +92,7 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     function claimRewards(uint256 noteId, address recipient) external {
         StakeInfo storage stakeInfo = stakes[noteId];
         require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
+        require(stakeInfo.isStaked, "Note not staked");
 
         _claimRewards(noteId, stakeInfo, recipient);
     }
