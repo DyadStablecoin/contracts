@@ -61,6 +61,9 @@ contract PublicVaultManager is UUPSUpgradeable, OwnableUpgradeable {
         emit Deposit(msg.sender, amount);
     }
 
+    // @dev this does not work because of the flash loan protection in the
+    // VaultManager. Can be ddosed by anyone calling deposit with any arbitrary
+    // amount in the same block as the withdraw.
     function withdraw(address vault, uint256 amount) external {
         Position storage position = positions[msg.sender];
         require(block.number > position.lastDepositBlock, "Cannot withdraw in same block");
