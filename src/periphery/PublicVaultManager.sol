@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import {VaultLicenser} from "./VaultLicenser.sol";
-import { VaultManagerV5 } from "src/core/VaultManagerV5.sol";
+import {VaultLicenser} from "src/core/VaultLicenser.sol";
+import {VaultManagerV5} from "src/core/VaultManagerV5.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
