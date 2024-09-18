@@ -109,7 +109,8 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
 
         uint256 xp = dyadXP.balanceOfNote(noteId); 
 
-        return timeDiff * rewardsRate * stakeInfo.liquidity * xp;
+       (,,,,,,, uint128 liquidity,,,,) = positionManager.positions(stakeInfo.tokenId);  
+       return timeDiff * rewardsRate * liquidity * xp;
     }
 
     function currentRewards(uint256 noteId) external view returns (uint256) {
