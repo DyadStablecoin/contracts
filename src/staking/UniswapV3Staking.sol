@@ -34,7 +34,6 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     constructor() { _disableInitializers(); }
 
     function initialize(
-        address _owner, 
         IERC20 _rewardsToken,
         INonfungiblePositionManager _positionManager,
         IDyadXP _dyadXP,

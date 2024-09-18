@@ -67,10 +67,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(address owner) public reinitializer(2) {
-        __UUPSUpgradeable_init();
-        __Ownable_init(msg.sender);
-
+    function initialize() public reinitializer(2) {
         uint256 dnftSupply = DNFT.totalSupply();
 
         for (uint256 i = 0; i < dnftSupply; ++i) {
