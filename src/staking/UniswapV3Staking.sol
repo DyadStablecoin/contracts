@@ -96,9 +96,9 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
         require(stakeInfo.isStaked, "Note not staked");
         uint256 rewards = _calculateRewards(noteId, stakeInfo);
-        stakeInfo.lastRewardTime = block.timestamp;
 
         if (rewards > 0) {
+            stakeInfo.lastRewardTime = block.timestamp;
             rewardsToken.transferFrom(rewardsTokenHolder, recipient, rewards);
             emit RewardClaimed(recipient, rewards);
         }
