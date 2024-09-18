@@ -47,11 +47,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     /// @notice Extensions authorized by a user for use on their notes
     mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
-    modifier isDNftOwner(uint256 id) {
-        if (dNft.ownerOf(id) != msg.sender) revert NotOwner();
-        _;
-    }
-
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
         _;
