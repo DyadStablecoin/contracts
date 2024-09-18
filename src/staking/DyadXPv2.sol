@@ -74,12 +74,16 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         uint256 dnftSupply = DNFT.totalSupply();
 
         for (uint256 i = 0; i < dnftSupply; ++i) {
+            uint256 mintedDyad = DYAD.mintedDyad(i);
+            if (mintedDyad == 0) {
+              continue;
+            }
             noteData[i] = NoteXPData({
                 lastAction: uint40(block.timestamp),
                 keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(i)),
                 lastXP: noteData[i].lastXP,
                 totalXP: noteData[i].lastXP,
-                dyadMinted: DYAD.mintedDyad(i)
+                dyadMinted: mintedDyad
             });
         }
     }
