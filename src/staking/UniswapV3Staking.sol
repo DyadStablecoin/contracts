@@ -79,9 +79,9 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
 
         _claimRewards(noteId, stakeInfo, recipient);
 
-        positionManager.safeTransferFrom(address(this), msg.sender, stakeInfo.tokenId);
-
         delete stakes[noteId];
+
+        positionManager.safeTransferFrom(address(this), msg.sender, stakeInfo.tokenId);
 
         emit Unstaked(msg.sender, noteId, stakeInfo.tokenId);
     }
