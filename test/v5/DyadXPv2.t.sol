@@ -63,7 +63,10 @@ contract DyadXPv2Test is BaseTestV5 {
         assertLe(accrualRate, keroseneAmount * 2);
         assertGe(accrualRate, keroseneAmount);
 
-        uint256 expectedBoost = keroseneAmount.mulWadDown((dyadAmount.divWadDown(dyadAmount + keroseneAmount)));
+        uint256 expectedBoost;
+        if (keroseneAmount > 0) {
+            expectedBoost = keroseneAmount.mulWadDown((dyadAmount.divWadDown(dyadAmount + keroseneAmount)));
+        }
         uint256 expectedAccrualRate = expectedBoost + keroseneAmount;
 
         assertEq(accrualRate, expectedAccrualRate);

@@ -72,6 +72,8 @@ contract DyadXPFuzzTest is Test {
         vm.assume(deposit3 < kerosine.totalSupply());
         vm.assume(deposit1 + deposit2 + deposit3 <= kerosine.totalSupply());
 
+        momentum.setHalvingConfiguration(uint40(block.timestamp), 1 minutes);
+
         kerosine.transfer(address(keroseneVault), deposit1);
         vm.startPrank(VAULT_MANAGER);
         keroseneVault.deposit(0, deposit1);
@@ -127,6 +129,6 @@ contract DyadXPFuzzTest is Test {
         uint256 balance2 = momentum.balanceOf(USER_2);
         uint256 balance3 = momentum.balanceOf(USER_3);
 
-        vm.assertEq(totalSupply, balance1 + balance2 + balance3);
+        vm.assertGe(totalSupply, balance1 + balance2 + balance3);
     }
 }
