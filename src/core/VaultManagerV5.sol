@@ -145,6 +145,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
         uint256 debt = dyad.mintedDyad(id);
         dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
+        dyadXP.updateXP(id);
 
         lastDeposit[to] = block.number; // `move` acts like a deposit
 
@@ -180,10 +181,12 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
                 }
                 vaultAmounts[i] = asset;
 
-                vault.move(id, to, asset);
                 if (address(vault) == KEROSENE_VAULT) {
-                    dyadXP.updateXP(id);
+                    dyadXP.beforeKeroseneWithdrawn(id, asset); 
+                    vault.move(id, to, asset);
                     dyadXP.updateXP(to);
+                } else {
+                    vault.move(id, to, asset);
                 }
             }
         }
