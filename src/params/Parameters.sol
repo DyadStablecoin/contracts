@@ -55,6 +55,7 @@ contract Parameters {
   address MAINNET_V2_XP                = 0xeF443646E52d1C28bd757F570D18F4Db30dB70F4;
   address MAINNET_APXETH               = 0x9Ba021B0a9b958B5E75cE9f6dff97C7eE52cb3E6;
   address MAINNET_APXETH_ORACLE        = 0x19219BC90F48DeE4d5cF202E09c438FAacFd8Bea;
+  address MAINNET_APXETH_VAULT         = 0xB58d87dD30a67823acC4b9Fa533F464CdEdA737E;
 
   // ---------------- Sepolia ----------------
   address SEPOLIA_OWNER           = 0xEd6715D2172BFd50C2DBF608615c2AB497904803;
