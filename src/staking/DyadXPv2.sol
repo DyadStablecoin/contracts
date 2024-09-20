@@ -69,9 +69,6 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function initialize() public reinitializer(2) {
-        __UUPSUpgradeable_init();
-        __Ownable_init(msg.sender);
-
         uint256 dnftSupply = DNFT.totalSupply();
         for (uint256 i = 0; i < dnftSupply; ++i) {
             if (DYAD.mintedDyad(i) == 0) {
