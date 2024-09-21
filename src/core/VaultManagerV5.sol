@@ -5,7 +5,7 @@ import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
-import {DyadXP}          from "../staking/DyadXP.sol";
+import {DyadXPv2}        from "../staking/DyadXPv2.sol";
 import {IVaultManagerV5} from "../interfaces/IVaultManagerV5.sol";
 import {DyadHooks}       from "./DyadHooks.sol";
 import "../interfaces/IExtension.sol";
@@ -39,7 +39,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   mapping (uint256 id => EnumerableSet.AddressSet vaults) internal vaults; 
   mapping (uint256 id => uint256 block)  private lastDeposit;
 
-  DyadXP public dyadXP;
+  DyadXPv2 public dyadXP;
 
   /// @notice Extensions authorized for use in the system, with bitmap of enabled hooks
   mapping(address => uint256) private _systemExtensions;
@@ -47,9 +47,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   /// @notice Extensions authorized by a user for use on their notes
   mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
-  modifier isDNftOwner(uint256 id) {
-    if (dNft.ownerOf(id) != msg.sender) revert NotOwner();    _;
-  }
   modifier isValidDNft(uint256 id) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
@@ -143,6 +140,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   {
     uint256 extensionFlags = _authorizeCall(id);
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
+    dyadXP.afterDyadMinted(id);
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_MINT)) {
       IAfterMintHook(msg.sender).afterMint(id, amount, to);
     }
@@ -178,6 +176,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     public isValidDNft(id)
   {
     dyad.burn(id, msg.sender, amount);
+    dyadXP.afterDyadBurned(id);
     emit BurnDyad(id, amount, msg.sender);
   }
 
@@ -199,6 +198,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint256 debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
+      dyadXP.afterDyadBurned(id);
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
