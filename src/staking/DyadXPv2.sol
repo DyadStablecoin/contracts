@@ -128,25 +128,11 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         revert TransferNotAllowed();
     }
 
-    function afterKeroseneDeposited(uint256 noteId) external {
-        if (msg.sender != address(VAULT_MANAGER)) {
-            revert NotVaultManager();
-        }
-        _updateNoteBalance(noteId);
-    }
-
-    function afterDyadMinted(uint256 noteId) external {
-        if (msg.sender != address(VAULT_MANAGER)) {
-            revert NotVaultManager();
-        }
-        _updateNoteBalance(noteId);
-    }
-
-    function afterDyadBurned(uint256 noteId) external {
-        if (msg.sender != address(VAULT_MANAGER)) {
-            revert NotVaultManager();
-        }
-        _updateNoteBalance(noteId);
+    function afterNoteUpdated(uint256 noteId) external {
+      if (msg.sender != address(VAULT_MANAGER)) {
+          revert NotVaultManager();
+      }
+      _updateNoteBalance(noteId);
     }
 
     function forceUpdateXPBalance(uint256 noteId) external onlyOwner {

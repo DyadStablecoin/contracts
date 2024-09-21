@@ -54,9 +54,9 @@ contract DyadXPv2Test is BaseTestV5 {
 
         vm.startPrank(address(vaultManager));
         dyad.mint(0, address(this), dyadAmount);
-        dyadXP.afterDyadMinted(0);
+        dyadXP.afterNoteUpdated(0);
         keroseneVault.deposit(0, keroseneAmount);
-        dyadXP.afterKeroseneDeposited(0);
+        dyadXP.afterNoteUpdated(0);
         vm.stopPrank();
 
         uint256 accrualRate = dyadXP.accrualRate(0);

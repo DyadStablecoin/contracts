@@ -107,7 +107,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     _vault.deposit(id, amount);
 
     if (vault == KEROSENE_VAULT) {
-      dyadXP.afterKeroseneDeposited(id);
+      dyadXP.afterNoteUpdated(id);
     }
   }
 
@@ -140,7 +140,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   {
     uint256 extensionFlags = _authorizeCall(id);
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
-    dyadXP.afterDyadMinted(id);
+    dyadXP.afterNoteUpdated(id);
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_MINT)) {
       IAfterMintHook(msg.sender).afterMint(id, amount, to);
     }
@@ -176,7 +176,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     public isValidDNft(id)
   {
     dyad.burn(id, msg.sender, amount);
-    dyadXP.afterDyadBurned(id);
+    dyadXP.afterNoteUpdated(id);
     emit BurnDyad(id, amount, msg.sender);
   }
 
@@ -198,7 +198,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint256 debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
-      dyadXP.afterDyadBurned(id);
+      dyadXP.afterNoteUpdated(id);
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
@@ -242,7 +242,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
           }
           vault.move(id, to, asset);
           if (address(vault) == KEROSENE_VAULT) {
-            dyadXP.afterKeroseneDeposited(to);
+            dyadXP.afterNoteUpdated(to);
           } 
         }
       }

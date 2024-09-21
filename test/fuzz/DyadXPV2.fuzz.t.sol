@@ -77,21 +77,21 @@ contract DyadXPFuzzTest is Test {
         kerosine.transfer(address(keroseneVault), deposit1);
         vm.startPrank(VAULT_MANAGER);
         keroseneVault.deposit(0, deposit1);
-        momentum.afterKeroseneDeposited(0);
+        momentum.afterNoteUpdated(0);
         vm.stopPrank();
 
         kerosine.transfer(address(keroseneVault), deposit2);
         vm.startPrank(VAULT_MANAGER);
         dyad.mint(1, address(this), 10_000 * 1e18);
-        momentum.afterDyadMinted(1);
+        momentum.afterNoteUpdated(1);
         keroseneVault.deposit(1, deposit2);
-        momentum.afterKeroseneDeposited(1);
+        momentum.afterNoteUpdated(1);
         vm.stopPrank();
 
         kerosine.transfer(address(keroseneVault), deposit3);
         vm.startPrank(VAULT_MANAGER);
         keroseneVault.deposit(2, deposit3);
-        momentum.afterKeroseneDeposited(2);
+        momentum.afterNoteUpdated(2);
         vm.stopPrank();
 
         _checkInvariantSupplyBalances();
@@ -115,7 +115,7 @@ contract DyadXPFuzzTest is Test {
         assertTrue(totalMomentumBefore > totalMomentumAfter);
         assertTrue(userMomentumBefore > userMomentumAfter);
         keroseneVault.deposit(0, deposit1 / 2);
-        momentum.afterKeroseneDeposited(0);
+        momentum.afterNoteUpdated(0);
         assertEq(momentum.totalSupply(), totalMomentumAfter);
         assertEq(momentum.balanceOf(USER_1), userMomentumAfter);
         vm.stopPrank();
