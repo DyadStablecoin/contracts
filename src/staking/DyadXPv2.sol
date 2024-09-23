@@ -68,7 +68,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _disableInitializers();
     }
 
-    function initialize() public reinitializer(2) {
+    function initialize(uint40 _halvingStart, uint40 _halvingCadence) public reinitializer(2) {
         uint256 dnftSupply = DNFT.totalSupply();
         for (uint256 i = 0; i < dnftSupply; ++i) {
             if (DYAD.mintedDyad(i) == 0) {
@@ -76,6 +76,14 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             }
             _updateNoteBalance(i);
         }
+        if (_halvingCadence == 0) {
+            revert InvalidConfiguration();
+        }
+        if (_halvingStart < block.timestamp) {
+            revert InvalidConfiguration();
+        }
+        halvingCadence = _halvingCadence;
+        halvingStart = _halvingStart;
     }
 
     /// @notice Returns the amount of tokens in existence.
@@ -184,26 +192,15 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
     }
 
-    function setHalvingConfiguration(
-        uint40 _halvingStart,
-        uint40 _halvingCadence
-    ) external onlyOwner {
-        if (halvingStart != 0) {
-            uint256 dnftSupply = DNFT.totalSupply();
-            for (uint256 i = 0; i < dnftSupply; ++i) {
-                _updateNoteBalance(i);
-            }
-        } else if (_halvingStart < halvingStart) {
-            revert InvalidConfiguration();
-        } else if (_halvingStart < block.timestamp) {
-            revert InvalidConfiguration();
-        }
-        if (_halvingCadence == 0) {
-            revert InvalidConfiguration();
+    function grantXP(uint256 noteId, uint256 amount) external {
+        if (msg.sender != address(VAULT_MANAGER)) {
+            revert NotVaultManager();
         }
 
-        halvingStart = _halvingStart;
-        halvingCadence = _halvingCadence;
+        _updateNoteBalance(noteId);
+        noteData[noteId].lastXP += uint120(amount);
+
+        emit Transfer(address(0), DNFT.ownerOf(noteId), amount);
     }
 
     function accrualRate(uint256 noteId) external view returns (uint256) {

@@ -76,5 +76,7 @@ contract RedeemCollateralExtensionTest is BaseTestV5 {
         vaultManager.deposit(0, address(wethVault), 1 ether);
         vaultManager.mintDyad(0, 1000 ether, USER_1);
         vm.stopPrank();
+
+        vm.roll(vm.getBlockNumber() + 1);
     }
 }

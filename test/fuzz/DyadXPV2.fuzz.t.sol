@@ -47,7 +47,9 @@ contract DyadXPFuzzTest is Test {
             address(
                 new ERC1967Proxy(
                     address(impl),
-                    abi.encodeWithSignature("initialize()")
+                    abi.encodeWithSignature("initialize(uint40,uint40)",
+                        block.timestamp,
+                        1 seconds)
                 )
             )
         );
@@ -71,8 +73,6 @@ contract DyadXPFuzzTest is Test {
         vm.assume(deposit2 < kerosine.totalSupply());
         vm.assume(deposit3 < kerosine.totalSupply());
         vm.assume(deposit1 + deposit2 + deposit3 <= kerosine.totalSupply());
-
-        momentum.setHalvingConfiguration(uint40(block.timestamp), 1 minutes);
 
         kerosine.transfer(address(keroseneVault), deposit1);
         vm.startPrank(VAULT_MANAGER);

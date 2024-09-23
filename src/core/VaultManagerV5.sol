@@ -47,6 +47,8 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   /// @notice Extensions authorized by a user for use on their notes
   mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
+  uint256 xpPerKeroseneIgnited;
+
   modifier isValidDNft(uint256 id) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
   }
@@ -166,6 +168,27 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     if (cr < MIN_COLLAT_RATIO) {
       revert CrTooLow();
     }
+  }
+
+
+  function igniteKerosene(uint256 id, uint256 amount) external {
+    uint256 extensionFlags = _authorizeCall(id);
+    uint256 xpPerKerosene = xpPerKeroseneIgnited;
+    if (xpPerKerosene == 0) {
+      revert NotAvailable();
+    }
+    address ownerAddr = owner();
+    Vault(KEROSENE_VAULT).withdraw(id, ownerAddr, amount); // changes `exo` or `kero` value and `cr`
+    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_WITHDRAW)) {
+      IAfterWithdrawHook(msg.sender).afterWithdraw(id, KEROSENE_VAULT, amount, ownerAddr);
+    }
+    uint256 xpAmount = amount * xpPerKeroseneIgnited;
+    dyadXP.grantXP(id, xpAmount);
+    _checkExoValueAndCollatRatio(id);
+  }
+
+  function setXpPerKeroseneIgnited(uint256 amount) external onlyOwner {
+    xpPerKeroseneIgnited = amount;
   }
 
   /// @inheritdoc IVaultManagerV5

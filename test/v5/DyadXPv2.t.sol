@@ -74,7 +74,7 @@ contract DyadXPv2Test is BaseTestV5 {
 
     function test_XPHalving() public {
         uint256 halvingStart = block.timestamp + 7 days;
-        dyadXP.setHalvingConfiguration(uint40(halvingStart), 7 days);
+        _setHalvingConfiguration(uint40(halvingStart), 7 days);
 
         kerosene.transfer(USER_1, 200_000 ether);
 
@@ -142,7 +142,7 @@ contract DyadXPv2Test is BaseTestV5 {
 
     function test_XPHalving_zeroInitialBalance() public {
         uint256 halvingStart = block.timestamp;
-        dyadXP.setHalvingConfiguration(uint40(halvingStart), 2);
+        _setHalvingConfiguration(uint40(halvingStart), 2);
 
         kerosene.transfer(USER_1, 200_000 ether);
 
@@ -172,6 +172,7 @@ contract DyadXPv2Test is BaseTestV5 {
     }
 
     function test_XPHalving_initialBalanceGtRestingValue() public {
+        _setHalvingConfiguration(0, 0);
         kerosene.transfer(USER_1, 50_000 ether);
 
         vm.startPrank(USER_1);
@@ -183,7 +184,7 @@ contract DyadXPv2Test is BaseTestV5 {
         // verify initial balance
         assertEq(dyadXP.balanceOfNote(0), 100_000_000_000 ether);
 
-        dyadXP.setHalvingConfiguration(uint40(block.timestamp), 7 days);
+        _setHalvingConfiguration(uint40(block.timestamp), 7 days);
         // Skip to first halving
         skip(7 days);
         // user accrued additional30,240,000,000 XP, cut total balance in half
@@ -211,9 +212,7 @@ contract DyadXPv2Test is BaseTestV5 {
     }
 
     function test_nextHalving() public {
-        assertEq(dyadXP.nextHalving(), 0);
-
-        dyadXP.setHalvingConfiguration(uint40(block.timestamp), 7 days);
+        _setHalvingConfiguration(uint40(block.timestamp), 7 days);
         assertEq(dyadXP.nextHalving(), dyadXP.halvingStart() + 7 days);
 
         skip(7 days);
@@ -227,5 +226,12 @@ contract DyadXPv2Test is BaseTestV5 {
 
         skip(7 days);
         assertEq(dyadXP.nextHalving(), dyadXP.halvingStart() + 35 days);
+    }
+
+    function _setHalvingConfiguration(uint40 halvingStart, uint40 halvingCadence) internal {
+        uint256 value = uint256(halvingStart) << 40 | halvingCadence;
+        vm.store(address(dyadXP), bytes32(uint256(3)), bytes32(value));
+        assertEq(dyadXP.halvingStart(), halvingStart);
+        assertEq(dyadXP.halvingCadence(), halvingCadence);
     }
 }

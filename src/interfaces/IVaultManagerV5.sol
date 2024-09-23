@@ -26,6 +26,7 @@ interface IVaultManagerV5 {
   error NotEnoughExoCollat();
   error VaultNotKerosene();
   error Unauthorized();
+  error NotAvailable();
 
   /**
    * @notice Adds a vault to the dNFT position

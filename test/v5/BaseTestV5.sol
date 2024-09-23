@@ -103,7 +103,8 @@ contract BaseTestV5 is Test, Parameters {
 
         VaultManagerV5(proxy).upgradeToAndCall(address(vaultManagerV5), abi.encodeWithSignature("initialize()"));
 
-        dxp.upgradeToAndCall(address(dyadXPv2), abi.encodeWithSignature("initialize()"));
+        dyadXP = DyadXPv2(address(dxp));
+        dxp.upgradeToAndCall(address(dyadXPv2), abi.encodeWithSignature("initialize(uint40,uint40)", block.timestamp, 7 days));
         vaultManager = VaultManagerV5(proxy);
 
         wethGateway =
