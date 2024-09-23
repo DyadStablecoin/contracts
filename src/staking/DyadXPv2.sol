@@ -128,6 +128,13 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         revert TransferNotAllowed();
     }
 
+    function addXP(uint256 noteId, uint256 amount) external {
+      if (msg.sender != address(VAULT_MANAGER)) {
+        revert Unauthorized();
+      }
+      noteData[noteId].lastXP += uint120(amount);
+    }
+
     function afterNoteUpdated(uint256 noteId) external {
       if (msg.sender != address(VAULT_MANAGER)) {
           revert NotVaultManager();
@@ -147,7 +154,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     function beforeKeroseneWithdrawn(
         uint256 noteId,
         uint256 amountWithdrawn
-    ) external {
+    ) external returns (uint256) {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
@@ -182,6 +189,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         globalAccrualRate = globalAccrualRate - lastUpdate.accrualRate + newAccrualRate;
 
         _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
+
+        return slashedXP;
     }
 
     function setHalvingConfiguration(
