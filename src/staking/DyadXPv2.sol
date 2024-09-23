@@ -155,7 +155,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     function beforeKeroseneWithdrawn(
         uint256 noteId,
         uint256 amountWithdrawn
-    ) external {
+    ) external returns (uint256) {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
@@ -190,6 +190,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         globalAccrualRate = globalAccrualRate - lastUpdate.accrualRate + newAccrualRate;
 
         _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
+
+        return slashedXP;
     }
 
     function grantXP(uint256 noteId, uint256 amount) external {
