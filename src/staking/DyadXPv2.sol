@@ -199,6 +199,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
         _updateNoteBalance(noteId);
         noteData[noteId].lastXP += uint120(amount);
+        globalLastXP += amount;
 
         emit Transfer(address(0), DNFT.ownerOf(noteId), amount);
     }

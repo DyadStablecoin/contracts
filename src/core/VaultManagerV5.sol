@@ -183,7 +183,9 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
       IAfterWithdrawHook(msg.sender).afterWithdraw(id, KEROSENE_VAULT, amount, ownerAddr);
     }
     uint256 xpAmount = amount * xpPerKeroseneIgnited;
-    dyadXP.grantXP(id, xpAmount);
+    // grant xp will adjust the accrual rate down based on current kero deposited
+    // but give a bulk amount of XP based on the amount granted
+    dyadXP.grantXP(id, xpAmount); 
     _checkExoValueAndCollatRatio(id);
   }
 
