@@ -47,7 +47,9 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   /// @notice Extensions authorized by a user for use on their notes
   mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
-  uint256 xpPerKeroseneIgnited;
+  /// @notice Amount of XP gained by igniting kerosene. Equivalent to `xpPerKeroseneIgnited` seconds
+  ///         of kerosene accrual.
+  uint256 public xpPerKeroseneIgnited;
 
   modifier isValidDNft(uint256 id) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;

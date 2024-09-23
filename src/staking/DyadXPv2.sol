@@ -74,7 +74,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             if (DYAD.mintedDyad(i) == 0) {
                 continue;
             }
-            _updateNoteBalance(i);
+            _updateNoteBalance(i, 0);
         }
         if (_halvingCadence == 0) {
             revert InvalidConfiguration();
@@ -140,7 +140,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
       if (msg.sender != address(VAULT_MANAGER)) {
           revert NotVaultManager();
       }
-      _updateNoteBalance(noteId);
+      _updateNoteBalance(noteId, 0);
     }
 
     function forceUpdateXPBalance(uint256 noteId) external onlyOwner {
@@ -149,7 +149,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 revert Unauthorized();
             }
         }
-        _updateNoteBalance(noteId);
+        _updateNoteBalance(noteId, 0);
     }
 
     function beforeKeroseneWithdrawn(
@@ -197,11 +197,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             revert NotVaultManager();
         }
 
-        _updateNoteBalance(noteId);
-        noteData[noteId].lastXP += uint120(amount);
-        globalLastXP += amount;
-
-        emit Transfer(address(0), DNFT.ownerOf(noteId), amount);
+        _updateNoteBalance(noteId, amount);
     }
 
     function accrualRate(uint256 noteId) external view returns (uint256) {
@@ -211,7 +207,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     function _authorizeUpgrade(address) internal view override onlyOwner {}
 
-    function _updateNoteBalance(uint256 noteId) internal {
+    function _updateNoteBalance(uint256 noteId, uint256 grantAmount) internal {
         NoteXPData memory lastUpdate = noteData[noteId];
 
         uint256 newXP = _computeXP(lastUpdate.accrualRate, lastUpdate.lastAction, lastUpdate.lastXP);
@@ -227,10 +223,10 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             accrualRate: uint96(newAccrualRate),
-            lastXP: uint120(newXP)
+            lastXP: uint120(newXP + grantAmount)
         });
 
-        globalLastXP = uint192(totalSupply());
+        globalLastXP = uint192(totalSupply() + grantAmount);
         globalLastUpdate = uint40(block.timestamp);
         globalAccrualRate = globalAccrualRate - lastUpdate.accrualRate + newAccrualRate;
 
