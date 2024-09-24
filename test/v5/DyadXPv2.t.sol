@@ -228,6 +228,21 @@ contract DyadXPv2Test is BaseTestV5 {
         assertEq(dyadXP.nextHalving(), dyadXP.halvingStart() + 35 days);
     }
 
+    function test_grantXP() public {
+        vm.startPrank(address(vaultManager));
+        dyadXP.grantXP(0, 100_000 ether);
+        vm.stopPrank();
+
+        assertEq(dyadXP.balanceOfNote(0), 100_000 ether);
+    }
+
+    function test_grantXP_revertNotVaultManager() public {
+        vm.expectRevert(abi.encodeWithSignature("NotVaultManager()"));
+        dyadXP.grantXP(0, 100_000 ether);
+        
+        assertEq(dyadXP.balanceOfNote(0), 0);
+    }
+
     function _setHalvingConfiguration(uint40 halvingStart, uint40 halvingCadence) internal {
         uint256 value = uint256(halvingStart) << 40 | halvingCadence;
         vm.store(address(dyadXP), bytes32(uint256(3)), bytes32(value));
