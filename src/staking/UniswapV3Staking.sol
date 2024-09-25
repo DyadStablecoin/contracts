@@ -164,7 +164,7 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function setTickRange(int24 _minTick, int24 _maxTick) external onlyOwner {
-        require(_minTick <= _maxTick, "Invalid tick range");
+        require(_minTick < _maxTick, "Invalid tick range");
         minTick = _minTick;
         maxTick = _maxTick;
     }
