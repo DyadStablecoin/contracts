@@ -7,48 +7,48 @@ import {Owned}           from "@solmate/src/auth/Owned.sol";
 import {ERC20}           from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 
+import {IERC721} from "forge-std/interfaces/IERC721.sol";
+import {Ignition} from "./Ignition.sol";
+import {Dyad} from "../core/Dyad.sol";
+
 // from https://solidity-by-example.org/defi/staking-rewards/
 contract Staking is IStaking, Owned(msg.sender) {
     using SafeTransferLib for ERC20;
 
     ERC20 public immutable stakingToken;
     ERC20 public immutable rewardsToken;
+    IERC721 public immutable dNft;
+    Ignition public immutable ignition;
+    Dyad public immutable dyad;
+    address public immutable vaultManager;
 
     // Duration of rewards to be paid out (in seconds)
-    uint public duration; 
+    uint256 public duration; 
     // Timestamp of when the rewards finish
-    uint public finishAt;
+    uint256 public finishAt;
     // Minimum of last updated time and reward finish time
-    uint public updatedAt;
+    uint256 public updatedAt;
     // Reward to be paid out per second
-    uint public rewardRate;
+    uint256 public rewardRate;
     // Sum of (reward rate * dt * 1e18 / total supply)
-    uint public rewardPerTokenStored;
+    uint256 public rewardPerTokenStored;
     // User address => rewardPerTokenStored
-    mapping(address => uint) public userRewardPerTokenPaid;
+    mapping(uint256 noteId => uint256 rewardPerTokenPaid) public userRewardPerTokenPaid;
     // User address => rewards to be claimed
-    mapping(address => uint) public rewards;
+    mapping(uint256 noteId => uint256 rewards) public rewards;
 
     // Total staked
-    uint public totalSupply;
+    uint256 public totalSupply;
     // User address => staked amount
-    mapping(address => uint) public balanceOf;
+    mapping(uint256 noteId => uint256 balance) public balanceOf;
+    mapping(uint256 noteId => uint256 multiplier) public multipliers;
 
-    constructor(ERC20 _stakingToken, ERC20 _rewardToken) {
+    constructor(ERC20 _stakingToken, ERC20 _rewardToken, IERC721 _dNft, Ignition _ignition, Dyad _dyad) {
       stakingToken = _stakingToken;
       rewardsToken = _rewardToken;
-    }
-
-    modifier updateReward(address _account) {
-      rewardPerTokenStored = rewardPerToken();
-      updatedAt = lastTimeRewardApplicable();
-
-      if (_account != address(0)) {
-          rewards[_account] = earned(_account);
-          userRewardPerTokenPaid[_account] = rewardPerTokenStored;
-      }
-
-      _;
+      dNft = _dNft;
+      ignition = _ignition;
+      dyad = _dyad;
     }
 
     function lastTimeRewardApplicable() public view returns (uint) {
@@ -66,35 +66,70 @@ contract Staking is IStaking, Owned(msg.sender) {
           totalSupply;
     }
 
-    function stake(uint _amount) external updateReward(msg.sender) {
+    function stake(uint256 noteId, uint _amount) external {
+      address noteholder = dNft.ownerOf(noteId);
+      require(noteholder == msg.sender, "not the owner");
       require(_amount > 0, "amount = 0");
-      stakingToken.safeTransferFrom(msg.sender, address(this), _amount);
-      balanceOf[msg.sender] += _amount;
-      totalSupply += _amount;
-      emit Staked(msg.sender, _amount);
+      stakingToken.safeTransferFrom(noteholder, address(this), _amount);
+      balanceOf[noteId] += _amount;
+      totalSupply += _amount * multipliers[noteId];
+      emit Staked(noteId, _amount);
     }
 
-    function withdraw(uint _amount) external updateReward(msg.sender) {
+    function withdraw(uint256 noteId, uint _amount) external {
+      address noteholder = dNft.ownerOf(noteId);
+      require(noteholder == msg.sender, "not the owner");
       require(_amount > 0, "amount = 0");
-      balanceOf[msg.sender] -= _amount;
-      totalSupply -= _amount;
-      stakingToken.safeTransfer(msg.sender, _amount);
-      emit Withdrawn(msg.sender, _amount);
+      _updateReward(noteId);
+      balanceOf[noteId] -= _amount;
+      totalSupply -= _amount * multipliers[noteId];
+      stakingToken.safeTransfer(noteholder, _amount);
+      emit Withdrawn(noteId, _amount);
     }
 
-    function earned(address _account) public view returns (uint) {
+    function updateBoost(uint256 noteId) external {
+      if (msg.sender != address(ignition)) {
+        if (msg.sender != address(vaultManager)) {
+          revert("only ignition or vault manager");
+        }
+      }
+
+      uint256 balance = balanceOf[noteId];
+
+      if (balance > 0) {
+        _updateReward(noteId);
+      }
+
+      uint256 totalIgnited = ignition.totalIgnited(noteId);
+      uint256 dyadMinted = dyad.mintedDyad(noteId);
+
+      uint256 boost;
+      if (totalIgnited > 0) {
+        if (dyadMinted > 0) {
+          boost = totalIgnited * (dyadMinted / (dyadMinted / totalIgnited));
+        }
+      }
+
+      uint256 newMultiplier = totalIgnited + boost;
+      totalSupply = totalSupply - (multipliers[noteId] * balance) + (newMultiplier * balance);
+      multipliers[noteId] = newMultiplier;
+    }
+
+    function earned(uint256 noteId) public view returns (uint) {
       return
-          ((balanceOf[_account] *
-              (rewardPerToken() - userRewardPerTokenPaid[_account])) / 1e18) +
-          rewards[_account];
+          ((_effectiveBalance(noteId) *
+              (rewardPerToken() - userRewardPerTokenPaid[noteId])) / 1e18) +
+          rewards[noteId];
     }
 
-    function getReward() external updateReward(msg.sender) {
-      uint reward = rewards[msg.sender];
+    function getReward(uint256 noteId) external {
+      _updateReward(noteId);
+      address noteholder = dNft.ownerOf(noteId);
+      uint reward = rewards[noteId];
       if (reward > 0) {
-          rewards[msg.sender] = 0;
-          rewardsToken.safeTransfer(msg.sender, reward);
-          emit RewardPaid(msg.sender, reward);
+          rewards[noteId] = 0;
+          rewardsToken.safeTransfer(noteholder, reward);
+          emit RewardPaid(noteId, reward);
       }
     }
 
@@ -106,7 +141,8 @@ contract Staking is IStaking, Owned(msg.sender) {
 
     function notifyRewardAmount(
       uint _amount
-    ) external onlyOwner updateReward(address(0)) {
+    ) external onlyOwner {
+      _updateReward(type(uint256).max);
       if (block.timestamp >= finishAt) {
           rewardRate = _amount / duration;
       } else {
@@ -123,6 +159,20 @@ contract Staking is IStaking, Owned(msg.sender) {
       finishAt = block.timestamp + duration;
       updatedAt = block.timestamp;
       emit RewardAdded(_amount);
+    }
+
+    function _effectiveBalance(uint256 noteId) internal view returns (uint256) {
+      return balanceOf[noteId] * multipliers[noteId];
+    }
+
+    function _updateReward(uint256 noteId) internal {
+      rewardPerTokenStored = rewardPerToken();
+      updatedAt = lastTimeRewardApplicable();
+
+      if (noteId != type(uint256).max) {
+          rewards[noteId] = earned(noteId);
+          userRewardPerTokenPaid[noteId] = rewardPerTokenStored;
+      }
     }
 
     function _min(uint x, uint y) private pure returns (uint) {
