@@ -12,16 +12,22 @@ struct PayoutSplit {
 }
 
 contract Ignition is Owned {
+
+    error Unauthorized();
+
     ERC20 public immutable kerosene;
     Staking public immutable staking;
+    address public immutable vaultManager;
     PayoutSplit[] public payments;
+    
     
     mapping(uint256 noteId => uint256 totalIgnited) public totalIgnited;
 
-    constructor(address _kerosene, address _owner, Staking _staking) Owned(_owner) {
+    constructor(address _kerosene, address _owner, Staking _staking, address _vaultManager) Owned(_owner) {
         kerosene = ERC20(_kerosene);
         payments.push(PayoutSplit(_owner, 10000));
         staking = _staking;
+        vaultManager = _vaultManager;
     }
 
     function ignite(uint256 noteId, uint256 amount) external {
@@ -37,6 +43,16 @@ contract Ignition is Owned {
             }
         }
         totalIgnited[noteId] += amount;
+        staking.updateBoost(noteId);
+    }
+
+    function grantBoost(uint256 noteId, uint256 boost) external {
+        if (msg.sender != vaultManager) {
+            if (msg.sender != owner) {
+                revert Unauthorized();
+            }
+        }
+        totalIgnited[noteId] += boost;
         staking.updateBoost(noteId);
     }
 

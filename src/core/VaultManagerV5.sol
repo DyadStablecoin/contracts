@@ -49,12 +49,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   /// @notice Extensions authorized by a user for use on their notes
   mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
-  /// @notice Amount of XP gained by igniting kerosene. Equivalent to `xpPerKeroseneIgnited` seconds
-  ///         of kerosene accrual.
-  uint256 public xpPerKeroseneIgnited;
-
   Staking public staking;
-  Ignition public ignition;
 
   modifier isValidDNft(uint256 id) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
@@ -68,7 +63,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
       reinitializer(5) 
   {
     staking = _staking;
-    ignition = Ignition(staking.ignition());
   }
 
   /// @inheritdoc IVaultManagerV5
@@ -173,25 +167,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     }
   }
 
-
-  function igniteKerosene(uint256 id, uint256 amount) external {
-    uint256 extensionFlags = _authorizeCall(id);
-    uint256 xpPerKerosene = xpPerKeroseneIgnited;
-    if (xpPerKerosene == 0) {
-      revert NotAvailable();
-    }
-    address ownerAddr = owner();
-    Vault(KEROSENE_VAULT).withdraw(id, ownerAddr, amount); // changes `exo` or `kero` value and `cr`
-    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_WITHDRAW)) {
-      IAfterWithdrawHook(msg.sender).afterWithdraw(id, KEROSENE_VAULT, amount, ownerAddr);
-    }
-    uint256 xpAmount = amount * xpPerKeroseneIgnited;
-    // grant xp will adjust the accrual rate down based on current kero deposited
-    // but give a bulk amount of XP based on the amount granted
-    ignition.ignite(id, xpAmount); 
-    _checkExoValueAndCollatRatio(id);
-  }
-
   function setXpPerKeroseneIgnited(uint256 amount) external onlyOwner {
     xpPerKeroseneIgnited = amount;
   }
@@ -204,7 +179,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     public isValidDNft(id)
   {
     dyad.burn(id, msg.sender, amount);
-    dyadXP.afterNoteUpdated(id);
+    staking.updateBoost(id);
     emit BurnDyad(id, amount, msg.sender);
   }
 
