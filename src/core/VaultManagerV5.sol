@@ -5,6 +5,8 @@ import {DNft}          from "./DNft.sol";
 import {Dyad}          from "./Dyad.sol";
 import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
+import {Staking}       from "../staking/Staking.sol";
+import {Ignition}      from "../staking/Ignition.sol";
 import {DyadXPv2}        from "../staking/DyadXPv2.sol";
 import {IVaultManagerV5} from "../interfaces/IVaultManagerV5.sol";
 import {DyadHooks}       from "./DyadHooks.sol";
@@ -39,7 +41,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   mapping (uint256 id => EnumerableSet.AddressSet vaults) internal vaults; 
   mapping (uint256 id => uint256 block)  private lastDeposit;
 
-  DyadXPv2 public dyadXP;
+  DyadXPv2 public dyadXP; // not used anymore
 
   /// @notice Extensions authorized for use in the system, with bitmap of enabled hooks
   mapping(address => uint256) private _systemExtensions;
@@ -47,9 +49,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   /// @notice Extensions authorized by a user for use on their notes
   mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
-  /// @notice Amount of XP gained by igniting kerosene. Equivalent to `xpPerKeroseneIgnited` seconds
-  ///         of kerosene accrual.
-  uint256 public xpPerKeroseneIgnited;
+  Staking public staking;
 
   modifier isValidDNft(uint256 id) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
@@ -58,11 +58,11 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   /// @custom:oz-upgrades-unsafe-allow constructor
   constructor() { _disableInitializers(); }
 
-  function initialize()
+  function initialize(Staking _staking)
     public 
       reinitializer(5) 
   {
-    // Nothing to initialize right now
+    staking = _staking;
   }
 
   /// @inheritdoc IVaultManagerV5
@@ -109,10 +109,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     Vault _vault = Vault(vault);
     _vault.asset().safeTransferFrom(msg.sender, vault, amount);
     _vault.deposit(id, amount);
-
-    if (vault == KEROSENE_VAULT) {
-      dyadXP.afterNoteUpdated(id);
-    }
   }
 
   /// @inheritdoc IVaultManagerV5
@@ -126,7 +122,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   {
     uint256 extensionFlags = _authorizeCall(id);
     if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
-    if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
     Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_WITHDRAW)) {
       IAfterWithdrawHook(msg.sender).afterWithdraw(id, vault, amount, to);
@@ -144,7 +139,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   {
     uint256 extensionFlags = _authorizeCall(id);
     dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
-    dyadXP.afterNoteUpdated(id);
+    staking.updateBoost(id);
     if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_MINT)) {
       IAfterMintHook(msg.sender).afterMint(id, amount, to);
     }
@@ -172,25 +167,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     }
   }
 
-
-  function igniteKerosene(uint256 id, uint256 amount) external {
-    uint256 extensionFlags = _authorizeCall(id);
-    uint256 xpPerKerosene = xpPerKeroseneIgnited;
-    if (xpPerKerosene == 0) {
-      revert NotAvailable();
-    }
-    address ownerAddr = owner();
-    Vault(KEROSENE_VAULT).withdraw(id, ownerAddr, amount); // changes `exo` or `kero` value and `cr`
-    if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_WITHDRAW)) {
-      IAfterWithdrawHook(msg.sender).afterWithdraw(id, KEROSENE_VAULT, amount, ownerAddr);
-    }
-    uint256 xpAmount = amount * xpPerKeroseneIgnited;
-    // grant xp will adjust the accrual rate down based on current kero deposited
-    // but give a bulk amount of XP based on the amount granted
-    dyadXP.grantXP(id, xpAmount); 
-    _checkExoValueAndCollatRatio(id);
-  }
-
   function setXpPerKeroseneIgnited(uint256 amount) external onlyOwner {
     xpPerKeroseneIgnited = amount;
   }
@@ -203,7 +179,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     public isValidDNft(id)
   {
     dyad.burn(id, msg.sender, amount);
-    dyadXP.afterNoteUpdated(id);
+    staking.updateBoost(id);
     emit BurnDyad(id, amount, msg.sender);
   }
 
@@ -225,7 +201,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
       if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
       uint256 debt = dyad.mintedDyad(id);
       dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
-      dyadXP.afterNoteUpdated(id);
+      staking.updateBoost(id);
 
       lastDeposit[to] = block.number; // `move` acts like a deposit
 
@@ -267,13 +243,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
           uint256 slashedXP;
           bool isKeroseneVault = (address(vault) == KEROSENE_VAULT);
-          if (isKeroseneVault) {
-              slashedXP = dyadXP.beforeKeroseneWithdrawn(id, asset);
-          }
           vault.move(id, to, asset);
-          if (isKeroseneVault) {
-              dyadXP.grantXP(to, slashedXP);
-          }
         }
       }
 
