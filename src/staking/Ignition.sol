@@ -36,6 +36,7 @@ contract Ignition is Owned {
                 amountRemaining -= amountToSend;
             }
         }
+        totalIgnited[noteId] += amount;
         staking.updateBoost(noteId);
     }
 

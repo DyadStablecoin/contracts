@@ -20,7 +20,8 @@ contract Staking is IStaking, Owned(msg.sender) {
     IERC721 public immutable dNft;
     Ignition public immutable ignition;
     Dyad public immutable dyad;
-    address public immutable vaultManager;
+
+    address public vaultManager;
 
     // Duration of rewards to be paid out (in seconds)
     uint256 public duration; 
@@ -64,6 +65,10 @@ contract Staking is IStaking, Owned(msg.sender) {
           rewardPerTokenStored +
           (rewardRate * (lastTimeRewardApplicable() - updatedAt) * 1e18) /
           totalSupply;
+    }
+
+    function setVaultManager(address _vaultManager) public onlyOwner {
+      vaultManager = _vaultManager;
     }
 
     function stake(uint256 noteId, uint _amount) external {
