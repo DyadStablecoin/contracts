@@ -92,11 +92,10 @@ contract Staking is IStaking, Owned(msg.sender) {
     }
 
     function updateBoost(uint256 noteId) external {
-      if (msg.sender != address(ignition)) {
-        if (msg.sender != address(vaultManager)) {
-          revert("only ignition or vault manager");
-        }
-      }
+      require(
+          msg.sender == address(ignition) || msg.sender == address(vaultManager),
+          "only ignition or vault manager"
+      );
 
       uint256 balance = balanceOf[noteId];
 
