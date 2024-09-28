@@ -11,7 +11,6 @@ import {IERC721} from "forge-std/interfaces/IERC721.sol";
 import {Ignition} from "./Ignition.sol";
 import {Dyad} from "../core/Dyad.sol";
 
-// from https://solidity-by-example.org/defi/staking-rewards/
 contract Staking is IStaking, Owned(msg.sender) {
     using SafeTransferLib for ERC20;
 
