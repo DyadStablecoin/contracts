@@ -34,8 +34,7 @@ contract Staking is IStaking, Owned(msg.sender) {
     IERC721 public immutable dNft;
     Ignition public immutable ignition;
     Dyad public immutable dyad;
-
-    address public vaultManager;
+    address public immutable vaultManager;
 
     // Duration of rewards to be paid out (in seconds)
     uint256 public duration;
@@ -59,12 +58,13 @@ contract Staking is IStaking, Owned(msg.sender) {
     mapping(uint256 noteId => NoteDetails) public noteDetails;
     mapping(uint256 noteId => uint256 effectiveBalance) public effectiveBalanceOf;
 
-    constructor(ERC20 _stakingToken, ERC20 _rewardToken, IERC721 _dNft, Ignition _ignition, Dyad _dyad) {
+    constructor(ERC20 _stakingToken, ERC20 _rewardToken, IERC721 _dNft, Ignition _ignition, Dyad _dyad, address _vaultManager) {
         stakingToken = _stakingToken;
         rewardsToken = _rewardToken;
         dNft = _dNft;
         ignition = _ignition;
         dyad = _dyad;
+        vaultManager = _vaultManager;
     }
 
     function lastTimeRewardApplicable() public view returns (uint256) {
@@ -77,10 +77,6 @@ contract Staking is IStaking, Owned(msg.sender) {
         }
 
         return rewardPerTokenStored + (rewardRate * (lastTimeRewardApplicable() - updatedAt) * 1e18) / totalSupply;
-    }
-
-    function setVaultManager(address _vaultManager) public onlyOwner {
-        vaultManager = _vaultManager;
     }
 
     function stake(uint256 noteId, uint256 _amount) external {
