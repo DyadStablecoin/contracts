@@ -167,10 +167,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     }
   }
 
-  function setXpPerKeroseneIgnited(uint256 amount) external onlyOwner {
-    xpPerKeroseneIgnited = amount;
-  }
-
   /// @inheritdoc IVaultManagerV5
   function burnDyad(
     uint256 id,

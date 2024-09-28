@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {IExtension} from "../interfaces/IExtension.sol";
 import {Ignition} from "../staking/Ignition.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {IVaultManagerV5} from "../interfaces/IVaultManagerV5.sol";
 import {DNft} from "../core/DNft.sol";
 
 contract KeroseneVaultIgnition is IExtension {
