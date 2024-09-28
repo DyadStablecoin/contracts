@@ -25,15 +25,15 @@ contract KeroseneVaultIgnition is IExtension {
         IERC20(kerosene).approve(address(ignition), type(uint256).max);
     }
 
-    function name() external view returns (string memory) {
+    function name() external pure returns (string memory) {
         return "Kerosene Vault Ignition";
     }
 
-    function description() external view returns (string memory) {
+    function description() external pure returns (string memory) {
         return "This extension allows you to ignite kerosene from your vault.";
     }
 
-    function getHookFlags() external view returns (uint256) {
+    function getHookFlags() external pure returns (uint256) {
         return 0;
     }
 
