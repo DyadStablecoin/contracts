@@ -37,11 +37,13 @@ contract Staking is IStaking, Owned(msg.sender) {
     // User address => rewards to be claimed
     mapping(uint256 noteId => uint256 rewards) public rewards;
 
-    // Total staked
+    // @notice Total effective staked LP (includes tanh multipliers)
+    // @dev this is what is used for reward rate calculations
     uint256 public totalSupply;
-    // User address => staked amount
+    // @notice User address => staked amount of LP tokens
     mapping(uint256 noteId => uint256 balance) public balanceOf;
-    mapping(uint256 noteId => uint256 multiplier) public multipliers;
+    // @notice User address => multiplier for kero + minted dyad
+    mapping(uint256 noteId => uint256 multiplier) public ignitionBoost;
 
     constructor(ERC20 _stakingToken, ERC20 _rewardToken, IERC721 _dNft, Ignition _ignition, Dyad _dyad) {
       stakingToken = _stakingToken;
@@ -74,9 +76,11 @@ contract Staking is IStaking, Owned(msg.sender) {
       address noteholder = dNft.ownerOf(noteId);
       require(noteholder == msg.sender, "not the owner");
       require(_amount > 0, "amount = 0");
+      _updateReward(noteId);
       stakingToken.safeTransferFrom(noteholder, address(this), _amount);
+      uint256 oldEffectiveBalance = _effectiveBalance(noteId);
       balanceOf[noteId] += _amount;
-      totalSupply += _amount * multipliers[noteId];
+      totalSupply = totalSupply - oldEffectiveBalance + _effectiveBalance(noteId);
       emit Staked(noteId, _amount);
     }
 
@@ -85,8 +89,9 @@ contract Staking is IStaking, Owned(msg.sender) {
       require(noteholder == msg.sender, "not the owner");
       require(_amount > 0, "amount = 0");
       _updateReward(noteId);
+      uint256 oldEffectiveBalance = _effectiveBalance(noteId);
       balanceOf[noteId] -= _amount;
-      totalSupply -= _amount * multipliers[noteId];
+      totalSupply = totalSupply - oldEffectiveBalance + _effectiveBalance(noteId);
       stakingToken.safeTransfer(noteholder, _amount);
       emit Withdrawn(noteId, _amount);
     }
@@ -113,9 +118,9 @@ contract Staking is IStaking, Owned(msg.sender) {
         }
       }
 
-      uint256 newMultiplier = totalIgnited + boost;
-      totalSupply = totalSupply - (multipliers[noteId] * balance) + (newMultiplier * balance);
-      multipliers[noteId] = newMultiplier;
+      uint256 oldEffectiveBalance = _effectiveBalance(noteId);
+      multipliers[noteId] = totalIgnited + boost;
+      totalSupply = totalSupply - oldEffectiveBalance + _effectiveBalance(noteId);
     }
 
     function earned(uint256 noteId) public view returns (uint) {
@@ -165,6 +170,9 @@ contract Staking is IStaking, Owned(msg.sender) {
     }
 
     function _effectiveBalance(uint256 noteId) internal view returns (uint256) {
+      
+//      uint256 tanhBoost = _tanh(multipliers[noteId].divWad(MAX_BOOST_FACTOR));
+//      uint256 lpBoost = _tanh(balanceOf[noteId].divWad(MAX_LP_FACTOR));
       return balanceOf[noteId] * multipliers[noteId];
     }
 
@@ -180,5 +188,18 @@ contract Staking is IStaking, Owned(msg.sender) {
 
     function _min(uint x, uint y) private pure returns (uint) {
       return x <= y ? x : y;
+    }
+
+    /// @notice Computes the hyperbolic tangent of a number.
+    /// @param x The number to compute the hyperbolic tangent of.
+    /// @return The hyperbolic tangent of x.
+    /// @dev tanh can be computed as (exp(x) - exp(-x)) / (exp(x) + exp(-x))
+    ///      but we need to be careful with overflow: x must be less than 135 * WAD.
+    function _tanh(uint256 x) internal pure returns (uint256) {
+      int256 xInt = x.toInt256();
+      expX = xInt.expWad();
+      invExpX = (xInt * -1).expWad();
+
+      return ((expX - invExpX) / (expX + invExpX)).toUint256();
     }
 }
