@@ -46,8 +46,7 @@ contract Ignition is Owned {
         staking.updateBoost(noteId);
     }
 
-    function grantBoost(uint256 noteId, uint256 boost) external {
-        require(msg.sender == vaultManager || msg.sender == owner, "Unauthorized");
+    function grantBoost(uint256 noteId, uint256 boost) external onlyOwner {
         totalIgnited[noteId] += boost;
         staking.updateBoost(noteId);
     }
