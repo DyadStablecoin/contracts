@@ -4,7 +4,7 @@ pragma solidity ^0.8.17;
 interface IStaking {
   error NotOwnerOfNote();
   error InvalidAmount();
-  error OnlyIgnitionOrVaultManager();
+  error NotAuthorized();
 
   event Staked                (uint256 indexed noteId, uint amount);
   event Withdrawn             (uint256 indexed noteId, uint amount);

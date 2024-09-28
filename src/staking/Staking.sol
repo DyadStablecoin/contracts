@@ -132,14 +132,23 @@ contract Staking is IStaking, Owned(msg.sender) {
     function updateBoost(uint256 noteId) external {
         if (msg.sender != address(ignition)) {
             if (msg.sender != vaultManager) {
-                revert OnlyIgnitionOrVaultManager();
+                if (msg.sender != owner) {
+                    revert NotAuthorized();
+                }
             }
         }
 
-        _updateReward(noteId);
+        _updateBoost(noteId);
+    }
+    
+    function batchUpdateBoost(uint256[] calldata noteIds) external onlyOwner {
+        for (uint256 i = 0; i < noteIds.length; i++) {
+            _updateBoost(noteIds[i]);
+        }
+    }
 
-        uint256 totalIgnited = ignition.totalIgnited(noteId);
-        uint256 dyadMinted = dyad.mintedDyad(noteId);
+    function _updateBoost(uint256 noteId) internal {
+        _updateReward(noteId);
 
         uint256 totalBoost = ignition.totalIgnited(noteId) + dyad.mintedDyad(noteId);
 
