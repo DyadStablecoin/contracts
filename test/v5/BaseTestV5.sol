@@ -12,7 +12,6 @@ import {Licenser} from "../../src/core/Licenser.sol";
 import {VaultLicenser} from "../../src/core/VaultLicenser.sol";
 import {Dyad} from "../../src/core/Dyad.sol";
 import {DyadXP} from "../../src/staking/DyadXP.sol";
-import {DyadXPv2} from "../../src/staking/DyadXPv2.sol";
 import {IWETH} from "../../src/interfaces/IWETH.sol";
 import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -24,6 +23,10 @@ import {KeroseneOracleV2} from "../../src/core/KeroseneOracleV2.sol";
 import {KerosineManager} from "../../src/core/KerosineManager.sol";
 import {Kerosine} from "../../src/staking/Kerosine.sol";
 import {WETHGateway} from "../../src/periphery/WETHGateway.sol";
+import {Staking} from "../../src/staking/Staking.sol";
+import {Ignition} from "../../src/staking/Ignition.sol";
+import {ERC20Mock} from "../ERC20Mock.sol";
+import {IERC721} from "forge-std/interfaces/IERC721.sol";
 
 contract BaseTestV5 is Test, Parameters {
     address internal constant USER_1 = address(0x1111);
@@ -43,7 +46,9 @@ contract BaseTestV5 is Test, Parameters {
     KerosineDenominator internal keroseneDenominator;
     WETHGateway internal wethGateway;
     Vault internal wethVault;
-    DyadXPv2 internal dyadXP;
+    Staking internal staking;
+    Ignition internal ignition;
+    ERC20Mock internal lpToken;
 
     function setUp() public virtual {
         vm.etch(
@@ -89,7 +94,6 @@ contract BaseTestV5 is Test, Parameters {
         keroseneVault.setDenominator(keroseneDenominator);
 
         DyadXP dxp = new DyadXP(proxy, address(keroseneVault), address(dNft));
-        DyadXPv2 dyadXPv2 = new DyadXPv2(proxy, address(keroseneVault), address(dNft), address(dyad));
 
         vaultLicenser.add(address(wethVault), false);
         vaultLicenser.add(address(keroseneVault), true);
@@ -101,10 +105,17 @@ contract BaseTestV5 is Test, Parameters {
 
         dxp = VaultManagerV4(proxy).dyadXP();
 
-        VaultManagerV5(proxy).upgradeToAndCall(address(vaultManagerV5), abi.encodeWithSignature("initialize()"));
+        lpToken = new ERC20Mock("LP", "LP");
+        staking = new Staking(
+            lpToken,
+            kerosene,
+            IERC721(address(dNft)),
+            dyad,
+            address(proxy)
+        );
+        ignition = staking.ignition();
 
-        dyadXP = DyadXPv2(address(dxp));
-        dxp.upgradeToAndCall(address(dyadXPv2), abi.encodeWithSignature("initialize(uint40,uint40)", block.timestamp, 7 days));
+        VaultManagerV5(proxy).upgradeToAndCall(address(vaultManagerV5), abi.encodeWithSignature("initialize(address)", address(staking)));
         vaultManager = VaultManagerV5(proxy);
 
         wethGateway =
@@ -115,7 +126,6 @@ contract BaseTestV5 is Test, Parameters {
         dNft.mintInsiderNft(USER_1);
         dNft.mintInsiderNft(USER_2);
         dNft.mintInsiderNft(USER_3);
-
         // dyadXP = vaultManager.dyadXP();
     }
 

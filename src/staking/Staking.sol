@@ -18,7 +18,7 @@ struct NoteDetails {
     uint128 boost;
 }
 
-contract Staking is IStaking, Owned(msg.sender) {
+contract Staking is Owned, IStaking {
     using SafeTransferLib for ERC20;
     using SafeCastLib for uint256;
     using SafeCastLib for int256;
@@ -62,14 +62,13 @@ contract Staking is IStaking, Owned(msg.sender) {
         ERC20 _stakingToken,
         ERC20 _rewardToken,
         IERC721 _dNft,
-        Ignition _ignition,
         Dyad _dyad,
         address _vaultManager
-    ) {
+    ) Owned(msg.sender) {
         stakingToken = _stakingToken;
         rewardsToken = _rewardToken;
         dNft = _dNft;
-        ignition = _ignition;
+        ignition = new Ignition(address(_rewardToken), msg.sender, this, _vaultManager);
         dyad = _dyad;
         vaultManager = _vaultManager;
     }

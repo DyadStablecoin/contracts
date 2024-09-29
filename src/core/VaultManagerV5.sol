@@ -7,7 +7,6 @@ import {VaultLicenser} from "./VaultLicenser.sol";
 import {Vault}         from "./Vault.sol";
 import {Staking}       from "../staking/Staking.sol";
 import {Ignition}      from "../staking/Ignition.sol";
-import {DyadXPv2}        from "../staking/DyadXPv2.sol";
 import {IVaultManagerV5} from "../interfaces/IVaultManagerV5.sol";
 import {DyadHooks}       from "./DyadHooks.sol";
 import "../interfaces/IExtension.sol";
@@ -41,15 +40,13 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
   mapping (uint256 id => EnumerableSet.AddressSet vaults) internal vaults; 
   mapping (uint256 id => uint256 block)  private lastDeposit;
 
-  DyadXPv2 public dyadXP; // not used anymore
+  Staking public staking;
 
   /// @notice Extensions authorized for use in the system, with bitmap of enabled hooks
   mapping(address => uint256) private _systemExtensions;
 
   /// @notice Extensions authorized by a user for use on their notes
   mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
-
-  Staking public staking;
 
   modifier isValidDNft(uint256 id) {
     if (dNft.ownerOf(id) == address(0)) revert InvalidDNft(); _;
