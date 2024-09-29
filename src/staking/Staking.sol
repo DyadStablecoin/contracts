@@ -37,15 +37,15 @@ contract Staking is IStaking, Owned(msg.sender) {
     address public immutable vaultManager;
 
     // Duration of rewards to be paid out (in seconds)
-    uint256 public duration;
+    uint40 public duration;
     // Timestamp of when the rewards finish
-    uint256 public finishAt;
+    uint40 public finishAt;
     // Minimum of last updated time and reward finish time
-    uint256 public updatedAt;
+    uint40 public updatedAt;
     // Reward to be paid out per second
-    uint256 public rewardRate;
+    uint40 public rewardRate;
     // Sum of (reward rate * dt * 1e18 / total supply)
-    uint256 public rewardPerTokenStored;
+    uint96 public rewardPerTokenStored;
     // User address => rewardPerTokenStored
     mapping(uint256 noteId => uint256 rewardPerTokenPaid) public userRewardPerTokenPaid;
     // User address => rewards to be claimed
@@ -74,16 +74,17 @@ contract Staking is IStaking, Owned(msg.sender) {
         vaultManager = _vaultManager;
     }
 
-    function lastTimeRewardApplicable() public view returns (uint256) {
-        return _min(finishAt, block.timestamp);
+    function lastTimeRewardApplicable() public view returns (uint40) {
+        return uint40(_min(finishAt, block.timestamp));
     }
 
-    function rewardPerToken() public view returns (uint256) {
+    function rewardPerToken() public view returns (uint96) {
         if (totalSupply == 0) {
             return rewardPerTokenStored;
         }
 
-        return rewardPerTokenStored + (rewardRate * (lastTimeRewardApplicable() - updatedAt) * 1e18) / totalSupply;
+        return
+            uint96(rewardPerTokenStored + (rewardRate * (lastTimeRewardApplicable() - updatedAt) * 1e18) / totalSupply);
     }
 
     function stake(uint256 noteId, uint256 _amount) external {
@@ -177,8 +178,10 @@ contract Staking is IStaking, Owned(msg.sender) {
         }
     }
 
-    function setRewardsDuration(uint256 _duration) external onlyOwner {
-        require(finishAt < block.timestamp, "reward duration not finished");
+    function setRewardsDuration(uint40 _duration) external onlyOwner {
+        if (finishAt >= block.timestamp) {
+            revert RewardDurationNotFinished();
+        }
         duration = _duration;
         emit RewardsDurationUpdated(_duration);
     }
@@ -186,17 +189,21 @@ contract Staking is IStaking, Owned(msg.sender) {
     function notifyRewardAmount(uint256 _amount) external onlyOwner {
         _updateReward(type(uint256).max);
         if (block.timestamp >= finishAt) {
-            rewardRate = _amount / duration;
+            rewardRate = uint40(_amount / duration);
         } else {
             uint256 remainingRewards = (finishAt - block.timestamp) * rewardRate;
-            rewardRate = (_amount + remainingRewards) / duration;
+            rewardRate = uint40((_amount + remainingRewards) / duration);
         }
 
-        require(rewardRate > 0, "reward rate = 0");
-        require(rewardRate * duration <= rewardsToken.balanceOf(address(this)), "reward amount > balance");
+        if (rewardRate == 0) {
+            revert RewardRateIsZero();
+        }
+        if (rewardRate * duration > rewardsToken.balanceOf(address(this))) {
+            revert RewardAmountExceedsBalance();
+        }
 
-        finishAt = block.timestamp + duration;
-        updatedAt = block.timestamp;
+        finishAt = uint40(block.timestamp + duration);
+        updatedAt = uint40(block.timestamp);
         emit RewardAdded(_amount);
     }
 

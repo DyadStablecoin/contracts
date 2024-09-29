@@ -5,6 +5,9 @@ interface IStaking {
   error NotOwnerOfNote();
   error InvalidAmount();
   error NotAuthorized();
+  error RewardRateIsZero();
+  error RewardAmountExceedsBalance();
+  error RewardDurationNotFinished();
 
   event Staked                (uint256 indexed noteId, uint amount);
   event Withdrawn             (uint256 indexed noteId, uint amount);
