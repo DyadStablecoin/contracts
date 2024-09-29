@@ -58,7 +58,14 @@ contract Staking is IStaking, Owned(msg.sender) {
     mapping(uint256 noteId => NoteDetails) public noteDetails;
     mapping(uint256 noteId => uint256 effectiveBalance) public effectiveBalanceOf;
 
-    constructor(ERC20 _stakingToken, ERC20 _rewardToken, IERC721 _dNft, Ignition _ignition, Dyad _dyad, address _vaultManager) {
+    constructor(
+        ERC20 _stakingToken,
+        ERC20 _rewardToken,
+        IERC721 _dNft,
+        Ignition _ignition,
+        Dyad _dyad,
+        address _vaultManager
+    ) {
         stakingToken = _stakingToken;
         rewardsToken = _rewardToken;
         dNft = _dNft;
@@ -136,7 +143,7 @@ contract Staking is IStaking, Owned(msg.sender) {
 
         _updateBoost(noteId);
     }
-    
+
     function batchUpdateBoost(uint256[] calldata noteIds) external onlyOwner {
         for (uint256 i = 0; i < noteIds.length; i++) {
             _updateBoost(noteIds[i]);
