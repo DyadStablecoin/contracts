@@ -43,9 +43,9 @@ contract Staking is IStaking, Owned(msg.sender) {
     // Minimum of last updated time and reward finish time
     uint40 public updatedAt;
     // Reward to be paid out per second
-    uint40 public rewardRate;
+    uint96 public rewardRate;
     // Sum of (reward rate * dt * 1e18 / total supply)
-    uint96 public rewardPerTokenStored;
+    uint256 public rewardPerTokenStored;
     // User address => rewardPerTokenStored
     mapping(uint256 noteId => uint256 rewardPerTokenPaid) public userRewardPerTokenPaid;
     // User address => rewards to be claimed
@@ -78,13 +78,13 @@ contract Staking is IStaking, Owned(msg.sender) {
         return uint40(_min(finishAt, block.timestamp));
     }
 
-    function rewardPerToken() public view returns (uint96) {
+    function rewardPerToken() public view returns (uint256) {
         if (totalSupply == 0) {
             return rewardPerTokenStored;
         }
 
         return
-            uint96(rewardPerTokenStored + (rewardRate * (lastTimeRewardApplicable() - updatedAt) * 1e18) / totalSupply);
+            rewardPerTokenStored + (rewardRate * (lastTimeRewardApplicable() - updatedAt) * 1e18) / totalSupply;
     }
 
     function stake(uint256 noteId, uint256 _amount) external {
