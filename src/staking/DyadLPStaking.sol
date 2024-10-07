@@ -17,6 +17,8 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     error InvalidProof();
 
     event Claimed(uint256 indexed noteId, uint256 indexed amount, uint256 unclaimedBonus);
+    event Deposited(uint256 indexed noteId, uint256 indexed amount);
+    event Withdrawn(uint256 indexed noteId, uint256 indexed amount);
 
     uint256 public constant MANAGER_ROLE = _ROLE_0;
 
@@ -61,6 +63,8 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     function deposit(uint256 noteId, uint256 amount) public {
         noteIdToAmountDeposited[noteId] += amount;
         lpToken.safeTransferFrom(msg.sender, address(this), amount);
+
+        emit Deposited(noteId, amount);
     }
 
     function withdraw(uint256 noteId, uint256 amount) public {
@@ -69,6 +73,8 @@ contract DyadLPStaking is OwnableRoles, IExtension {
         
         noteIdToAmountDeposited[noteId] -= amount;
         lpToken.safeTransfer(owner, amount);
+
+        emit Withdrawn(noteId, amount);
     }
 
     function setRoot(bytes32 _merkleRoot) public onlyRoles(MANAGER_ROLE) {
