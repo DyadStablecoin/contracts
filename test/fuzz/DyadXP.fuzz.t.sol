@@ -36,30 +36,16 @@ contract DyadXPFuzzTest is Test {
             IAggregatorV3(address(0x0)),
             KerosineDenominator(address(0x0))
         );
-        DyadXP impl = new DyadXP(
-            VAULT_MANAGER,
-            address(keroseneVault),
-            address(dnft)
-        );
-        momentum = DyadXP(
-            address(
-                new ERC1967Proxy(
-                    address(impl),
-                    abi.encodeWithSignature("initialize(address)", msg.sender)
-                )
-            )
-        );
+        DyadXP impl = new DyadXP(VAULT_MANAGER, address(keroseneVault), address(dnft));
+        momentum =
+            DyadXP(address(new ERC1967Proxy(address(impl), abi.encodeWithSignature("initialize(address)", msg.sender))));
 
         dnft.mintInsiderNft(USER_1);
         dnft.mintInsiderNft(USER_2);
         dnft.mintInsiderNft(USER_3);
     }
 
-    function testFuzz_totalSupplyGteAllBalances(
-        uint256 deposit1,
-        uint256 deposit2,
-        uint256 deposit3
-    ) external {
+    function testFuzz_totalSupplyGteAllBalances(uint256 deposit1, uint256 deposit2, uint256 deposit3) external {
         vm.assume(deposit1 > 1);
         vm.assume(deposit2 > 1);
         vm.assume(deposit3 > 1);

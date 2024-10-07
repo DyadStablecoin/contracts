@@ -43,17 +43,12 @@ contract VaultWeETHTest is Test, Parameters {
         console.log("usdValue: %s", usdValue);
     }
 
-    function testFuzzDepositCap(
-        uint256 currentDeposit,
-        uint256 depositAmount
-    ) public {
+    function testFuzzDepositCap(uint256 currentDeposit, uint256 depositAmount) public {
         vm.assume(depositAmount < type(uint128).max);
         vm.assume(currentDeposit < depositCap);
 
         vm.mockCall(
-            MAINNET_WEETH,
-            abi.encodeWithSignature("balanceOf(address)", address(vault)),
-            abi.encode(currentDeposit)
+            MAINNET_WEETH, abi.encodeWithSignature("balanceOf(address)", address(vault)), abi.encode(currentDeposit)
         );
 
         vm.prank(MAINNET_V2_VAULT_MANAGER);

@@ -11,18 +11,16 @@ import {IAggregatorV3} from "../src/interfaces/IAggregatorV3.sol";
 import {IWstETH} from "../src/interfaces/IWstETH.sol";
 
 contract VaultWstEthTest is Test, Parameters {
-  VaultWstEth vault;
+    VaultWstEth vault;
 
-  function setUp() public {
-    vault = new VaultWstEth(
-      VaultManager (MAINNET_VAULT_MANAGER), 
-      ERC20        (MAINNET_WSTETH), 
-      IAggregatorV3(MAINNET_CHAINLINK_STETH)
-    );
-  }
+    function setUp() public {
+        vault = new VaultWstEth(
+            VaultManager(MAINNET_VAULT_MANAGER), ERC20(MAINNET_WSTETH), IAggregatorV3(MAINNET_CHAINLINK_STETH)
+        );
+    }
 
-  function test_assetPrice() public {
-    uint256 price = vault.assetPrice();
-    console.log("price: %s", price);
-  }
+    function test_assetPrice() public {
+        uint256 price = vault.assetPrice();
+        console.log("price: %s", price);
+    }
 }

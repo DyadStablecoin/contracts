@@ -50,10 +50,7 @@ contract VaultApxETHTest is Test, Parameters {
         assertEq(newCap, cap);
     }
 
-    function testFuzzDepositCap(
-        uint256 currentDeposit,
-        uint256 depositAmount
-    ) public {
+    function testFuzzDepositCap(uint256 currentDeposit, uint256 depositAmount) public {
         vm.assume(depositAmount < type(uint128).max);
         vm.assume(currentDeposit < depositCap);
 

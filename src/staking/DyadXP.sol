@@ -62,11 +62,8 @@ contract DyadXP is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 continue;
             }
             totalKeroseneInVault += depositedKero;
-            noteData[i] = NoteXPData({
-                lastAction: uint40(block.timestamp),
-                keroseneDeposited: uint96(depositedKero),
-                lastXP: 0
-            });
+            noteData[i] =
+                NoteXPData({lastAction: uint40(block.timestamp), keroseneDeposited: uint96(depositedKero), lastXP: 0});
         }
     }
 
@@ -114,18 +111,11 @@ contract DyadXP is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     /// @notice Moves `amount` tokens from `from` to `to` using the allowance mechanism.
     /// `amount` is then deducted from the caller's allowance.
-    function transferFrom(
-        address,
-        address,
-        uint256
-    ) external pure returns (bool) {
+    function transferFrom(address, address, uint256) external pure returns (bool) {
         revert TransferNotAllowed();
     }
 
-    function afterKeroseneDeposited(
-      uint256 noteId,
-      uint256 amountDeposited
-    ) external {
+    function afterKeroseneDeposited(uint256 noteId, uint256 amountDeposited) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
@@ -142,68 +132,41 @@ contract DyadXP is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             lastXP: uint120(newXP)
         });
 
-        globalLastXP += uint192(
-            (block.timestamp - globalLastUpdate) * (totalKeroseneInVault - amountDeposited)
-        );
+        globalLastXP += uint192((block.timestamp - globalLastUpdate) * (totalKeroseneInVault - amountDeposited));
         globalLastUpdate = uint40(block.timestamp);
 
-        emit Transfer(
-            address(0),
-            address(DNFT.ownerOf(noteId)),
-            newXP - lastUpdate.lastXP
-        );
+        emit Transfer(address(0), address(DNFT.ownerOf(noteId)), newXP - lastUpdate.lastXP);
     }
 
-    function beforeKeroseneWithdrawn(
-        uint256 noteId,
-        uint256 amountWithdrawn
-    ) external {
+    function beforeKeroseneWithdrawn(uint256 noteId, uint256 amountWithdrawn) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
 
         NoteXPData memory lastUpdate = noteData[noteId];
         uint256 xp = _computeXP(lastUpdate);
-        uint256 slashedXP = xp.mulDivUp(
-            amountWithdrawn,
-            lastUpdate.keroseneDeposited
-        );
+        uint256 slashedXP = xp.mulDivUp(amountWithdrawn, lastUpdate.keroseneDeposited);
         if (slashedXP > xp) {
             slashedXP = xp;
         }
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
-            keroseneDeposited: uint96(
-                lastUpdate.keroseneDeposited - amountWithdrawn
-            ),
+            keroseneDeposited: uint96(lastUpdate.keroseneDeposited - amountWithdrawn),
             lastXP: uint120(xp - slashedXP)
         });
 
-        globalLastXP = uint192(
-            globalLastXP +
-                (block.timestamp - globalLastUpdate) *
-                totalKeroseneInVault -
-                slashedXP
-        );
+        globalLastXP = uint192(globalLastXP + (block.timestamp - globalLastUpdate) * totalKeroseneInVault - slashedXP);
         globalLastUpdate = uint40(block.timestamp);
         totalKeroseneInVault -= amountWithdrawn;
 
-        emit Transfer(
-            address(0),
-            address(DNFT.ownerOf(noteId)),
-            xp - lastUpdate.lastXP
-        );
+        emit Transfer(address(0), address(DNFT.ownerOf(noteId)), xp - lastUpdate.lastXP);
         emit Transfer(DNFT.ownerOf(noteId), address(0), slashedXP);
     }
 
-    function _authorizeUpgrade(
-        address
-    ) internal view override onlyOwner {}
+    function _authorizeUpgrade(address) internal view override onlyOwner {}
 
-    function _computeXP(
-        NoteXPData memory lastUpdate
-    ) internal view returns (uint256) {
+    function _computeXP(NoteXPData memory lastUpdate) internal view returns (uint256) {
         uint256 elapsed = block.timestamp - lastUpdate.lastAction;
         uint256 deposited = lastUpdate.keroseneDeposited;
 

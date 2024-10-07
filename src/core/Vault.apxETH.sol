@@ -14,22 +14,22 @@ import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract VaultApxETH is Owned, IVault {
     using SafeTransferLib for ERC20;
-    using SafeCast for int;
-    using FixedPointMathLib for uint;
+    using SafeCast for int256;
+    using FixedPointMathLib for uint256;
 
     error ExceedsDepositCap();
 
-    uint public constant STALE_DATA_TIMEOUT = 36 hours;
+    uint256 public constant STALE_DATA_TIMEOUT = 36 hours;
 
     IVaultManager public immutable vaultManager;
     ERC20 public immutable asset;
     IAggregatorV3 public immutable oracle;
-    IVault        public immutable wethVault;
+    IVault public immutable wethVault;
     DNft public immutable dNft;
 
     uint256 public depositCap;
 
-    mapping(uint => uint) public id2asset;
+    mapping(uint256 => uint256) public id2asset;
 
     modifier onlyVaultManager() {
         if (msg.sender != address(vaultManager)) revert NotVaultManager();
@@ -53,7 +53,7 @@ contract VaultApxETH is Owned, IVault {
         depositCap = type(uint256).max;
     }
 
-    function deposit(uint id, uint amount) external onlyVaultManager {
+    function deposit(uint256 id, uint256 amount) external onlyVaultManager {
         if (asset.balanceOf(address(this)) > depositCap) {
             revert ExceedsDepositCap();
         }
@@ -61,32 +61,23 @@ contract VaultApxETH is Owned, IVault {
         emit Deposit(id, amount);
     }
 
-    function withdraw(
-        uint id,
-        address to,
-        uint amount
-    ) external onlyVaultManager {
+    function withdraw(uint256 id, address to, uint256 amount) external onlyVaultManager {
         id2asset[id] -= amount;
         asset.safeTransfer(to, amount);
         emit Withdraw(id, to, amount);
     }
 
-    function move(uint from, uint to, uint amount) external onlyVaultManager {
+    function move(uint256 from, uint256 to, uint256 amount) external onlyVaultManager {
         id2asset[from] -= amount;
         id2asset[to] += amount;
         emit Move(from, to, amount);
     }
 
-    function getUsdValue(uint id) external view returns (uint) {
-        return
-            (id2asset[id] * assetPrice() * 1e18) /
-            10 ** oracle.decimals() /
-            10 ** asset.decimals();
+    function getUsdValue(uint256 id) external view returns (uint256) {
+        return (id2asset[id] * assetPrice() * 1e18) / 10 ** oracle.decimals() / 10 ** asset.decimals();
     }
 
-    function balanceOf(
-        address account
-    ) external view returns (uint256 assetBalance) {
+    function balanceOf(address account) external view returns (uint256 assetBalance) {
         uint256 dnftBalance = dNft.balanceOf(account);
         for (uint256 i; i < dnftBalance; ++i) {
             uint256 id = dNft.tokenOfOwnerByIndex(account, i);
@@ -94,14 +85,15 @@ contract VaultApxETH is Owned, IVault {
         }
     }
 
-    function setDepositCap(uint _depositCap) external onlyOwner {
+    function setDepositCap(uint256 _depositCap) external onlyOwner {
         depositCap = _depositCap;
     }
 
-    function assetPrice() public view returns (uint) {
-        (, int256 answer, , uint256 updatedAt, ) = oracle.latestRoundData();
-        if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT)
+    function assetPrice() public view returns (uint256) {
+        (, int256 answer,, uint256 updatedAt,) = oracle.latestRoundData();
+        if (block.timestamp > updatedAt + STALE_DATA_TIMEOUT) {
             revert StaleData();
+        }
         return answer.toUint256().mulDivDown(wethVault.assetPrice(), 10 ** wethVault.oracle().decimals());
     }
 }

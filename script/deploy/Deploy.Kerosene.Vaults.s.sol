@@ -27,7 +27,7 @@
 //     // IMPORTANT: Vault needs to be licensed!
 //     UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
 //       VaultManager(MAINNET_VAULT_MANAGER),
-//       Kerosine(MAINNET_KEROSENE), 
+//       Kerosine(MAINNET_KEROSENE),
 //       Dyad(MAINNET_DYAD),
 //       kerosineManager
 //     );
@@ -35,7 +35,7 @@
 //     // IMPORTANT: Vault needs to be licensed!
 //     BoundedKerosineVault boundedKerosineVault     = new BoundedKerosineVault(
 //       VaultManager(MAINNET_VAULT_MANAGER),
-//       Kerosine(MAINNET_KEROSENE), 
+//       Kerosine(MAINNET_KEROSENE),
 //       kerosineManager
 //     );
 
