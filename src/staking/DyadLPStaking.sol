@@ -19,6 +19,8 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     event Claimed(uint256 indexed noteId, uint256 indexed amount, uint256 unclaimedBonus);
     event Deposited(uint256 indexed noteId, uint256 indexed amount);
     event Withdrawn(uint256 indexed noteId, uint256 indexed amount);
+    event RootUpdated(bytes32 newRoot);
+    event RewardsDeposited(uint256 amount);
 
     uint256 public constant MANAGER_ROLE = _ROLE_0;
 
@@ -78,6 +80,8 @@ contract DyadLPStaking is OwnableRoles, IExtension {
 
     function setRoot(bytes32 _merkleRoot) public onlyRoles(MANAGER_ROLE) {
         merkleRoot = _merkleRoot;
+
+        emit RootUpdated(_merkleRoot);
     }
 
     function claim(uint256 noteId, uint256 amount, bytes32[] calldata proof) public returns (uint256) {
@@ -136,5 +140,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
         } else if (amount > previousUnclaimedBonus) {
             kerosene.safeTransferFrom(msg.sender, address(this), amount - previousUnclaimedBonus);
         }
+
+        emit RewardsDeposited(amount);
     }
 }
