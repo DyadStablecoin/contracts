@@ -29,7 +29,6 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     IVaultManager public immutable vaultManager;
 
     bytes32 public merkleRoot;
-
     uint256 public unclaimedBonus;
 
     mapping(uint256 noteId => uint256 amount) public noteIdToAmountDeposited;
@@ -70,7 +69,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     function withdraw(uint256 noteId, uint256 amount) public {
         address owner = dnft.ownerOf(noteId);
         require(msg.sender == owner, NotOwnerOfNote());
-        
+
         noteIdToAmountDeposited[noteId] -= amount;
         lpToken.safeTransfer(owner, amount);
 
