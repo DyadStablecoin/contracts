@@ -132,7 +132,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
         uint256 previousUnclaimedBonus = unclaimedBonus;
         unclaimedBonus = 0;
         if (amount < previousUnclaimedBonus) {
-            kerosene.safeTransferFrom(address(this), msg.sender, previousUnclaimedBonus - amount);
+            kerosene.safeTransfer(msg.sender, previousUnclaimedBonus - amount);
         } else if (amount > previousUnclaimedBonus) {
             kerosene.safeTransferFrom(msg.sender, address(this), amount - previousUnclaimedBonus);
         }
