@@ -13,6 +13,7 @@ contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
     using SafeTransferLib for ERC20;
 
     error SwapFailed();
+    error OnlyVaultManager();
 
     address public constant AUGUSTUS_6_2 = 0x6A000F20005980200259B80c5102003040001068;
     IVaultManager public immutable vaultManager;
@@ -55,10 +56,13 @@ contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
     }
 
     function afterWithdraw(uint256 id, address vault, uint256 amount, address to) external {
+        require(msg.sender == address(vaultManager), OnlyVaultManager());
+
         uint256 numberOfSlots;
         address toVault;
         uint256 toAmount;
         bytes memory swapData;
+        
         assembly {
             // toVault should be the first transient slot
             toVault := tload(0)
