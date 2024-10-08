@@ -186,63 +186,116 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     uint256 amount
   ) 
     external 
-      isValidDNft(id)
-      isValidDNft(to)
-      returns (address[] memory, uint[] memory)
-    {
-      uint256 cr = collatRatio(id);
-      if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
-      uint256 debt = dyad.mintedDyad(id);
-      dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
-      staking.updateBoost(id);
+    isValidDNft(id)
+    isValidDNft(to)
+    returns (address[] memory, uint[] memory)
+  {
+    uint256 cr = collatRatio(id);
+    if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
+    uint256 debt = dyad.mintedDyad(id);
+    dyad.burn(id, msg.sender, amount); // changes debt and cr
+    staking.updateBoost(id);
 
-      lastDeposit[to] = block.number; // `move` acts like a deposit
+    lastDeposit[to] = block.number; // move acts like a deposit
 
-      uint256 numberOfVaults = vaults[id].length();
-      address[] memory vaultAddresses = new address[](numberOfVaults);
-      uint[] memory vaultAmounts = new uint[](numberOfVaults);
+    uint256 numberOfVaults = vaults[id].length();
+    address[] memory vaultAddresses = new address[](numberOfVaults);
+    uint[] memory vaultAmounts = new uint[](numberOfVaults);
 
-      uint256 totalValue = getTotalValue(id);
-      if (totalValue == 0) return (vaultAddresses, vaultAmounts);
+    // Separate exogenous and kerosene values
+    (uint256 exoValue, uint256 keroValue) = getVaultsValues(id);
+    uint256 totalValue = exoValue + keroValue;
+    if (totalValue == 0) return (vaultAddresses, vaultAmounts);
 
-      for (uint256 i = 0; i < numberOfVaults; i++) {
-        Vault vault = Vault(vaults[id].at(i));
-        vaultAddresses[i] = address(vault);
-        if (vaultLicenser.isLicensed(address(vault))) {
-          uint256 depositAmount = vault.id2asset(id);
-          if (depositAmount == 0) continue;
-          uint256 value = vault.getUsdValue(id);
-          uint256 asset;
-          if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
-            uint256 cappedCr               = cr < 1e18 ? 1e18 : cr;
-            uint256 liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
-            uint256 liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
-            uint256 allAsset = depositAmount.mulWadUp(liquidationAssetShare);
-            asset = allAsset.mulWadDown(amount).divWadDown(debt);
-          } else {
-            uint256 share       = value.divWadDown(totalValue);
-            uint256 amountShare = share.mulWadUp(amount);
-            uint256 reward_rate = amount
-                                .divWadDown(debt)
-                                .mulWadDown(LIQUIDATION_REWARD);
-            uint256 valueToMove = amountShare + amountShare.mulWadUp(reward_rate);
-            uint256 cappedValue = valueToMove > value ? value : valueToMove;
-            asset = cappedValue 
-                      * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
-                      / vault.assetPrice() 
-                      / 1e18;
-          }
-          vaultAmounts[i] = asset;
+    uint256 amountLeft = amount;
+    uint256 vaultIndex = 0;
 
-          uint256 slashedXP;
-          bool isKeroseneVault = (address(vault) == KEROSENE_VAULT);
-          vault.move(id, to, asset);
+    // Process non-kerosene (exogenous) vaults first
+    if (exoValue > 0) {
+        uint256 amountFromExoVaults = amountLeft <= exoValue ? amountLeft : exoValue;
+        amountLeft -= amountFromExoVaults;
+
+        for (uint256 i = 0; i < numberOfVaults; i++) {
+            Vault vault = Vault(vaults[id].at(i));
+            if (vaultLicenser.isLicensed(address(vault)) && !vaultLicenser.isKerosene(address(vault))) {
+                vaultAddresses[vaultIndex] = address(vault);
+                uint256 depositAmount = vault.id2asset(id);
+                if (depositAmount == 0) continue;
+                uint256 value = vault.getUsdValue(id);
+
+                // Calculate the share of the amount to cover from this vault
+                uint256 share = value.divWadDown(exoValue);
+                uint256 amountShare = share.mulWadUp(amountFromExoVaults);
+
+                // Adjust calculations based on the original logic
+                uint256 asset = _calculateAssetToMove(id, vault, cr, debt, amount, amountShare, value);
+
+                vaultAmounts[vaultIndex] = asset;
+                vault.move(id, to, asset);
+                vaultIndex++;
+            }
         }
+    }
+
+    // Process kerosene vaults if there's still an amount left
+    if (amountLeft > 0 && keroValue > 0) {
+        uint256 amountFromKeroVaults = amountLeft <= keroValue ? amountLeft : keroValue;
+        amountLeft -= amountFromKeroVaults;
+
+        for (uint256 i = 0; i < numberOfVaults; i++) {
+            Vault vault = Vault(vaults[id].at(i));
+            if (vaultLicenser.isLicensed(address(vault)) && vaultLicenser.isKerosene(address(vault))) {
+                vaultAddresses[vaultIndex] = address(vault);
+                uint256 depositAmount = vault.id2asset(id);
+                if (depositAmount == 0) continue;
+                uint256 value = vault.getUsdValue(id);
+
+                // Calculate the share of the amount to cover from this vault
+                uint256 share = value.divWadDown(keroValue);
+                uint256 amountShare = share.mulWadUp(amountFromKeroVaults);
+
+                // Adjust calculations based on the original logic
+                uint256 asset = _calculateAssetToMove(id, vault, cr, debt, amount, amountShare, value);
+
+                vaultAmounts[vaultIndex] = asset;
+                vault.move(id, to, asset);
+                vaultIndex++;
+            }
+        }
+    }
+
+    emit Liquidate(id, msg.sender, to, amount);
+
+    return (vaultAddresses, vaultAmounts);
+  }
+
+  // Helper function to calculate the asset amount to move
+  function _calculateAssetToMove(
+      uint256 id,
+      Vault vault,
+      uint256 cr,
+      uint256 debt,
+      uint256 amount,
+      uint256 amountShare,
+      uint256 value
+  ) internal view returns (uint256 asset) {
+      if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
+          uint256 cappedCr               = cr < 1e18 ? 1e18 : cr;
+          uint256 liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
+          uint256 liquidationAssetShare  = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
+          uint256 allAsset = vault.id2asset(id).mulWadUp(liquidationAssetShare);
+          asset = allAsset.mulWadDown(amount).divWadDown(debt);
+      } else {
+          uint256 reward_rate = amount
+                              .divWadDown(debt)
+                              .mulWadDown(LIQUIDATION_REWARD);
+          uint256 valueToMove = amountShare + amountShare.mulWadUp(reward_rate);
+          uint256 cappedValue = valueToMove > value ? value : valueToMove;
+          asset = cappedValue 
+                  * (10**(vault.oracle().decimals() + vault.asset().decimals())) 
+                  / vault.assetPrice() 
+                  / 1e18;
       }
-
-      emit Liquidate(id, msg.sender, to, amount);
-
-      return (vaultAddresses, vaultAmounts);
   }
 
   /// @notice Returns the collateral ratio for the specified note.
