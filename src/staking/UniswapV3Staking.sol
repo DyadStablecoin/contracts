@@ -107,11 +107,13 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
 
         _claimRewards(noteId, stakeInfo, recipient);
 
-        positionManager.safeTransferFrom(address(this), msg.sender, stakeInfo.tokenId);
+        uint tokenId = stakeInfo.tokenId;
 
         delete stakes[noteId];
 
-        emit Unstaked(msg.sender, noteId, stakeInfo.tokenId);
+        positionManager.safeTransferFrom(address(this), msg.sender, tokenId);
+
+        emit Unstaked(msg.sender, noteId, tokenId);
     }
 
     function claimRewards(uint256 noteId, address recipient) external {
