@@ -189,7 +189,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         uint256 dyadMinted = lastUpdate.dyadMinted;
         uint256 totalXP = lastUpdate.totalXP;
 
-        uint256 accrualRateModifier = totalXP > 0 ? 1e18 / totalXP.log10() : 1e18;
+        uint256 accrualRateModifier = totalXP > 99 ? 1e18 / totalXP.log10() : 1e18;
 
         uint256 adjustedAccrualRate = accrualRateModifier * 1e7;
 
