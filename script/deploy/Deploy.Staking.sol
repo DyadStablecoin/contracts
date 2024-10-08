@@ -3,38 +3,34 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 
-import {Kerosine}   from "../../src/staking/Kerosine.sol";
-import {Staking}    from "../../src/staking/Staking.sol";
+import {Kerosine} from "../../src/staking/Kerosine.sol";
+import {Staking} from "../../src/staking/Staking.sol";
 import {Parameters} from "../../src/params/Parameters.sol";
 
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract DeployStaking is Script, Parameters {
-  function run() public {
+    function run() public {
+        uint256 ONE_MILLION = 1_000_000;
+        uint256 STAKING_REWARDS = ONE_MILLION * 10 ** 18;
 
-    uint ONE_MILLION     = 1_000_000;
-    uint STAKING_REWARDS = ONE_MILLION * 10**18;
+        vm.startBroadcast(); // ----------------------
 
-    vm.startBroadcast();  // ----------------------
+        Kerosine kerosine = new Kerosine();
+        Staking staking = new Staking(ERC20(MAINNET_WETH_DYAD_UNI), kerosine);
 
-    Kerosine kerosine = new Kerosine();
-    Staking  staking  = new Staking(ERC20(MAINNET_WETH_DYAD_UNI), kerosine);
+        kerosine.transfer(address(staking), STAKING_REWARDS);
 
-    kerosine.transfer(
-      address(staking),
-      STAKING_REWARDS
-    );
+        staking.setRewardsDuration(5 days);
+        staking.notifyRewardAmount(STAKING_REWARDS);
 
-    staking.setRewardsDuration(5 days);
-    staking.notifyRewardAmount(STAKING_REWARDS);
+        kerosine.transfer(
+            MAINNET_OWNER, // multi-sig
+            kerosine.totalSupply() - STAKING_REWARDS // the rest
+        );
 
-    kerosine.transfer(
-      MAINNET_OWNER,                           // multi-sig
-      kerosine.totalSupply() - STAKING_REWARDS // the rest
-    );
+        staking.transferOwnership(MAINNET_OWNER);
 
-    staking.transferOwnership(MAINNET_OWNER);
-
-    vm.stopBroadcast();  // ----------------------------
-  }
+        vm.stopBroadcast(); // ----------------------------
+    }
 }
