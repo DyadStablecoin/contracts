@@ -47,11 +47,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     /// @notice Extensions authorized by a user for use on their notes
     mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
-    modifier isDNftOwner(uint256 id) {
-        if (dNft.ownerOf(id) != msg.sender) revert NotOwner();
-        _;
-    }
-
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
         _;
@@ -145,6 +140,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
         uint256 debt = dyad.mintedDyad(id);
         dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
+        dyadXP.updateXP(id);
 
         lastDeposit[to] = block.number; // `move` acts like a deposit
 
@@ -180,10 +176,12 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
                 }
                 vaultAmounts[i] = asset;
 
-                vault.move(id, to, asset);
                 if (address(vault) == KEROSENE_VAULT) {
-                    dyadXP.updateXP(id);
+                    dyadXP.beforeKeroseneWithdrawn(id, asset); 
+                    vault.move(id, to, asset);
                     dyadXP.updateXP(to);
+                } else {
+                    vault.move(id, to, asset);
                 }
             }
         }

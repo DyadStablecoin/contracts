@@ -16,6 +16,9 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     DNft public dnft;
     uint256 public rewardsRate; 
     address public rewardsTokenHolder;
+    address public token0;
+    address public token1;
+    uint24 public poolFee;
 
     struct StakeInfo {
         uint256 liquidity;
@@ -34,13 +37,15 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
     constructor() { _disableInitializers(); }
 
     function initialize(
-        address _owner, 
         IERC20 _rewardsToken,
         INonfungiblePositionManager _positionManager,
         IDyadXP _dyadXP,
         DNft _dnft, 
         uint256 _rewardsRate,
-        address _rewardsTokenHolder
+        address _rewardsTokenHolder, 
+        address _token0,
+        address _token1,
+        uint24 _poolFee
     ) public initializer {
         __UUPSUpgradeable_init();
         __Ownable_init(msg.sender);
@@ -51,6 +56,10 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         dnft = _dnft;
         rewardsRate = _rewardsRate;
         rewardsTokenHolder = _rewardsTokenHolder;
+        
+        token0 = _token0;
+        token1 = _token1;
+        poolFee = _poolFee;
     }
 
     function stake(uint256 noteId, uint256 tokenId) external {
@@ -59,8 +68,27 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         StakeInfo storage stakeInfo = stakes[noteId];
         require(!stakeInfo.isStaked, "Note already used for staking"); 
 
-        (,,,,,,, uint128 liquidity,,,,) = positionManager.positions(tokenId);
+        (
+          , 
+          , 
+          address positionToken0, 
+          address positionToken1, 
+          uint24 positionFee, 
+          , 
+          , 
+          uint128 liquidity, 
+          , 
+          ,
+          , 
+        ) = positionManager.positions(tokenId);
+
         require(liquidity > 0, "No liquidity");
+        require(
+          (positionToken0 == token0 && positionToken1 == token1) ||
+          (positionToken0 == token1 && positionToken1 == token0),
+          "Invalid token pair"
+        );
+        require(positionFee == poolFee, "Invalid fee");
 
         positionManager.safeTransferFrom(msg.sender, address(this), tokenId);
 
@@ -79,11 +107,13 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
 
         _claimRewards(noteId, stakeInfo, recipient);
 
-        positionManager.safeTransferFrom(address(this), msg.sender, stakeInfo.tokenId);
+        uint tokenId = stakeInfo.tokenId;
 
         delete stakes[noteId];
 
-        emit Unstaked(msg.sender, noteId, stakeInfo.tokenId);
+        positionManager.safeTransferFrom(address(this), msg.sender, tokenId);
+
+        emit Unstaked(msg.sender, noteId, tokenId);
     }
 
     function claimRewards(uint256 noteId, address recipient) external {
@@ -96,9 +126,9 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         require(dnft.ownerOf(noteId) == msg.sender, "You are not the Note owner");
         require(stakeInfo.isStaked, "Note not staked");
         uint256 rewards = _calculateRewards(noteId, stakeInfo);
-        stakeInfo.lastRewardTime = block.timestamp;
 
         if (rewards > 0) {
+            stakeInfo.lastRewardTime = block.timestamp;
             rewardsToken.transferFrom(rewardsTokenHolder, recipient, rewards);
             emit RewardClaimed(recipient, rewards);
         }
@@ -109,7 +139,7 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
 
         uint256 xp = dyadXP.balanceOfNote(noteId); 
 
-        return timeDiff * rewardsRate * stakeInfo.liquidity * xp;
+        return timeDiff * rewardsRate * stakeInfo.liquidity / 1e18 * xp / 1e18;
     }
 
     function currentRewards(uint256 noteId) external view returns (uint256) {
@@ -125,5 +155,15 @@ contract UniswapV3Staking is UUPSUpgradeable, OwnableUpgradeable {
         rewardsTokenHolder = _rewardsTokenHolder; 
     }
 
+    function setPoolParameters(address _token0, address _token1, uint24 _poolFee) external onlyOwner {
+      token0 = _token0;
+      token1 = _token1;
+      poolFee = _poolFee;
+    }
+
     function _authorizeUpgrade(address newImplementation) internal override onlyOwner {}
+
+    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+        return this.onERC721Received.selector;
+    }
 }

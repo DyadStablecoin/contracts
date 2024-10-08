@@ -67,10 +67,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _disableInitializers();
     }
 
-    function initialize(address owner) public reinitializer(2) {
-        __UUPSUpgradeable_init();
-        __Ownable_init(msg.sender);
-
+    function initialize() public reinitializer(2) {
         uint256 dnftSupply = DNFT.totalSupply();
 
         for (uint256 i = 0; i < dnftSupply; ++i) {
@@ -93,7 +90,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     function totalSupply() public view returns (uint256) {
         uint256 totalXP;
         for (uint256 i = 0; i < DNFT.totalSupply(); i++) {
-            totalXP += _computeXP(noteData[i]);
+          uint256 newXP = _computeNewXP(noteData[i]);
+          totalXP += noteData[i].lastXP + newXP;
         }
         return totalXP;
     }
@@ -113,7 +111,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     function balanceOfNote(uint256 noteId) public view returns (uint256) {
         NoteXPData memory lastUpdate = noteData[noteId];
-        return _computeXP(lastUpdate);
+        return lastUpdate.lastXP + _computeNewXP(lastUpdate);
     }
 
     /// @notice Moves `amount` tokens from the caller's account to `to`.
@@ -142,7 +140,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     function beforeKeroseneWithdrawn(uint256 noteId, uint256 amountWithdrawn) external onlyVaultManager {
         NoteXPData memory lastUpdate = noteData[noteId];
 
-        uint256 xp = _computeXP(lastUpdate);
+        uint256 newXP = _computeNewXP(lastUpdate);
+        uint256 xp = lastUpdate.lastXP + newXP;
 
         uint256 slashedXP = xp.mulDivUp(amountWithdrawn, lastUpdate.keroseneDeposited);
 
@@ -150,32 +149,32 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             slashedXP = xp;
         }
 
-        uint120 newXP = uint120(xp - slashedXP);
+        uint120 lastXP = uint120(xp - slashedXP);
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(lastUpdate.keroseneDeposited - amountWithdrawn),
-            lastXP: newXP,
-            totalXP: xp,
+            lastXP: lastXP,
+            totalXP: lastUpdate.totalXP + newXP,
             dyadMinted: DYAD.mintedDyad(noteId)
         });
 
-        if (newXP > lastUpdate.lastXP) {
-          emit Transfer(address(0), DNFT.ownerOf(noteId), newXP - lastUpdate.lastXP);
+        if (lastXP > lastUpdate.lastXP) {
+          emit Transfer(address(0), DNFT.ownerOf(noteId), lastXP - lastUpdate.lastXP);
         } else {
-          emit Transfer(DNFT.ownerOf(noteId), address(0), lastUpdate.lastXP - newXP);
+          emit Transfer(DNFT.ownerOf(noteId), address(0), lastUpdate.lastXP - lastXP);
         }
     }
 
     function updateXP(uint256 noteId) external onlyVaultManager {
         NoteXPData memory lastUpdate = noteData[noteId];
-        uint256 newXP = _computeXP(lastUpdate);
+        uint256 newXP = _computeNewXP(lastUpdate);
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
             keroseneDeposited: uint96(KEROSENE_VAULT.id2asset(noteId)),
-            lastXP: uint120(newXP),
-            totalXP: lastUpdate.totalXP,
+            lastXP: uint120(lastUpdate.lastXP + newXP),
+            totalXP: lastUpdate.totalXP + newXP,
             dyadMinted: DYAD.mintedDyad(noteId)
         });
 
@@ -184,15 +183,15 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     function _authorizeUpgrade(address) internal view override onlyOwner {}
 
-    function _computeXP(NoteXPData memory lastUpdate) internal view returns (uint256) {
+    function _computeNewXP(NoteXPData memory lastUpdate) internal view returns (uint256) {
         uint256 elapsed = block.timestamp - lastUpdate.lastAction;
         uint256 deposited = lastUpdate.keroseneDeposited;
         uint256 dyadMinted = lastUpdate.dyadMinted;
         uint256 totalXP = lastUpdate.totalXP;
 
-        uint256 accrualRateModifier = totalXP > 0 ? 1e18 / totalXP.log10() : 1e18;
+        uint256 accrualRateModifier = totalXP > 99 ? 1e18 / totalXP.log10() : 1e18;
 
-        uint256 adjustedAccrualRate = accrualRateModifier * 1e7;
+        uint256 adjustedAccrualRate = accrualRateModifier * 1e9;
 
         // bonus = deposited + deposited * (dyadMinted / (dyadMinted + deposited))
         uint256 bonus = deposited;
@@ -201,6 +200,6 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
             bonus += deposited.mulWadDown(dyadMinted.divWadDown(dyadMinted + deposited));
         }
 
-        return uint256(lastUpdate.lastXP + (elapsed * adjustedAccrualRate * bonus) / 1e18);
+        return uint256(elapsed * adjustedAccrualRate * bonus) / 1e18;
     }
 }
