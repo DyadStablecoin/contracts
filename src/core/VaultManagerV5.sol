@@ -76,7 +76,9 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         _authorizeCall(id);
         if (vaults[id].remove(vault)) {
             if (Vault(vault).id2asset(id) > 0) {
-                _checkExoValueAndCollatRatio(id);
+                if (vaultLicenser.isLicensed(vault)) {
+                    _checkExoValueAndCollatRatio(id);
+                }
             }
             emit Removed(id, vault);
         }
