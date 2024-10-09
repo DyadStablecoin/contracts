@@ -6,12 +6,11 @@ import "forge-std/Script.sol";
 import {VaultManagerV5} from "../../src/core/VaultManagerV5.sol";
 
 contract DeployVaultManagerV3 is Script {
-  function run() public {
-    vm.startBroadcast();  // ----------------------
+    function run() public {
+        vm.startBroadcast(); // ----------------------
 
-    VaultManagerV5 vm3 = new VaultManagerV5();
+        VaultManagerV5 vm3 = new VaultManagerV5();
 
-    vm.stopBroadcast();  // ----------------------------
-  }
+        vm.stopBroadcast(); // ----------------------------
+    }
 }
-
