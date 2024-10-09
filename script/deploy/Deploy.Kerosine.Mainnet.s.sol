@@ -14,9 +14,9 @@
 //     vm.startBroadcast();  // ----------------------
 
 //     new KerosineDeployBase().deploy(
-//       MAINNET_OWNER, 
+//       MAINNET_OWNER,
 //       ERC20(MAINNET_WETH_DYAD_UNI),
-//       VaultManager(MAINNET_VAULT_MANAGER), 
+//       VaultManager(MAINNET_VAULT_MANAGER),
 //       Dyad(MAINNET_DYAD)
 //     );
 

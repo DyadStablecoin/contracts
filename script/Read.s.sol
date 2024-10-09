@@ -7,5 +7,5 @@ import {IDNft} from "../src/interfaces/IDNft.sol";
 import {Dyad} from "../src/core/Dyad.sol";
 
 contract Read is Script {
-  function run() public {}
+    function run() public {}
 }

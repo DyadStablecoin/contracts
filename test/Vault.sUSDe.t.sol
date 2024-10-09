@@ -43,10 +43,7 @@ contract VaultStakedUSDeTest is Test, Parameters {
         assertEq(newCap, cap);
     }
 
-    function testFuzz_depositOverCapReverts(
-        uint256 cap,
-        uint256 depositAmount
-    ) public {
+    function testFuzz_depositOverCapReverts(uint256 cap, uint256 depositAmount) public {
         vm.assume(depositAmount > cap);
         vault.setDepositCap(cap);
         vm.prank(MAINNET_V2_VAULT_MANAGER);
