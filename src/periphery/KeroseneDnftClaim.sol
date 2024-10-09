@@ -23,24 +23,17 @@ contract KeroseneDnftClaim is Owned, IERC721TokenReceiver {
 
     mapping(address => bool) public purchased;
 
-    constructor(
-        address dnft,
-        address kerosene,
-        uint256 price_,
-        bytes32 root_
-    ) Owned(tx.origin) {
+    constructor(address dnft, address kerosene, uint256 price_, bytes32 root_) Owned(tx.origin) {
         DNFT = IERC721Enumerable(dnft);
         KEROSENE = ERC20(kerosene);
         price = price_;
         merkleRoot = root_;
     }
 
-    function onERC721Received(
-        address _operator,
-        address _from,
-        uint256 _tokenId,
-        bytes calldata _data
-    ) external returns (bytes4) {
+    function onERC721Received(address _operator, address _from, uint256 _tokenId, bytes calldata _data)
+        external
+        returns (bytes4)
+    {
         if (msg.sender != address(DNFT)) {
             revert NotNote();
         }

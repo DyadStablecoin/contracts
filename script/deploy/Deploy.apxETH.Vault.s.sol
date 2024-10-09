@@ -14,18 +14,18 @@ import {DNft} from "../../src/core/DNft.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 contract DeployVault is Script, Parameters {
-  function run() public {
-    vm.startBroadcast();  // ----------------------
+    function run() public {
+        vm.startBroadcast(); // ----------------------
 
-    new VaultApxETH(
-      MAINNET_FEE_RECIPIENT,
-      VaultManager (MAINNET_V2_VAULT_MANAGER), 
-      ERC20        (MAINNET_APXETH), 
-      IAggregatorV3(MAINNET_APXETH_ORACLE),
-      IVault(MAINNET_V2_WETH_VAULT),
-      DNft(MAINNET_DNFT)
-    );
+        new VaultApxETH(
+            MAINNET_FEE_RECIPIENT,
+            VaultManager(MAINNET_V2_VAULT_MANAGER),
+            ERC20(MAINNET_APXETH),
+            IAggregatorV3(MAINNET_APXETH_ORACLE),
+            IVault(MAINNET_V2_WETH_VAULT),
+            DNft(MAINNET_DNFT)
+        );
 
-    vm.stopBroadcast();  // ----------------------------
-  }
+        vm.stopBroadcast(); // ----------------------------
+    }
 }

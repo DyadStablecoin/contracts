@@ -19,16 +19,16 @@
 //   uint STAKING_REWARDS = ONE_MILLION * 10**18;
 
 //   function deploy(
-//     address      _owner, 
+//     address      _owner,
 //     ERC20        _stakingToken1,
 //     VaultManager _vaultManager,
 //     Dyad         _dyad
 //   ) public returns (
-//     Kerosine, 
-//     KerosineManager, 
-//     Staking, 
-//     UnboundedKerosineVault, 
-//     BoundedKerosineVault   
+//     Kerosine,
+//     KerosineManager,
+//     Staking,
+//     UnboundedKerosineVault,
+//     BoundedKerosineVault
 //   ) {
 
 //     Kerosine        kerosine        = new Kerosine();
@@ -59,7 +59,7 @@
 //     // IMPORTANT: Vault needs to be licensed!
 //     UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
 //       _vaultManager,
-//       kerosine, 
+//       kerosine,
 //       _dyad,
 //       kerosineManager
 //     );
@@ -67,7 +67,7 @@
 //     // IMPORTANT: Vault needs to be licensed!
 //     BoundedKerosineVault boundedKerosineVault     = new BoundedKerosineVault(
 //       _vaultManager,
-//       kerosine, 
+//       kerosine,
 //       kerosineManager
 //     );
 

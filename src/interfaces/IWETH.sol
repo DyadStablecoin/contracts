@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 interface IWETH {
-  function deposit() external payable;
-  function withdraw(uint) external;
-  function approve(address, uint) external returns (bool);
+    function deposit() external payable;
+    function withdraw(uint256) external;
+    function approve(address, uint256) external returns (bool);
 }
