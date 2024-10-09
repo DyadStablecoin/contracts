@@ -14,9 +14,9 @@
 //     vm.startBroadcast();  // ----------------------
 
 //     new KerosineDeployBase().deploy(
-//       GOERLI_OWNER, 
+//       GOERLI_OWNER,
 //       ERC20(GOERLI_WETH_DYAD_UNI),
-//       VaultManager(GOERLI_VAULT_MANAGER), 
+//       VaultManager(GOERLI_VAULT_MANAGER),
 //       Dyad(GOERLI_DYAD)
 //     );
 

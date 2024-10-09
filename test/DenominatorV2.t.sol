@@ -6,7 +6,6 @@ import {Kerosine} from "../src/staking/Kerosine.sol";
 import {KerosineDenominatorV2} from "../src/staking/KerosineDenominatorV2.sol";
 
 contract KerosineDenominatorV2Test is Test {
-
     Kerosine kero;
     KerosineDenominatorV2 denominator;
 
@@ -28,7 +27,6 @@ contract KerosineDenominatorV2Test is Test {
     }
 
     function test_denominator_setExcluded() external {
-
         uint256 totalSupply = kero.totalSupply();
         uint256 denominatorValue = denominator.denominator();
 
@@ -60,7 +58,7 @@ contract KerosineDenominatorV2Test is Test {
         denominator.setAddressExcluded(TEST_ADDR_1, true);
 
         excludedAddresses = denominator.excludedAddresses();
-        assertEq(excludedAddresses.length,3);
+        assertEq(excludedAddresses.length, 3);
         assertEq(excludedAddresses[0], 0xDeD796De6a14E255487191963dEe436c45995813);
         assertEq(excludedAddresses[1], 0x3962f6585946823440d274aD7C719B02b49DE51E);
         assertEq(excludedAddresses[2], TEST_ADDR_1);
@@ -68,7 +66,7 @@ contract KerosineDenominatorV2Test is Test {
 
     function test_denominator_setIncluded() external {
         address[] memory excludedAddresses = denominator.excludedAddresses();
-        for (uint i = 0; i < excludedAddresses.length; i++) {
+        for (uint256 i = 0; i < excludedAddresses.length; i++) {
             vm.prank(denominator.owner());
             denominator.setAddressExcluded(excludedAddresses[i], false);
         }

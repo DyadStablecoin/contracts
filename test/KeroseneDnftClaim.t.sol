@@ -45,12 +45,12 @@
 //     function test_buyNote_success() external {
 //         bytes32[] memory proof = m.getProof(tree, 1);
 //         vm.startPrank(USER_2);
-        
+
 //         kero.approve(address(claim), 250_000 ether);
 //         vm.expectEmit(true, true, true, false);
 //         emit IERC721.Transfer(address(claim), USER_2, 2);
 //         claim.buyNote(proof);
-        
+
 //         vm.stopPrank();
 
 //         assertEq(dnft.balanceOf(USER_2), 1);
@@ -59,22 +59,22 @@
 //     function test_buyTwice_reverts() external {
 //         bytes32[] memory proof = m.getProof(tree, 1);
 //         vm.startPrank(USER_2);
-        
+
 //         kero.approve(address(claim), 250_000 ether);
 //         claim.buyNote(proof);
 //         vm.expectRevert(KeroseneDnftClaim.AlreadyPurchased.selector);
 //         claim.buyNote(proof);
-        
+
 //         vm.stopPrank();
 
 //         assertEq(dnft.balanceOf(USER_2), 1);
-        
+
 //     }
 
 //     function test_notEnoughKerosense_reverts() external {
 //         bytes32[] memory proof = m.getProof(tree, 0);
 //         vm.startPrank(USER_1);
-        
+
 //         kero.approve(address(claim), 250_000 ether);
 //         vm.expectRevert();
 //         claim.buyNote(proof);

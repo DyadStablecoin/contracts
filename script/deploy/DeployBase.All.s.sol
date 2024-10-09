@@ -16,7 +16,6 @@
 //import {Kerosine}               from "../../src/staking/Kerosine.sol";
 //import {Staking}                from "../../src/staking/Staking.sol";
 
-
 //import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 
 //// only used for stack too deep issues
@@ -32,14 +31,14 @@
 //contract DeployBase is Script {
 
 //  function deploy(
-//    address _owner, 
+//    address _owner,
 //    address _asset,
-//    address _oracle, 
+//    address _oracle,
 //    uint    _fee,
 //    address _feeRecipient
 //  )
-//    public 
-//    payable 
+//    public
+//    payable
 //    returns (
 //      Contracts memory
 //    ) {
@@ -75,7 +74,7 @@
 //      payments.setFee(_fee);
 //      payments.setFeeRecipient(_feeRecipient);
 
-//      // 
+//      //
 //      vaultManagerLicenser.add(address(vaultManager));
 //      vaultLicenser       .add(address(vault));
 
@@ -85,8 +84,8 @@
 //      payments            .transferOwnership(_owner);
 
 //      // new VaultWstEth(
-//      //   VaultManager (address(vaultManager)), 
-//      //   ERC20        (SEPOLIA_WSTETH), 
+//      //   VaultManager (address(vaultManager)),
+//      //   ERC20        (SEPOLIA_WSTETH),
 //      //   IAggregatorV3(SEPOLIA_CHAINLINK_STETH)
 //      // );
 
@@ -118,7 +117,7 @@
 //      // IMPORTANT: Vault needs to be licensed!
 //      UnboundedKerosineVault unboundedKerosineVault = new UnboundedKerosineVault(
 //        vaultManager,
-//        kerosine, 
+//        kerosine,
 //        dyad,
 //        kerosineManager
 //      );
@@ -126,7 +125,7 @@
 //      // IMPORTANT: Vault needs to be licensed!
 //      BoundedKerosineVault boundedKerosineVault     = new BoundedKerosineVault(
 //        vaultManager,
-//        kerosine, 
+//        kerosine,
 //        dyad,
 //        kerosineManager
 //      );
@@ -140,7 +139,7 @@
 //        vaultLicenser,
 //        dyad,
 //        vaultManager,
-//        vault, 
+//        vault,
 //        payments
 //      );
 //  }

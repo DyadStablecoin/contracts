@@ -8,55 +8,41 @@ import {IDNft} from "../interfaces/IDNft.sol";
 import {DNftParameters} from "../params/DNftParameters.sol";
 
 contract DNft is ERC721Enumerable, Owned, DNftParameters, IDNft {
-  using SafeTransferLib for address;
+    using SafeTransferLib for address;
 
-  uint public publicMints;  // Number of public mints
-  uint public insiderMints; // Number of insider mints
+    uint256 public publicMints; // Number of public mints
+    uint256 public insiderMints; // Number of insider mints
 
-  constructor()
-    ERC721("Dyad NFT", "dNFT") 
-    Owned(msg.sender) 
-    {}
+    constructor() ERC721("Dyad NFT", "dNFT") Owned(msg.sender) {}
 
-  /// @inheritdoc IDNft
-  function mintNft(address to)
-    external 
-    payable
-    returns (uint) {
-      uint price = START_PRICE + (PRICE_INCREASE * publicMints++);
-      if (msg.value < price) revert InsufficientFunds();
-      uint id = _mintNft(to);
-      if (msg.value > price) to.safeTransferETH(msg.value - price);
-      emit MintedNft(id, to);
-      return id;
-  }
+    /// @inheritdoc IDNft
+    function mintNft(address to) external payable returns (uint256) {
+        uint256 price = START_PRICE + (PRICE_INCREASE * publicMints++);
+        if (msg.value < price) revert InsufficientFunds();
+        uint256 id = _mintNft(to);
+        if (msg.value > price) to.safeTransferETH(msg.value - price);
+        emit MintedNft(id, to);
+        return id;
+    }
 
-  /// @inheritdoc IDNft
-  function mintInsiderNft(address to)
-    external 
-      onlyOwner 
-    returns (uint) {
-      if (++insiderMints > INSIDER_MINTS) revert InsiderMintsExceeded();
-      uint id = _mintNft(to); 
-      emit MintedInsiderNft(id, to);
-      return id;
-  }
+    /// @inheritdoc IDNft
+    function mintInsiderNft(address to) external onlyOwner returns (uint256) {
+        if (++insiderMints > INSIDER_MINTS) revert InsiderMintsExceeded();
+        uint256 id = _mintNft(to);
+        emit MintedInsiderNft(id, to);
+        return id;
+    }
 
-  function _mintNft(address to)
-    private 
-    returns (uint) {
-      uint id = totalSupply();
-      _safeMint(to, id); 
-      return id;
-  }
+    function _mintNft(address to) private returns (uint256) {
+        uint256 id = totalSupply();
+        _safeMint(to, id);
+        return id;
+    }
 
-  /// @inheritdoc IDNft
-  function drain(address to)
-    external
-      onlyOwner
-  {
-    uint balance = address(this).balance;
-    to.safeTransferETH(balance);
-    emit Drained(to, balance);
-  }
+    /// @inheritdoc IDNft
+    function drain(address to) external onlyOwner {
+        uint256 balance = address(this).balance;
+        to.safeTransferETH(balance);
+        emit Drained(to, balance);
+    }
 }
