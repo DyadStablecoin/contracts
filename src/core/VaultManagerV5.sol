@@ -191,7 +191,9 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     returns (address[] memory, uint[] memory)
   {
     uint256 cr = collatRatio(id);
-    if (cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
+    (uint256 exoValue, uint256 keroValue) = getVaultsValues(id);
+    uint256 mintedDyad = dyad.mintedDyad(id);
+    if (exoValue > mintedDyad && cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
     uint256 debt = dyad.mintedDyad(id);
     dyad.burn(id, msg.sender, amount); // changes debt and cr
     staking.updateBoost(id);
@@ -203,7 +205,6 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     uint[] memory vaultAmounts = new uint[](numberOfVaults);
 
     // Separate exogenous and kerosene values
-    (uint256 exoValue, uint256 keroValue) = getVaultsValues(id);
     uint256 totalValue = exoValue + keroValue;
     if (totalValue == 0) return (vaultAddresses, vaultAmounts);
 
