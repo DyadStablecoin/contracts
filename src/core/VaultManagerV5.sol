@@ -193,7 +193,7 @@ contract VaultManagerV5 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     uint256 cr = collatRatio(id);
     (uint256 exoValue, uint256 keroValue) = getVaultsValues(id);
     uint256 mintedDyad = dyad.mintedDyad(id);
-    if (exoValue > mintedDyad && cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
+    if (exoValue >= mintedDyad && cr >= MIN_COLLAT_RATIO) revert CrTooHigh();
     uint256 debt = dyad.mintedDyad(id);
     dyad.burn(id, msg.sender, amount); // changes debt and cr
     staking.updateBoost(id);
