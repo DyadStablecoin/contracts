@@ -12,7 +12,7 @@ import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 
 /**
- * Notes: Fork test 
+ * Notes: Fork test
  *   - block 19621640
  *   - $3,545.56 / ETH
  */
