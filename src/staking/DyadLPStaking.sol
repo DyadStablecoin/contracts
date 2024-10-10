@@ -15,11 +15,12 @@ contract DyadLPStaking is OwnableRoles, IExtension {
 
     error NotOwnerOfNote();
     error InvalidProof();
+    error InvalidBlockNumber();
 
     event Claimed(uint256 indexed noteId, uint256 indexed amount, uint256 unclaimedBonus);
     event Deposited(uint256 indexed noteId, uint256 indexed amount);
     event Withdrawn(uint256 indexed noteId, uint256 indexed amount);
-    event RootUpdated(bytes32 newRoot);
+    event RootUpdated(bytes32 newRoot, uint256 blockNumber);
     event RewardsDeposited(uint256 amount);
 
     uint256 public constant MANAGER_ROLE = _ROLE_0;
@@ -32,6 +33,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
 
     bytes32 public merkleRoot;
     uint256 public unclaimedBonus;
+    uint256 public lastUpdateBlock;
 
     mapping(uint256 noteId => uint256 amount) public noteIdToAmountDeposited;
     mapping(uint256 noteId => uint256 amount) public noteIdToTotalClaimed;
@@ -78,10 +80,14 @@ contract DyadLPStaking is OwnableRoles, IExtension {
         emit Withdrawn(noteId, amount);
     }
 
-    function setRoot(bytes32 _merkleRoot) public onlyRoles(MANAGER_ROLE) {
+    function setRoot(bytes32 _merkleRoot, uint256 blockNumber) public onlyRoles(MANAGER_ROLE) {
+        if (blockNumber > lastUpdateBlock) {
+            revert InvalidBlockNumber();
+        }
         merkleRoot = _merkleRoot;
+        lastUpdateBlock = blockNumber;
 
-        emit RootUpdated(_merkleRoot);
+        emit RootUpdated(_merkleRoot, blockNumber);
     }
 
     function claim(uint256 noteId, uint256 amount, bytes32[] calldata proof) public returns (uint256) {
