@@ -50,12 +50,12 @@ contract DyadLPStaking is OwnableRoles, IExtension {
         _initializeOwner(msg.sender);
     }
 
-    function name() public pure override returns (string memory) {
-        return "Dyad LP Staking";
+    function name() public view override returns (string memory) {
+        return string.concat("Dyad ", IERC20(lpToken).symbol(), " LP Staking");
     }
 
     function description() public pure override returns (string memory) {
-        return "Stake LP tokens to earn Kerosene";
+        return string.concat("Stake ", IERC20(lpToken).symbol(), " tokens to earn Kerosene");
     }
 
     function getHookFlags() public pure override returns (uint256) {
