@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
+import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {IERC721} from "forge-std/interfaces/IERC721.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {OwnableRoles} from "solady/auth/OwnableRoles.sol";
 import {MerkleProofLib} from "solady/utils/MerkleProofLib.sol";
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
-import {DNft} from "../core/DNft.sol";
 import {IExtension} from "../interfaces/IExtension.sol";
 
 contract DyadLPStaking is OwnableRoles, IExtension {
@@ -16,7 +17,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     error NotOwnerOfNote();
     error InvalidProof();
     error InvalidBlockNumber();
-
+    error NotAllowed();
     event Claimed(uint256 indexed noteId, uint256 indexed amount, uint256 unclaimedBonus);
     event Deposited(uint256 indexed noteId, uint256 indexed amount);
     event Withdrawn(uint256 indexed noteId, uint256 indexed amount);
@@ -27,11 +28,12 @@ contract DyadLPStaking is OwnableRoles, IExtension {
 
     address public immutable lpToken;
     address public immutable kerosene;
-    DNft public immutable dnft;
+    IERC721 public immutable dnft;
     address public immutable keroseneVault;
     IVaultManager public immutable vaultManager;
 
     bytes32 public merkleRoot;
+    uint256 public totalLP;
     uint256 public unclaimedBonus;
     uint256 public lastUpdateBlock;
 
@@ -41,7 +43,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     constructor(address _lpToken, address _kerosene, address _dnft, address _keroseneVault, address _vaultManager) {
         lpToken = _lpToken;
         kerosene = _kerosene;
-        dnft = DNft(_dnft);
+        dnft = IERC721(_dnft);
         keroseneVault = _keroseneVault;
         vaultManager = IVaultManager(_vaultManager);
         _initializeOwner(msg.sender);
@@ -59,11 +61,8 @@ contract DyadLPStaking is OwnableRoles, IExtension {
         return 0;
     }
 
-    function totalLP() public view returns (uint256) {
-        return lpToken.balanceOf(address(this));
-    }
-
     function deposit(uint256 noteId, uint256 amount) public {
+        totalLP += amount;
         noteIdToAmountDeposited[noteId] += amount;
         lpToken.safeTransferFrom(msg.sender, address(this), amount);
 
@@ -73,7 +72,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     function withdraw(uint256 noteId, uint256 amount) public {
         address owner = dnft.ownerOf(noteId);
         require(msg.sender == owner, NotOwnerOfNote());
-
+        totalLP -= amount;
         noteIdToAmountDeposited[noteId] -= amount;
         lpToken.safeTransfer(owner, amount);
 
@@ -148,5 +147,21 @@ contract DyadLPStaking is OwnableRoles, IExtension {
         }
 
         emit RewardsDeposited(amount);
+    }
+
+    function recoverERC20(address token) public onlyOwner {
+        uint256 amount = IERC20(token).balanceOf(address(this));
+        if (token == address(lpToken)) {
+            // lpToken is staked by users so the only amount that should be recoverable is tokens
+            // that are sent accidentally without using the deposit function
+            amount -= totalLP;
+        } else if (token == address(kerosene)) {
+            revert NotAllowed();
+        }
+        token.safeTransfer(msg.sender, amount);
+    }
+
+    function recoverERC721(address token, uint256 tokenId) public onlyOwner {
+        IERC721(token).transferFrom(address(this), msg.sender, tokenId);
     }
 }
