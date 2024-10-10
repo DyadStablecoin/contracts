@@ -54,7 +54,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
         return string.concat("Dyad ", IERC20(lpToken).symbol(), " LP Staking");
     }
 
-    function description() public pure override returns (string memory) {
+    function description() public view override returns (string memory) {
         return string.concat("Stake ", IERC20(lpToken).symbol(), " tokens to earn Kerosene");
     }
 
