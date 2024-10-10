@@ -18,6 +18,7 @@ contract DyadLPStaking is OwnableRoles, IExtension {
     error InvalidProof();
     error InvalidBlockNumber();
     error NotAllowed();
+
     event Claimed(uint256 indexed noteId, uint256 indexed amount, uint256 unclaimedBonus);
     event Deposited(uint256 indexed noteId, uint256 indexed amount);
     event Withdrawn(uint256 indexed noteId, uint256 indexed amount);
