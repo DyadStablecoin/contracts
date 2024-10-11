@@ -50,8 +50,11 @@ contract LPStakingFactory is OwnableRoles, IExtension {
     /// @notice last block number when the root was updated
     uint256 public lastUpdateBlock;
 
+    /// @notice total amount of rewards claimed
+    uint128 public totalClaimed;
+
     /// @notice forfited bonus in kerosene
-    uint248 public unclaimedBonus;
+    uint120 public unclaimedBonus;
 
     /// @notice indicates whether claiming is paused
     bool public paused;
@@ -137,7 +140,8 @@ contract LPStakingFactory is OwnableRoles, IExtension {
         uint256 amountToSend = _syncClaimableAmount(noteId, amount);
         uint256 claimSubBonus = amountToSend.mulDiv(80, 100);
         uint256 unclaimed = amountToSend - claimSubBonus;
-        unclaimedBonus += unclaimed;
+        unclaimedBonus += uint120(unclaimed);
+        totalClaimed += uint128(claimSubBonus);
 
         kerosene.safeTransfer(noteOwner, claimSubBonus);
 
@@ -148,12 +152,14 @@ contract LPStakingFactory is OwnableRoles, IExtension {
 
     function claimToVault(uint256 noteId, uint256 amount, bytes32[] calldata proof)
         public
-        whenNotPausedreturns(uint256)
+        whenNotPaused
+        returns (uint256)
     {
         require(msg.sender == dnft.ownerOf(noteId), NotOwnerOfNote());
 
         _verifyProof(noteId, amount, proof);
         uint256 amountToSend = _syncClaimableAmount(noteId, amount);
+        totalClaimed += uint128(amountToSend);
 
         kerosene.safeApprove(address(vaultManager), amountToSend);
         vaultManager.deposit(noteId, keroseneVault, amountToSend);
