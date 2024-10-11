@@ -15,7 +15,6 @@ contract LPStakingFactory is OwnableRoles, IExtension {
     using FixedPointMathLib for uint256;
     using EnumerableSetLib for EnumerableSetLib.AddressSet;
 
-    error NotAllowed();
     error InvalidProof();
     error NotOwnerOfNote();
     error InvalidBlockNumber();
@@ -188,9 +187,6 @@ contract LPStakingFactory is OwnableRoles, IExtension {
 
     function recoverERC20(address token) public onlyOwner {
         uint256 amount = IERC20(token).balanceOf(address(this));
-        if (token == address(kerosene)) {
-            revert NotAllowed();
-        }
         token.safeTransfer(msg.sender, amount);
     }
 
