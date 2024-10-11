@@ -10,7 +10,7 @@ import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 import {IExtension} from "../interfaces/IExtension.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 
-contract LPStakingFactory is OwnableRoles, IExtension {
+contract DyadLPStakingFactory is OwnableRoles, IExtension {
     using SafeTransferLib for address;
     using FixedPointMathLib for uint256;
     using EnumerableSetLib for EnumerableSetLib.AddressSet;
