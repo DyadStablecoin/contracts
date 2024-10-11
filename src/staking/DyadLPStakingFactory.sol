@@ -84,7 +84,8 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     }
 
     function createPoolStaking(address _lpToken) external onlyOwnerOrRoles(POOL_MANAGER_ROLE) returns (address) {
-        DyadLPStaking staking = new DyadLPStaking(_lpToken, address(dnft), owner());
+        DyadLPStaking staking =
+            new DyadLPStaking{salt: keccak256(abi.encode(_lpToken))}(_lpToken, address(dnft), owner());
 
         lpTokenToStaking[_lpToken] = address(staking);
         emit PoolStakingCreated(_lpToken, address(staking));
