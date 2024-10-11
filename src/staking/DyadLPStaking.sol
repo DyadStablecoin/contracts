@@ -30,6 +30,10 @@ contract DyadLPStaking is OwnableRoles {
         _initializeOwner(_owner);
     }
 
+    function name() public view returns (string memory) {
+        return string.concat(IERC20(lpToken).name(), " LP Staking");
+    }
+
     function deposit(uint256 noteId, uint256 amount) public {
         totalLP += amount;
         noteIdToAmountDeposited[noteId] += amount;
