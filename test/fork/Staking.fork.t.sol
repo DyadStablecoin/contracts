@@ -26,7 +26,7 @@ contract StakingTest is Test, Parameters {
     address pool = 0xa969cFCd9e583edb8c8B270Dc8CaFB33d6Cf662D;
 
     function setUp() public {
-        vm.createSelectFork(vm.envString("RPC_URL"), 20938966);
+        vm.createSelectFork(vm.envString("ETH_RPC_URL"), 20938966);
 
         factory = new DyadLPStakingFactory(
             MAINNET_KEROSENE, MAINNET_DNFT, MAINNET_V2_KEROSENE_V2_VAULT, MAINNET_V2_VAULT_MANAGER
