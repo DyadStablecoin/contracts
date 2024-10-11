@@ -87,7 +87,7 @@ contract StakingTest is Test, Parameters {
         data[0] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(0), uint256(100000 ether)))));
         data[1] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(1), uint256(200000 ether)))));
         bytes32 root = m.getRoot(data);
-        
+
         vm.roll(vm.getBlockNumber() + 1);
         factory.setRoot(root, vm.getBlockNumber());
         bytes32[] memory proof = m.getProof(data, 0);
@@ -106,7 +106,7 @@ contract StakingTest is Test, Parameters {
         data[0] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(0), uint256(100000 ether)))));
         data[1] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(1), uint256(200000 ether)))));
         bytes32 root = m.getRoot(data);
-        
+
         vm.roll(vm.getBlockNumber() + 1);
         factory.setRoot(root, vm.getBlockNumber());
         bytes32[] memory proof = m.getProof(data, 0);
