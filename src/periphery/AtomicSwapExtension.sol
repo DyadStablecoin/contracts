@@ -62,7 +62,7 @@ contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
         address toVault;
         uint256 toAmount;
         bytes memory swapData;
-        
+
         assembly {
             // toVault should be the first transient slot
             toVault := tload(0)
