@@ -123,9 +123,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     }
 
     function setRoot(bytes32 _merkleRoot, uint256 blockNumber) public onlyOwnerOrRoles(REWARDS_MANAGER_ROLE) {
-        if (blockNumber > lastUpdateBlock) {
-            revert InvalidBlockNumber();
-        }
+        require(blockNumber >= lastUpdateBlock, InvalidBlockNumber());
         merkleRoot = _merkleRoot;
         lastUpdateBlock = blockNumber;
 

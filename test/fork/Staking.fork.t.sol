@@ -7,15 +7,21 @@ import {DyadLPStaking} from "../../src/staking/DyadLPStaking.sol";
 import {Parameters} from "../../src/params/Parameters.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {IERC721} from "forge-std/interfaces/IERC721.sol";
+import {Merkle} from "@murky/Merkle.sol";
+import {IVault} from "../../src/interfaces/IVault.sol";
+import {VaultManagerV5} from "../../src/core/VaultManagerV5.sol";
 
 contract StakingTest is Test, Parameters {
     DyadLPStakingFactory public factory;
 
     IERC20 wM = IERC20(0x437cc33344a0B27A429f795ff6B469C72698B291);
-
     IERC20 dyad = IERC20(MAINNET_V2_DYAD);
+    IERC20 kerosene = IERC20(MAINNET_KEROSENE);
+    IVault keroseneVault = IVault(MAINNET_V2_KEROSENE_V2_VAULT);
+    VaultManagerV5 vaultManager = VaultManagerV5(MAINNET_V2_VAULT_MANAGER);
 
     address USER_1 = address(0xabab);
+    address USER_2 = address(0xcdcd);
     // Smart M / DYAD
     address pool = 0xa969cFCd9e583edb8c8B270Dc8CaFB33d6Cf662D;
 
@@ -29,6 +35,12 @@ contract StakingTest is Test, Parameters {
         address note0holder = IERC721(MAINNET_DNFT).ownerOf(0);
         vm.prank(note0holder);
         IERC721(MAINNET_DNFT).transferFrom(note0holder, USER_1, 0);
+
+        vm.prank(MAINNET_FEE_RECIPIENT);
+        kerosene.transfer(address(factory), 100000 ether);
+
+        vm.prank(MAINNET_FEE_RECIPIENT);
+        vaultManager.authorizeSystemExtension(address(factory), true);
     }
 
     function test_ownerShouldBeDeployer() public {
@@ -67,6 +79,46 @@ contract StakingTest is Test, Parameters {
         DyadLPStaking(poolStaking).deposit(0, lpAmount);
 
         vm.stopPrank();
+    }
+
+    function test_claim() public {
+        Merkle m = new Merkle();
+        bytes32[] memory data = new bytes32[](2);
+        data[0] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(0), uint256(100000 ether)))));
+        data[1] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(1), uint256(200000 ether)))));
+        bytes32 root = m.getRoot(data);
+        
+        vm.roll(vm.getBlockNumber() + 1);
+        factory.setRoot(root, vm.getBlockNumber());
+        bytes32[] memory proof = m.getProof(data, 0);
+
+        vm.prank(USER_1);
+        factory.claim(0, 100000 ether, proof);
+
+        // amount claimed is 80% of the amount rewarded
+        assertEq(kerosene.balanceOf(address(USER_1)), 80000 ether);
+        assertEq(factory.unclaimedBonus(), 20000 ether);
+    }
+
+    function test_claimToNote() public {
+        Merkle m = new Merkle();
+        bytes32[] memory data = new bytes32[](2);
+        data[0] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(0), uint256(100000 ether)))));
+        data[1] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(1), uint256(200000 ether)))));
+        bytes32 root = m.getRoot(data);
+        
+        vm.roll(vm.getBlockNumber() + 1);
+        factory.setRoot(root, vm.getBlockNumber());
+        bytes32[] memory proof = m.getProof(data, 0);
+
+        vm.startPrank(USER_1);
+        vaultManager.authorizeExtension(address(factory), true);
+        factory.claimToVault(0, 100000 ether, proof);
+        vm.stopPrank();
+
+        assertEq(keroseneVault.id2asset(0), 100000 ether);
+        assertEq(kerosene.balanceOf(address(USER_1)), 0 ether);
+        assertEq(factory.unclaimedBonus(), 0 ether);
     }
 
     function _yoinkTokens(address to) internal {
