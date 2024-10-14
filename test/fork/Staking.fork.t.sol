@@ -81,7 +81,30 @@ contract StakingTest is Test, Parameters {
         vm.stopPrank();
     }
 
+    function test_claim_disabledByDefault() public {
+        Merkle m = new Merkle();
+        bytes32[] memory data = new bytes32[](2);
+        data[0] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(0), uint256(100000 ether)))));
+        data[1] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(1), uint256(200000 ether)))));
+        bytes32 root = m.getRoot(data);
+
+        vm.roll(vm.getBlockNumber() + 1);
+        factory.setRoot(root, vm.getBlockNumber());
+        bytes32[] memory proof = m.getProof(data, 0);
+
+        vm.prank(USER_1);
+        vm.expectRevert(DyadLPStakingFactory.DirectClaimDisabled.selector);
+        factory.claim(0, 100000 ether, proof);
+
+        assertEq(factory.noteIdToTotalClaimed(0), 0);
+        assertEq(kerosene.balanceOf(address(USER_1)), 0 ether);
+        assertEq(factory.unclaimedBonus(), 0 ether);
+    }
+
     function test_claim() public {
+        vm.prank(factory.owner());
+        factory.setDirectDepositBonus(2000);
+
         Merkle m = new Merkle();
         bytes32[] memory data = new bytes32[](2);
         data[0] = keccak256(bytes.concat(keccak256(abi.encodePacked(uint256(0), uint256(100000 ether)))));

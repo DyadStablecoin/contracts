@@ -19,7 +19,10 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     error NotOwnerOfNote();
     error InvalidBlockNumber();
     error Paused();
+    error InvalidBonus();
+    error DirectClaimDisabled();
 
+    event DirectDepositBonusUpdated(uint256 oldBoost, uint256 newBoost);
     event PoolStakingCreated(address indexed lpToken, address indexed staking);
     event RewardRateSet(address indexed lpToken, uint256 oldRewardRate, uint256 newRewardRate);
     event Claimed(uint256 indexed noteId, uint256 indexed amount, uint256 unclaimedBonus);
@@ -53,7 +56,10 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     uint128 public totalClaimed;
 
     /// @notice forfited bonus in kerosene
-    uint120 public unclaimedBonus;
+    uint96 public unclaimedBonus;
+
+    /// @notice direct deposit bonus in bps
+    uint16 public directDepositBonusBps;
 
     /// @notice indicates whether claiming is paused
     bool public paused;
@@ -64,6 +70,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     }
 
     constructor(address _kerosene, address _dnft, address _keroseneVault, address _vaultManager) {
+        directDepositBonusBps = 10000;
         kerosene = _kerosene;
         dnft = IERC721(_dnft);
         keroseneVault = _keroseneVault;
@@ -130,15 +137,22 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
         emit RootUpdated(_merkleRoot, blockNumber);
     }
 
+    function setDirectDepositBonus(uint16 _directDepositBonusBps) public onlyOwnerOrRoles(REWARDS_MANAGER_ROLE) {
+        require(_directDepositBonusBps <= 10000, InvalidBonus());
+        directDepositBonusBps = _directDepositBonusBps;
+    }
+
     function claim(uint256 noteId, uint256 amount, bytes32[] calldata proof) public whenNotPaused returns (uint256) {
+        uint256 bonusBps = directDepositBonusBps;
+        require(bonusBps < 10000, DirectClaimDisabled());
         address noteOwner = dnft.ownerOf(noteId);
         require(msg.sender == noteOwner, NotOwnerOfNote());
 
         _verifyProof(noteId, amount, proof);
         uint256 amountToSend = _syncClaimableAmount(noteId, amount);
-        uint256 claimSubBonus = amountToSend.mulDiv(80, 100);
+        uint256 claimSubBonus = amountToSend.mulDiv(10000 - bonusBps, 10000);
         uint256 unclaimed = amountToSend - claimSubBonus;
-        unclaimedBonus += uint120(unclaimed);
+        unclaimedBonus += uint96(unclaimed);
         totalClaimed += uint128(claimSubBonus);
 
         kerosene.safeTransfer(noteOwner, claimSubBonus);
