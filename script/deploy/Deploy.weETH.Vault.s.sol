@@ -17,7 +17,7 @@ contract DeployVault is Script, Parameters {
         vm.startBroadcast(); // ----------------------
 
         new VaultWeETH(
-            MAINNET_FEE_RECIPIENT,
+            MAINNET_OWNER,
             VaultManager(MAINNET_V2_VAULT_MANAGER),
             ERC20(MAINNET_WEETH),
             IAggregatorV3(MAINNET_CHAINLINK_WEETH),

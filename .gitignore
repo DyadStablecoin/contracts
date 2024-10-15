@@ -2,6 +2,8 @@
 cache/
 out/
 
+/tags
+
 # Ignores development broadcast logs
 !/broadcast
 /broadcast/*/31337/
