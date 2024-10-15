@@ -15,7 +15,7 @@ contract DeployVault is Script, Parameters {
             MAINNET_DNFT,
             MAINNET_WETH,
             MAINNET_V2_VAULT_MANAGER,
-            MAINNET_V2_WETH_VAULT,
+            MAINNET_V2_WETH_VAULT
         );
 
         vm.stopBroadcast(); // ----------------------------
