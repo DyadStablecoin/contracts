@@ -3,6 +3,7 @@
 [profile.default]
 src = 'src'
 out = 'out'
+evm_version = "cancun"
 libs = ['lib']
 
 # copy/pasta from https://docs.openzeppelin.com/upgrades-plugins/1.x/foundry-upgrades
