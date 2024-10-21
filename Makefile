@@ -215,3 +215,15 @@ deployV5:
 		--via-ir \
 		--verify \
 		--optimize
+
+deployStaking:
+	forge clean
+	forge script script/deploy/Deploy.Staking.s.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0x9180397941B0d63C3B7CdEE9Dd904D4E4c1DE117 \
+		--broadcast \
+		-i 1 \
+		-vvvv \
+		--via-ir \
+		--verify \
+		--optimize
