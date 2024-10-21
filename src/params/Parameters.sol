@@ -56,6 +56,9 @@ contract Parameters {
     address MAINNET_APXETH_ORACLE = 0x19219BC90F48DeE4d5cF202E09c438FAacFd8Bea;
     address MAINNET_APXETH_VAULT = 0xB58d87dD30a67823acC4b9Fa533F464CdEdA737E;
 
+    // ---------------- POOLS ----------------
+    address MAINNET_CURVE_M0_DYAD = 0xa969cFCd9e583edb8c8B270Dc8CaFB33d6Cf662D;
+
     // ---------------- Sepolia ----------------
     address SEPOLIA_OWNER = 0xEd6715D2172BFd50C2DBF608615c2AB497904803;
     address SEPOLIA_DNFT = address(0);

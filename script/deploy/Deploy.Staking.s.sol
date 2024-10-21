@@ -16,7 +16,7 @@ contract DeployStaking is Script, Parameters {
             MAINNET_V2_VAULT_MANAGER
         );
 
-        factory.createPoolStaking(address(0));
+        factory.createPoolStaking(MAINNET_CURVE_M0_DYAD);
 
         factory.grantRoles(MAINNET_OWNER, type(uint256).max);
         factory.transferOwnership(MAINNET_OWNER);
