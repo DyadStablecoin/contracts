@@ -35,6 +35,7 @@ contract DyadLPStaking is OwnableRoles {
     }
 
     function deposit(uint256 noteId, uint256 amount) public {
+        require(dnft.ownerOf(noteId) != address(0), "Invalid NoteId");
         totalLP += amount;
         noteIdToAmountDeposited[noteId] += amount;
         lpToken.safeTransferFrom(msg.sender, address(this), amount);
