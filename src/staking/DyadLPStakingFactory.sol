@@ -3,7 +3,6 @@ pragma solidity ^0.8.27;
 
 import {Ownable} from "solady/auth/Ownable.sol";
 import {DyadLPStaking} from "./DyadLPStaking.sol";
-import {EnumerableSetLib} from "solady/utils/EnumerableSetLib.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {IERC721} from "forge-std/interfaces/IERC721.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
@@ -16,7 +15,6 @@ import {IVaultManager} from "../interfaces/IVaultManager.sol";
 contract DyadLPStakingFactory is OwnableRoles, IExtension {
     using SafeTransferLib for address;
     using FixedPointMathLib for uint256;
-    using EnumerableSetLib for EnumerableSetLib.AddressSet;
 
     error InvalidProof();
     error NotOwnerOfNote();
