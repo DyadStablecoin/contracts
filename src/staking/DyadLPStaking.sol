@@ -4,11 +4,11 @@ pragma solidity ^0.8.27;
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
 import {IERC721} from "forge-std/interfaces/IERC721.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
-import {OwnableRoles} from "solady/auth/OwnableRoles.sol";
+import {Ownable} from "solady/auth/Ownable.sol";
 import {MerkleProofLib} from "solady/utils/MerkleProofLib.sol";
 import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 
-contract DyadLPStaking is OwnableRoles {
+contract DyadLPStaking is Ownable {
     using SafeTransferLib for address;
     using FixedPointMathLib for uint256;
 
