@@ -117,7 +117,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
         }
     }
 
-    function depositForRewards(uint256 amount) public onlyOwnerOrRoles(REWARDS_MANAGER_ROLE) {
+    function depositForRewards(uint256 amount) public onlyOwnerOrRoles(REWARDS_MANAGER_ROLE) whenNotPaused {
         uint256 previousUnclaimedBonus = unclaimedBonus;
         unclaimedBonus = 0;
         if (amount < previousUnclaimedBonus) {
@@ -150,6 +150,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
 
         _verifyProof(noteId, amount, proof);
         uint256 amountToSend = _syncClaimableAmount(noteId, amount);
+        require(amountToSend > 0, "Reward Already Claimed");
         uint256 claimSubBonus = amountToSend.mulDiv(10000 - bonusBps, 10000);
         uint256 unclaimed = amountToSend - claimSubBonus;
         unclaimedBonus += uint96(unclaimed);
@@ -171,6 +172,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
 
         _verifyProof(noteId, amount, proof);
         uint256 amountToSend = _syncClaimableAmount(noteId, amount);
+        require(amountToSend > 0, "Reward Already Claimed");
         totalClaimed += uint128(amountToSend);
 
         kerosene.safeApprove(address(vaultManager), amountToSend);
