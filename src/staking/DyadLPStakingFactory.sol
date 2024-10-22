@@ -25,7 +25,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     error InvalidBonus();
     error DirectClaimDisabled();
 
-    event Paused(bool paused);
+    event PausedUpdated(bool paused);
     event DirectDepositBonusUpdated(uint256 newBoost);
     event PoolStakingCreated(address indexed lpToken, address indexed staking);
     event RewardRateSet(address indexed lpToken, uint256 oldRewardRate, uint256 newRewardRate);
@@ -105,7 +105,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
 
     function setPaused(bool _paused) public onlyOwnerOrRoles(POOL_MANAGER_ROLE) {
         paused = _paused;
-        emit Paused(_paused);
+        emit PausedUpdated(_paused);
     }
 
     function setRewardRates(address[] calldata lpTokens, uint256[] calldata rewardRates)
