@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 
 import {DyadLPStakingFactory} from "../../src/staking/DyadLPStakingFactory.sol";
+import {Parameters} from "../../src/params/Parameters.sol";
 
 contract DeployStaking is Script, Parameters {
     function run() public {
