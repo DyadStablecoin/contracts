@@ -26,7 +26,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     error DirectClaimDisabled();
 
     event PausedUpdated(bool paused);
-    event DirectDepositBonusUpdated(uint256 newBoost);
+    event DirectDepositBonusUpdated(uint256 oldBonus, uint256 newBonus);
     event PoolStakingCreated(address indexed lpToken, address indexed staking);
     event RewardRateSet(address indexed lpToken, uint256 oldRewardRate, uint256 newRewardRate);
     event Claimed(uint256 indexed noteId, uint256 indexed amount, uint256 unclaimedBonus);
@@ -144,8 +144,9 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
 
     function setDirectDepositBonus(uint16 _directDepositBonusBps) public onlyOwnerOrRoles(REWARDS_MANAGER_ROLE) {
         require(_directDepositBonusBps <= 10000, InvalidBonus());
+        uint16 oldBonus = directDepositBonusBps;
         directDepositBonusBps = _directDepositBonusBps;
-        emit DirectDepositBonusUpdated(_directDepositBonusBps);
+        emit DirectDepositBonusUpdated(oldBonus, _directDepositBonusBps);
     }
 
     function claim(uint256 noteId, uint256 amount, bytes32[] calldata proof) public whenNotPaused returns (uint256) {
