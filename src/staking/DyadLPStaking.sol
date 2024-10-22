@@ -6,7 +6,7 @@ import {IERC721} from "forge-std/interfaces/IERC721.sol";
 import {SafeTransferLib} from "solady/utils/SafeTransferLib.sol";
 import {OwnableRoles} from "solady/auth/OwnableRoles.sol";
 
-contract DyadLPStaking is OwnableRoles {
+contract DyadLPStaking is Ownable {
     using SafeTransferLib for address;
 
     error NotOwnerOfNote();

@@ -1,3 +1,6 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.27;
+
 import {Ownable} from "solady/auth/Ownable.sol";
 import {DyadLPStaking} from "./DyadLPStaking.sol";
 import {IERC20} from "forge-std/interfaces/IERC20.sol";
@@ -20,7 +23,8 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     error InvalidBonus();
     error DirectClaimDisabled();
 
-    event DirectDepositBonusUpdated(uint256 oldBoost, uint256 newBoost);
+    event PausedUpdated(bool paused);
+    event DirectDepositBonusUpdated(uint256 oldBonus, uint256 newBonus);
     event PoolStakingCreated(address indexed lpToken, address indexed staking);
     event RewardRateSet(address indexed lpToken, uint256 oldRewardRate, uint256 newRewardRate);
     event Claimed(uint256 indexed noteId, uint256 indexed amount, uint256 unclaimedBonus);
@@ -99,6 +103,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
 
     function setPaused(bool _paused) public onlyOwnerOrRoles(POOL_MANAGER_ROLE) {
         paused = _paused;
+        emit PausedUpdated(_paused);
     }
 
     function setRewardRates(address[] calldata lpTokens, uint256[] calldata rewardRates)
@@ -137,7 +142,9 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
 
     function setDirectDepositBonus(uint16 _directDepositBonusBps) public onlyOwnerOrRoles(REWARDS_MANAGER_ROLE) {
         require(_directDepositBonusBps <= 10000, InvalidBonus());
+        uint16 oldBonus = directDepositBonusBps;
         directDepositBonusBps = _directDepositBonusBps;
+        emit DirectDepositBonusUpdated(oldBonus, _directDepositBonusBps);
     }
 
     function claim(uint256 noteId, uint256 amount, bytes32[] calldata proof) public whenNotPaused returns (uint256) {
@@ -199,6 +206,7 @@ contract DyadLPStakingFactory is OwnableRoles, IExtension {
     }
 
     function recoverERC20(address token) public onlyOwner {
+        require(token != kerosene, "Can't Recover Kerosene Token");
         uint256 amount = IERC20(token).balanceOf(address(this));
         token.safeTransfer(msg.sender, amount);
     }
