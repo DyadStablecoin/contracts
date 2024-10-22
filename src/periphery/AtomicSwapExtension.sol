@@ -5,7 +5,6 @@ import {IExtension, IAfterWithdrawHook} from "../interfaces/IExtension.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IVault} from "../interfaces/IVault.sol";
 import {DyadHooks} from "../core/DyadHooks.sol";
-import {console2} from "forge-std/console2.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
