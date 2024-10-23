@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.27;
 
+import {IERC721} from "forge-std/interfaces/IERC721.sol";
 import {IExtension, IAfterWithdrawHook} from "../interfaces/IExtension.sol";
 import {IVaultManager} from "../interfaces/IVaultManager.sol";
 import {IVault} from "../interfaces/IVault.sol";
@@ -8,17 +9,21 @@ import {DyadHooks} from "../core/DyadHooks.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
+
 contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
     using SafeTransferLib for ERC20;
 
     error SwapFailed();
     error OnlyVaultManager();
+    error NotOwnerOfNote();
 
     address public constant AUGUSTUS_6_2 = 0x6A000F20005980200259B80c5102003040001068;
     IVaultManager public immutable vaultManager;
+    IERC721 public immutable dnft;
 
-    constructor(address _vaultManager) {
+    constructor(address _vaultManager, address _dnft) {
         vaultManager = IVaultManager(_vaultManager);
+        dnft = IERC721(_dnft);
     }
 
     function name() external pure returns (string memory) {
@@ -41,6 +46,8 @@ contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
         uint256 toAmount,
         bytes calldata swapData
     ) external {
+        if (dnft.ownerOf(noteId) != msg.sender) revert NotOwnerOfNote();
+        
         // tstore swap data
         assembly {
             let size := calldatasize()
