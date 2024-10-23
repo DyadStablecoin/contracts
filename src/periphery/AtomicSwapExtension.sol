@@ -57,7 +57,6 @@ contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
     function afterWithdraw(uint256 id, address vault, uint256 amount, address to) external {
         require(msg.sender == address(vaultManager), OnlyVaultManager());
 
-        uint256 numberOfSlots;
         address toVault;
         uint256 toAmount;
         bytes memory swapData;
