@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import "forge-std/Script.sol";
 
 import {DyadLPStakingFactory} from "../../src/staking/DyadLPStakingFactory.sol";
+import {DyadLPStaking} from "../../src/staking/DyadLPStaking.sol";
 import {Parameters} from "../../src/params/Parameters.sol";
 
 contract DeployStaking is Script, Parameters {
@@ -17,7 +18,11 @@ contract DeployStaking is Script, Parameters {
             MAINNET_V2_VAULT_MANAGER
         );
 
-        factory.createPoolStaking(MAINNET_CURVE_M0_DYAD);
+        DyadLPStaking staking = DyadLPStaking(
+          factory.createPoolStaking(MAINNET_CURVE_M0_DYAD)
+        );
+        staking.grantRoles(MAINNET_OWNER, type(uint256).max);
+        staking.transferOwnership(MAINNET_OWNER);
 
         factory.grantRoles(MAINNET_OWNER, type(uint256).max);
         factory.transferOwnership(MAINNET_OWNER);
