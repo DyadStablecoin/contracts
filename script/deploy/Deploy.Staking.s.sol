@@ -21,8 +21,8 @@ contract DeployStaking is Script, Parameters {
         DyadLPStaking staking = DyadLPStaking(
           factory.createPoolStaking(MAINNET_CURVE_M0_DYAD)
         );
-        staking.transferOwnership(MAINNET_OWNER);
 
+        staking.transferOwnership(MAINNET_OWNER);
         factory.transferOwnership(MAINNET_OWNER);
 
         vm.stopBroadcast(); // ----------------------------
