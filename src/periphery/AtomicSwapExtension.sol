@@ -81,7 +81,7 @@ contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
                 mstore(add(swapData, mul(i, 0x20)), tload(add(i, 3)))
             }
             // update the free memory pointer
-            mstore(0x40, add(swapData, mul(sub(i, 1), 0x20)))
+            mstore(0x40, add(swapData, add(swapDataSize, 0x20)))
         }
 
         IVault(vault).asset().safeApprove(AUGUSTUS_6_2, amount);
