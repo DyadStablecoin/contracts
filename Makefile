@@ -220,7 +220,7 @@ deployStaking:
 	forge clean
 	forge script script/deploy/Deploy.Staking.s.sol \
 		--rpc-url $(MAINNET_RPC) \
-		--sender 0xD06E2045bA073011121746fEc82a369C31d51A97 \
+		--sender 0x43f95890eB5ABE84E5C6d28d84cFcA4c87C486a0 \
 		--broadcast \
 		-i 1 \
 		-vvvv \
