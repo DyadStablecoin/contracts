@@ -83,7 +83,7 @@ contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
             // store the size of the swapData in the first slot of the memory array
             mstore(swapData, swapDataSize)
             // iterate over the addresses and copy them into the memory array
-            for {} lt(sub(i, 1), swapDataSize) { i := add(i, 1) } {
+            for {} lt(mul(sub(i, 1), 0x20), swapDataSize) { i := add(i, 1) } {
                 // copy from transient storage into memory
                 mstore(add(swapData, mul(i, 0x20)), tload(add(i, 3)))
             }
