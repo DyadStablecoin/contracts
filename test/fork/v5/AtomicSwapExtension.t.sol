@@ -10,7 +10,7 @@ contract AtomicSwapExtensionTest is Test, Parameters {
     address public USER = 0xd0953aC488190BbD59240E0A59F697e32e303532;
 
     function setUp() public {
-        atomicSwapExtension = new AtomicSwapExtension(MAINNET_V2_VAULT_MANAGER);
+        atomicSwapExtension = new AtomicSwapExtension(MAINNET_V2_VAULT_MANAGER, MAINNET_DNFT);
         VaultManagerV5 vaultManager = VaultManagerV5(MAINNET_V2_VAULT_MANAGER);
 
         vm.createSelectFork(vm.envString("ETH_RPC_URL"), 20917569);
