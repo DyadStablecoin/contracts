@@ -58,9 +58,13 @@ contract Parameters {
 
     // ---------------- POOLS ----------------
     address MAINNET_CURVE_M0_DYAD = 0xa969cFCd9e583edb8c8B270Dc8CaFB33d6Cf662D;
+    
     // ---------------- STAKING ----------------
     address MAINNET_STAKING_FACTORY = 0xD19DCbB8B82805d779a6A2182d8F4355275CC30a;
     address MAINNEt_CURVE_M0_DYAD_STAKING = 0xe48c80CF20C7fCE3458896BB263D9D8D6404b39f;
+
+    // ---------------- Extensions ----------------
+    address MAINNET_WETH_GATEWAY = 0x9F77A6775d6aC6A69107326130D65E422002B5B2;
 
     // ---------------- Sepolia ----------------
     address SEPOLIA_OWNER = 0xEd6715D2172BFd50C2DBF608615c2AB497904803;
