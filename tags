@@ -1,0 +1,1150 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ApprovalRaceToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.Approval import ApprovalRaceToken$/;"	i
+ApprovalToZeroToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.ApprovalToZero import ApprovalToZeroToken$/;"	i
+BlockableToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.BlockList import BlockableToken$/;"	i
+Bytes32MetadataToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.Bytes32Metadata import ERC20 as Bytes32MetadataToken$/;"	i
+CHEATCODES_JSON_URL	lib/forge-std/scripts/vm.py	/^CHEATCODES_JSON_URL = "https:\/\/raw.githubusercontent.com\/foundry-rs\/foundry\/master\/crates\/cheatcodes\/assets\/cheatcodes.json"$/;"	v
+CHEATCODES_JSON_URL	lib/murky/lib/forge-std/scripts/vm.py	/^CHEATCODES_JSON_URL = "https:\/\/raw.githubusercontent.com\/foundry-rs\/foundry\/master\/crates\/cheatcodes\/assets\/cheatcodes.json"$/;"	v
+CHEATCODES_JSON_URL	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^CHEATCODES_JSON_URL = "https:\/\/raw.githubusercontent.com\/foundry-rs\/foundry\/master\/crates\/cheatcodes\/assets\/cheatcodes.json"$/;"	v
+CHEATCODES_JSON_URL	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^CHEATCODES_JSON_URL = "https:\/\/raw.githubusercontent.com\/foundry-rs\/foundry\/master\/crates\/cheatcodes\/assets\/cheatcodes.json"$/;"	v
+Callable	lib/forge-std/scripts/vm.py	/^from typing import Callable$/;"	i
+Callable	lib/murky/lib/forge-std/scripts/vm.py	/^from typing import Callable$/;"	i
+Callable	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^from typing import Callable$/;"	i
+Callable	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^from typing import Callable$/;"	i
+Cheatcode	lib/forge-std/scripts/vm.py	/^class Cheatcode:$/;"	c
+Cheatcode	lib/murky/lib/forge-std/scripts/vm.py	/^class Cheatcode:$/;"	c
+Cheatcode	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Cheatcode:$/;"	c
+Cheatcode	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Cheatcode:$/;"	c
+Cheatcodes	lib/forge-std/scripts/vm.py	/^class Cheatcodes:$/;"	c
+Cheatcodes	lib/murky/lib/forge-std/scripts/vm.py	/^class Cheatcodes:$/;"	c
+Cheatcodes	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Cheatcodes:$/;"	c
+Cheatcodes	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Cheatcodes:$/;"	c
+CheatcodesPrinter	lib/forge-std/scripts/vm.py	/^class CheatcodesPrinter:$/;"	c
+CheatcodesPrinter	lib/murky/lib/forge-std/scripts/vm.py	/^class CheatcodesPrinter:$/;"	c
+CheatcodesPrinter	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class CheatcodesPrinter:$/;"	c
+CheatcodesPrinter	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class CheatcodesPrinter:$/;"	c
+CmpCheatcode	lib/forge-std/scripts/vm.py	/^class CmpCheatcode:$/;"	c
+CmpCheatcode	lib/murky/lib/forge-std/scripts/vm.py	/^class CmpCheatcode:$/;"	c
+CmpCheatcode	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class CmpCheatcode:$/;"	c
+CmpCheatcode	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class CmpCheatcode:$/;"	c
+DIFF	lib/murky/lib/openzeppelin-contracts/certora/Makefile	/^DIFF  := diff$/;"	m
+DIFF	lib/openzeppelin-contracts-upgradeable/certora/Makefile	/^DIFF  := diff$/;"	m
+DIFF	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/Makefile	/^DIFF  := diff$/;"	m
+DIFF	lib/openzeppelin-contracts/certora/Makefile	/^DIFF  := diff$/;"	m
+DIFFS	lib/murky/lib/openzeppelin-contracts/certora/Makefile	/^DIFFS := $(shell find $(DIFF) -type f)$/;"	m
+DIFFS	lib/openzeppelin-contracts-upgradeable/certora/Makefile	/^DIFFS := $(shell find $(DIFF) -type f)$/;"	m
+DIFFS	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/Makefile	/^DIFFS := $(shell find $(DIFF) -type f)$/;"	m
+DIFFS	lib/openzeppelin-contracts/certora/Makefile	/^DIFFS := $(shell find $(DIFF) -type f)$/;"	m
+DST	lib/murky/lib/openzeppelin-contracts/certora/Makefile	/^DST   := patched$/;"	m
+DST	lib/openzeppelin-contracts-upgradeable/certora/Makefile	/^DST   := patched$/;"	m
+DST	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/Makefile	/^DST   := patched$/;"	m
+DST	lib/openzeppelin-contracts/certora/Makefile	/^DST   := patched$/;"	m
+DSTS	lib/murky/lib/openzeppelin-contracts/certora/Makefile	/^DSTS  := $(shell find $(DST) -type f)$/;"	m
+DSTS	lib/openzeppelin-contracts-upgradeable/certora/Makefile	/^DSTS  := $(shell find $(DST) -type f)$/;"	m
+DSTS	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/Makefile	/^DSTS  := $(shell find $(DST) -type f)$/;"	m
+DSTS	lib/openzeppelin-contracts/certora/Makefile	/^DSTS  := $(shell find $(DST) -type f)$/;"	m
+DefaultDict	lib/solady/ext/wake/test_erc1155_fuzz.py	/^from typing import DefaultDict, Set$/;"	i
+EIP712Mock	lib/solady/ext/wake/test_eip712.py	/^from pytypes.tests.EIP712Mock import EIP712Mock$/;"	i
+EIP712Mock	lib/solady/ext/wake/test_eip712_fuzz.py	/^from pytypes.tests.EIP712Mock import EIP712Mock$/;"	i
+ERC1155FuzzTest	lib/solady/ext/wake/test_erc1155_fuzz.py	/^class ERC1155FuzzTest(FuzzTest):$/;"	c
+ERC1155Mock	lib/solady/ext/wake/test_erc1155.py	/^from pytypes.tests.ERC1155Mock import ERC1155Mock, ERC1155ReceiverMock$/;"	i
+ERC1155Mock	lib/solady/ext/wake/test_erc1155_fuzz.py	/^from pytypes.tests.ERC1155Mock import ERC1155Mock$/;"	i
+ERC1155ReceiverMock	lib/solady/ext/wake/test_erc1155.py	/^from pytypes.tests.ERC1155Mock import ERC1155Mock, ERC1155ReceiverMock$/;"	i
+ERC1271SignatureChecker	lib/solady/ext/wake/test_signature_checker_fuzz.py	/^from pytypes.tests.SignatureCheckerMock import SignatureCheckerMock, ERC1271SignatureChecker$/;"	i
+ERC1967Factory	lib/solady/ext/wake/test_eip712.py	/^from pytypes.src.utils.ERC1967Factory import ERC1967Factory$/;"	i
+ERC1967Factory	lib/solady/ext/wake/test_eip712_fuzz.py	/^from pytypes.src.utils.ERC1967Factory import ERC1967Factory$/;"	i
+ERC20Mock	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.ERC20Mock import ERC20Mock$/;"	i
+ERC721	lib/solady/ext/wake/test_erc721_fuzz.py	/^class ERC721:$/;"	c
+ERC721FuzzTest	lib/solady/ext/wake/test_erc721_fuzz.py	/^class ERC721FuzzTest(FuzzTest):$/;"	c
+ERC721Mock	lib/solady/ext/wake/test_erc721_fuzz.py	/^from pytypes.tests.ERC721Mock import ERC721Mock$/;"	i
+Eip712FuzzTest	lib/solady/ext/wake/test_eip712_fuzz.py	/^class Eip712FuzzTest(FuzzTest):$/;"	c
+Enum	lib/forge-std/scripts/vm.py	/^class Enum:$/;"	c
+Enum	lib/murky/lib/forge-std/scripts/vm.py	/^class Enum:$/;"	c
+Enum	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Enum:$/;"	c
+Enum	lib/murky/lib/openzeppelin-contracts/test/helpers/enums.js	/^function Enum(...options) {$/;"	f
+Enum	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/enums.js	/^function Enum(...options) {$/;"	f
+Enum	lib/openzeppelin-contracts-upgradeable/test/helpers/enums.js	/^function Enum(...options) {$/;"	f
+Enum	lib/openzeppelin-contracts/test/helpers/enums.js	/^function Enum(...options) {$/;"	f
+Enum	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Enum:$/;"	c
+EnumVariant	lib/forge-std/scripts/vm.py	/^class EnumVariant:$/;"	c
+EnumVariant	lib/murky/lib/forge-std/scripts/vm.py	/^class EnumVariant:$/;"	c
+EnumVariant	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class EnumVariant:$/;"	c
+EnumVariant	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class EnumVariant:$/;"	c
+Error	lib/forge-std/scripts/vm.py	/^class Error:$/;"	c
+Error	lib/murky/lib/forge-std/scripts/vm.py	/^class Error:$/;"	c
+Error	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Error:$/;"	c
+Error	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Error:$/;"	c
+Event	lib/forge-std/scripts/vm.py	/^class Event:$/;"	c
+Event	lib/murky/lib/forge-std/scripts/vm.py	/^class Event:$/;"	c
+Event	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Event:$/;"	c
+Event	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Event:$/;"	c
+Function	lib/forge-std/scripts/vm.py	/^class Function:$/;"	c
+Function	lib/murky/lib/forge-std/scripts/vm.py	/^class Function:$/;"	c
+Function	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Function:$/;"	c
+Function	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Function:$/;"	c
+HighDecimalToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.HighDecimals import HighDecimalToken$/;"	i
+Item	lib/forge-std/scripts/vm.py	/^class Item(PyEnum):$/;"	c
+Item	lib/murky/lib/forge-std/scripts/vm.py	/^class Item(PyEnum):$/;"	c
+Item	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Item(PyEnum):$/;"	c
+Item	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Item(PyEnum):$/;"	c
+ItemOrder	lib/forge-std/scripts/vm.py	/^class ItemOrder:$/;"	c
+ItemOrder	lib/murky/lib/forge-std/scripts/vm.py	/^class ItemOrder:$/;"	c
+ItemOrder	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class ItemOrder:$/;"	c
+ItemOrder	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class ItemOrder:$/;"	c
+List	lib/solady/ext/wake/utils.py	/^from typing import List, Tuple$/;"	i
+Mail	lib/solady/ext/wake/test_eip712.py	/^class Mail:$/;"	c
+Mail	lib/solady/ext/wake/test_eip712_fuzz.py	/^class Mail:$/;"	c
+MerkleProofFuzzTest	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^class MerkleProofFuzzTest(FuzzTest):$/;"	c
+MerkleProofMock	lib/solady/ext/wake/test_merkle_proof.py	/^from pytypes.tests.MerkleProofMock import MerkleProofMock$/;"	i
+MerkleProofMock	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^from pytypes.tests.MerkleProofMock import MerkleProofMock$/;"	i
+MerkleTree	lib/solady/ext/wake/test_merkle_proof.py	/^from .utils import MerkleTree$/;"	i
+MerkleTree	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^from .utils import MerkleTree$/;"	i
+MerkleTree	lib/solady/ext/wake/utils.py	/^class MerkleTree:$/;"	c
+MissingReturnToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.MissingReturns import MissingReturnToken$/;"	i
+Mutability	lib/forge-std/scripts/vm.py	/^class Mutability(PyEnum):$/;"	c
+Mutability	lib/murky/lib/forge-std/scripts/vm.py	/^class Mutability(PyEnum):$/;"	c
+Mutability	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Mutability(PyEnum):$/;"	c
+Mutability	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Mutability(PyEnum):$/;"	c
+NoETHMock	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.NoETHMock import NoETHMock$/;"	i
+NoRevertToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.NoRevert import NoRevertToken$/;"	i
+OUT_PATH	lib/forge-std/scripts/vm.py	/^OUT_PATH = "src\/Vm.sol"$/;"	v
+OUT_PATH	lib/murky/lib/forge-std/scripts/vm.py	/^OUT_PATH = "src\/Vm.sol"$/;"	v
+OUT_PATH	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^OUT_PATH = "src\/Vm.sol"$/;"	v
+OUT_PATH	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^OUT_PATH = "src\/Vm.sol"$/;"	v
+P	utils/addresses.py	/^P = "..\/broadcast\/Deploy.Staking.sol\/1\/run-latest.json"$/;"	v
+PausableToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.Pausable import PausableToken$/;"	i
+Person	lib/solady/ext/wake/test_eip712.py	/^class Person:$/;"	c
+Person	lib/solady/ext/wake/test_eip712_fuzz.py	/^class Person:$/;"	c
+ProxiedToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.Proxied import ProxiedToken, TokenProxy$/;"	i
+PyEnum	lib/forge-std/scripts/vm.py	/^from enum import Enum as PyEnum$/;"	i
+PyEnum	lib/murky/lib/forge-std/scripts/vm.py	/^from enum import Enum as PyEnum$/;"	i
+PyEnum	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^from enum import Enum as PyEnum$/;"	i
+PyEnum	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^from enum import Enum as PyEnum$/;"	i
+ReentrantToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.Reentrant import ReentrantToken$/;"	i
+ReturnsFalseToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.ReturnsFalse import ReturnsFalseToken$/;"	i
+SRC	lib/murky/lib/openzeppelin-contracts/certora/Makefile	/^SRC   := ..\/contracts$/;"	m
+SRC	lib/openzeppelin-contracts-upgradeable/certora/Makefile	/^SRC   := ..\/contracts$/;"	m
+SRC	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/Makefile	/^SRC   := ..\/contracts$/;"	m
+SRC	lib/openzeppelin-contracts/certora/Makefile	/^SRC   := ..\/contracts$/;"	m
+SRCS	lib/murky/lib/openzeppelin-contracts/certora/Makefile	/^SRCS  := $(shell find $(SRC) -type f)$/;"	m
+SRCS	lib/openzeppelin-contracts-upgradeable/certora/Makefile	/^SRCS  := $(shell find $(SRC) -type f)$/;"	m
+SRCS	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/Makefile	/^SRCS  := $(shell find $(SRC) -type f)$/;"	m
+SRCS	lib/openzeppelin-contracts/certora/Makefile	/^SRCS  := $(shell find $(SRC) -type f)$/;"	m
+SafeTransferLib	lib/solady/ext/wake/test_erc20.py	/^from pytypes.src.utils.SafeTransferLib import SafeTransferLib$/;"	i
+Set	lib/solady/ext/wake/test_erc1155_fuzz.py	/^from typing import DefaultDict, Set$/;"	i
+SignatureCheckerFuzzTest	lib/solady/ext/wake/test_signature_checker_fuzz.py	/^class SignatureCheckerFuzzTest(FuzzTest):$/;"	c
+SignatureCheckerMock	lib/solady/ext/wake/test_signature_checker_fuzz.py	/^from pytypes.tests.SignatureCheckerMock import SignatureCheckerMock, ERC1271SignatureChecker$/;"	i
+Struct	lib/forge-std/scripts/vm.py	/^class Struct:$/;"	c
+Struct	lib/murky/lib/forge-std/scripts/vm.py	/^class Struct:$/;"	c
+Struct	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Struct:$/;"	c
+Struct	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Struct:$/;"	c
+StructField	lib/forge-std/scripts/vm.py	/^class StructField:$/;"	c
+StructField	lib/murky/lib/forge-std/scripts/vm.py	/^class StructField:$/;"	c
+StructField	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class StructField:$/;"	c
+StructField	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class StructField:$/;"	c
+TokenProxy	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.Proxied import ProxiedToken, TokenProxy$/;"	i
+TransferFeeToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.TransferFee import TransferFeeToken$/;"	i
+Tuple	lib/solady/ext/wake/utils.py	/^from typing import List, Tuple$/;"	i
+Uint96ERC20	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.Uint96 import Uint96ERC20$/;"	i
+UpgradableToken	lib/solady/ext/wake/test_erc20.py	/^from pytypes.tests.weird.Upgradable import Proxy as UpgradableToken$/;"	i
+Visibility	lib/forge-std/scripts/vm.py	/^class Visibility(PyEnum):$/;"	c
+Visibility	lib/murky/lib/forge-std/scripts/vm.py	/^class Visibility(PyEnum):$/;"	c
+Visibility	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^class Visibility(PyEnum):$/;"	c
+Visibility	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^class Visibility(PyEnum):$/;"	c
+VoidFn	lib/forge-std/scripts/vm.py	/^VoidFn = Callable[[], None]$/;"	v
+VoidFn	lib/murky/lib/forge-std/scripts/vm.py	/^VoidFn = Callable[[], None]$/;"	v
+VoidFn	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^VoidFn = Callable[[], None]$/;"	v
+VoidFn	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^VoidFn = Callable[[], None]$/;"	v
+__eq__	lib/forge-std/scripts/vm.py	/^    def __eq__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__eq__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __eq__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__eq__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __eq__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__eq__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __eq__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__gt__	lib/forge-std/scripts/vm.py	/^    def __gt__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__gt__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __gt__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__gt__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __gt__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__gt__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __gt__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:Cheatcodes
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:CheatcodesPrinter
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:Function
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, cheatcode: "Cheatcode"):$/;"	m	class:CmpCheatcode
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, func: Function, group: str, status: str, safety: str):$/;"	m	class:Cheatcode
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, list: list[Item]) -> None:$/;"	m	class:ItemOrder
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str):$/;"	m	class:EnumVariant
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, declaration: str):$/;"	m	class:Error
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, declaration: str):$/;"	m	class:Event
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, fields: list[StructField]):$/;"	m	class:Struct
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, variants: list[EnumVariant]):$/;"	m	class:Enum
+__init__	lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, ty: str, description: str):$/;"	m	class:StructField
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:Cheatcodes
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:CheatcodesPrinter
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:Function
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, cheatcode: "Cheatcode"):$/;"	m	class:CmpCheatcode
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, func: Function, group: str, status: str, safety: str):$/;"	m	class:Cheatcode
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, list: list[Item]) -> None:$/;"	m	class:ItemOrder
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str):$/;"	m	class:EnumVariant
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, declaration: str):$/;"	m	class:Error
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, declaration: str):$/;"	m	class:Event
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, fields: list[StructField]):$/;"	m	class:Struct
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, variants: list[EnumVariant]):$/;"	m	class:Enum
+__init__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, ty: str, description: str):$/;"	m	class:StructField
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:Cheatcodes
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:CheatcodesPrinter
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:Function
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, cheatcode: "Cheatcode"):$/;"	m	class:CmpCheatcode
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, func: Function, group: str, status: str, safety: str):$/;"	m	class:Cheatcode
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, list: list[Item]) -> None:$/;"	m	class:ItemOrder
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str):$/;"	m	class:EnumVariant
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, declaration: str):$/;"	m	class:Error
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, declaration: str):$/;"	m	class:Event
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, fields: list[StructField]):$/;"	m	class:Struct
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, variants: list[EnumVariant]):$/;"	m	class:Enum
+__init__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, ty: str, description: str):$/;"	m	class:StructField
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:Cheatcodes
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:CheatcodesPrinter
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__($/;"	m	class:Function
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, cheatcode: "Cheatcode"):$/;"	m	class:CmpCheatcode
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, func: Function, group: str, status: str, safety: str):$/;"	m	class:Cheatcode
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, list: list[Item]) -> None:$/;"	m	class:ItemOrder
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str):$/;"	m	class:EnumVariant
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, declaration: str):$/;"	m	class:Error
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, declaration: str):$/;"	m	class:Event
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, fields: list[StructField]):$/;"	m	class:Struct
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, description: str, variants: list[EnumVariant]):$/;"	m	class:Enum
+__init__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __init__(self, name: str, ty: str, description: str):$/;"	m	class:StructField
+__init__	lib/solady/ext/wake/test_eip712_fuzz.py	/^    def __init__(self):$/;"	m	class:Eip712FuzzTest
+__init__	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def __init__(self):$/;"	m	class:ERC721
+__init__	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^    def __init__(self):$/;"	m	class:MerkleProofFuzzTest
+__init__	lib/solady/ext/wake/utils.py	/^    def __init__(self):$/;"	m	class:MerkleTree
+__lt__	lib/forge-std/scripts/vm.py	/^    def __lt__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__lt__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __lt__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__lt__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __lt__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__lt__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __lt__(self, other: "CmpCheatcode") -> bool:$/;"	m	class:CmpCheatcode	file:
+__str__	lib/forge-std/scripts/vm.py	/^    def __str__(self):$/;"	m	class:Mutability	file:
+__str__	lib/forge-std/scripts/vm.py	/^    def __str__(self):$/;"	m	class:Visibility	file:
+__str__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __str__(self):$/;"	m	class:Mutability	file:
+__str__	lib/murky/lib/forge-std/scripts/vm.py	/^    def __str__(self):$/;"	m	class:Visibility	file:
+__str__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __str__(self):$/;"	m	class:Mutability	file:
+__str__	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def __str__(self):$/;"	m	class:Visibility	file:
+__str__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __str__(self):$/;"	m	class:Mutability	file:
+__str__	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def __str__(self):$/;"	m	class:Visibility	file:
+_bound$	lib/murky/lib/openzeppelin-contracts/scripts/generate/templates/Checkpoints.t.js	/^function _bound${capitalize(opts.keyTypeName)}($/;"	f
+_bound$	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/generate/templates/Checkpoints.t.js	/^function _bound${capitalize(opts.keyTypeName)}($/;"	f
+_bound$	lib/openzeppelin-contracts-upgradeable/scripts/generate/templates/Checkpoints.t.js	/^function _bound${capitalize(opts.keyTypeName)}($/;"	f
+_bound$	lib/openzeppelin-contracts/scripts/generate/templates/Checkpoints.t.js	/^function _bound${capitalize(opts.keyTypeName)}($/;"	f
+_build_level	lib/solady/ext/wake/utils.py	/^    def _build_level(self, level: List[bytes]) -> List[bytes]:$/;"	m	class:MerkleTree
+_build_tree	lib/solady/ext/wake/utils.py	/^    def _build_tree(self) -> None:$/;"	m	class:MerkleTree
+_dec_indent	lib/forge-std/scripts/vm.py	/^    def _dec_indent(self):$/;"	m	class:CheatcodesPrinter
+_dec_indent	lib/murky/lib/forge-std/scripts/vm.py	/^    def _dec_indent(self):$/;"	m	class:CheatcodesPrinter
+_dec_indent	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _dec_indent(self):$/;"	m	class:CheatcodesPrinter
+_dec_indent	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _dec_indent(self):$/;"	m	class:CheatcodesPrinter
+_inc_indent	lib/forge-std/scripts/vm.py	/^    def _inc_indent(self):$/;"	m	class:CheatcodesPrinter
+_inc_indent	lib/murky/lib/forge-std/scripts/vm.py	/^    def _inc_indent(self):$/;"	m	class:CheatcodesPrinter
+_inc_indent	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _inc_indent(self):$/;"	m	class:CheatcodesPrinter
+_inc_indent	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _inc_indent(self):$/;"	m	class:CheatcodesPrinter
+_p_comment	lib/forge-std/scripts/vm.py	/^    def _p_comment(self, s: str, doc: bool = False):$/;"	m	class:CheatcodesPrinter
+_p_comment	lib/murky/lib/forge-std/scripts/vm.py	/^    def _p_comment(self, s: str, doc: bool = False):$/;"	m	class:CheatcodesPrinter
+_p_comment	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _p_comment(self, s: str, doc: bool = False):$/;"	m	class:CheatcodesPrinter
+_p_comment	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _p_comment(self, s: str, doc: bool = False):$/;"	m	class:CheatcodesPrinter
+_p_indent	lib/forge-std/scripts/vm.py	/^    def _p_indent(self):$/;"	m	class:CheatcodesPrinter
+_p_indent	lib/murky/lib/forge-std/scripts/vm.py	/^    def _p_indent(self):$/;"	m	class:CheatcodesPrinter
+_p_indent	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _p_indent(self):$/;"	m	class:CheatcodesPrinter
+_p_indent	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _p_indent(self):$/;"	m	class:CheatcodesPrinter
+_p_indented	lib/forge-std/scripts/vm.py	/^    def _p_indented(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_p_indented	lib/murky/lib/forge-std/scripts/vm.py	/^    def _p_indented(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_p_indented	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _p_indented(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_p_indented	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _p_indented(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_p_items	lib/forge-std/scripts/vm.py	/^    def _p_items(self, contract: Cheatcodes):$/;"	m	class:CheatcodesPrinter
+_p_items	lib/murky/lib/forge-std/scripts/vm.py	/^    def _p_items(self, contract: Cheatcodes):$/;"	m	class:CheatcodesPrinter
+_p_items	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _p_items(self, contract: Cheatcodes):$/;"	m	class:CheatcodesPrinter
+_p_items	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _p_items(self, contract: Cheatcodes):$/;"	m	class:CheatcodesPrinter
+_p_line	lib/forge-std/scripts/vm.py	/^    def _p_line(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_p_line	lib/murky/lib/forge-std/scripts/vm.py	/^    def _p_line(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_p_line	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _p_line(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_p_line	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _p_line(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_p_nl	lib/forge-std/scripts/vm.py	/^    def _p_nl(self):$/;"	m	class:CheatcodesPrinter
+_p_nl	lib/murky/lib/forge-std/scripts/vm.py	/^    def _p_nl(self):$/;"	m	class:CheatcodesPrinter
+_p_nl	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _p_nl(self):$/;"	m	class:CheatcodesPrinter
+_p_nl	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _p_nl(self):$/;"	m	class:CheatcodesPrinter
+_p_str	lib/forge-std/scripts/vm.py	/^    def _p_str(self, txt: str):$/;"	m	class:CheatcodesPrinter
+_p_str	lib/murky/lib/forge-std/scripts/vm.py	/^    def _p_str(self, txt: str):$/;"	m	class:CheatcodesPrinter
+_p_str	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _p_str(self, txt: str):$/;"	m	class:CheatcodesPrinter
+_p_str	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _p_str(self, txt: str):$/;"	m	class:CheatcodesPrinter
+_with_indent	lib/forge-std/scripts/vm.py	/^    def _with_indent(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_with_indent	lib/murky/lib/forge-std/scripts/vm.py	/^    def _with_indent(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_with_indent	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def _with_indent(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+_with_indent	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def _with_indent(self, f: VoidFn):$/;"	m	class:CheatcodesPrinter
+add_leaf	lib/solady/ext/wake/utils.py	/^    def add_leaf(self, leaf: bytes):$/;"	m	class:MerkleTree
+alignPattern	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function alignPattern(align) {$/;"	f
+alignPattern	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function alignPattern(align) {$/;"	f
+alignPattern	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function alignPattern(align) {$/;"	f
+alignPattern	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function alignPattern(align) {$/;"	f
+anchor	lib/murky/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+anchor	lib/openzeppelin-contracts-upgradeable/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+anchor	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+anchor	lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+anchor	lib/openzeppelin-foundry-upgrades/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+approve	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def approve(self, _approved: Address, _token_id: uint):$/;"	m	class:ERC721
+approve_for_all	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def approve_for_all(self) -> None:$/;"	m	class:ERC721FuzzTest
+approve_operator	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def approve_operator(self) -> None:$/;"	m	class:ERC721FuzzTest
+approve_owner	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def approve_owner(self) -> None:$/;"	m	class:ERC721FuzzTest
+assert	lib/solady/js/solady.test.js	/^function assert(cond, msg) {$/;"	f
+assertEq	lib/solady/js/solady.test.js	/^function assertEq(a, b) {$/;"	f
+average	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function average(...args) {$/;"	f
+average	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function average(...args) {$/;"	f
+average	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function average(...args) {$/;"	f
+average	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function average(...args) {$/;"	f
+balance_of	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def balance_of(self, _owner: Address):$/;"	m	class:ERC721
+bufferToHexString	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/eip712.js	/^function bufferToHexString(buffer) {$/;"	f
+bufferToHexString	lib/openzeppelin-contracts-upgradeable/test/helpers/eip712.js	/^function bufferToHexString(buffer) {$/;"	f
+bufferToHexString	lib/openzeppelin-contracts/test/helpers/eip712.js	/^function bufferToHexString(buffer) {$/;"	f
+buildBaseRoles	lib/murky/lib/openzeppelin-contracts/test/helpers/access-manager.js	/^function buildBaseRoles() {$/;"	f
+buildBaseRoles	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/access-manager.js	/^function buildBaseRoles() {$/;"	f
+buildBaseRoles	lib/openzeppelin-contracts-upgradeable/test/helpers/access-manager.js	/^function buildBaseRoles() {$/;"	f
+buildBaseRoles	lib/openzeppelin-contracts/test/helpers/access-manager.js	/^function buildBaseRoles() {$/;"	f
+burn	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def burn(self,_token_id: int):$/;"	m	class:ERC721
+burn_approved	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def burn_approved(self) -> None:$/;"	m	class:ERC721FuzzTest
+burn_operator	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def burn_operator(self) -> None:$/;"	m	class:ERC721FuzzTest
+burn_owner	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def burn_owner(self) -> None:$/;"	m	class:ERC721FuzzTest
+capitalize	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/helpers.js	/^function capitalize(str) {$/;"	f
+capitalize	lib/openzeppelin-contracts-upgradeable/scripts/helpers.js	/^function capitalize(str) {$/;"	f
+capitalize	lib/openzeppelin-contracts/scripts/helpers.js	/^function capitalize(str) {$/;"	f
+center	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function center(text, length) {$/;"	f
+center	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function center(text, length) {$/;"	f
+center	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function center(text, length) {$/;"	f
+center	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function center(text, length) {$/;"	f
+chunk	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/helpers.js	/^function chunk(array, size = 1) {$/;"	f
+chunk	lib/openzeppelin-contracts-upgradeable/scripts/helpers.js	/^function chunk(array, size = 1) {$/;"	f
+chunk	lib/openzeppelin-contracts/scripts/helpers.js	/^function chunk(array, size = 1) {$/;"	f
+cmp_cheatcode	lib/forge-std/scripts/vm.py	/^def cmp_cheatcode(a: "Cheatcode", b: "Cheatcode") -> int:$/;"	f
+cmp_cheatcode	lib/murky/lib/forge-std/scripts/vm.py	/^def cmp_cheatcode(a: "Cheatcode", b: "Cheatcode") -> int:$/;"	f
+cmp_cheatcode	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^def cmp_cheatcode(a: "Cheatcode", b: "Cheatcode") -> int:$/;"	f
+cmp_cheatcode	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^def cmp_cheatcode(a: "Cheatcode", b: "Cheatcode") -> int:$/;"	f
+computeCreate2Address	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/create.js	/^function computeCreate2Address(saltHex, bytecode, deployer) {$/;"	f
+computeCreate2Address	lib/openzeppelin-contracts-upgradeable/test/helpers/create.js	/^function computeCreate2Address(saltHex, bytecode, deployer) {$/;"	f
+computeCreate2Address	lib/openzeppelin-contracts/test/helpers/create.js	/^function computeCreate2Address(saltHex, bytecode, deployer) {$/;"	f
+computeCreateAddress	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/create.js	/^function computeCreateAddress(deployer, nonce) {$/;"	f
+computeCreateAddress	lib/openzeppelin-contracts-upgradeable/test/helpers/create.js	/^function computeCreateAddress(deployer, nonce) {$/;"	f
+computeCreateAddress	lib/openzeppelin-contracts/test/helpers/create.js	/^function computeCreateAddress(deployer, nonce) {$/;"	f
+concatHex	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/governance.js	/^function concatHex(...args) {$/;"	f
+concatHex	lib/openzeppelin-contracts-upgradeable/test/helpers/governance.js	/^function concatHex(...args) {$/;"	f
+concatHex	lib/openzeppelin-contracts/test/helpers/governance.js	/^function concatHex(...args) {$/;"	f
+concatOpts	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/governance.js	/^function concatOpts(args, opts = null) {$/;"	f
+concatOpts	lib/openzeppelin-contracts-upgradeable/test/helpers/governance.js	/^function concatOpts(args, opts = null) {$/;"	f
+concatOpts	lib/openzeppelin-contracts/test/helpers/governance.js	/^function concatOpts(args, opts = null) {$/;"	f
+const	lib/murky/lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^  const assertProxyInitialization = function ({ value, balance }) {$/;"	f
+const	lib/murky/lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^  const assertProxyInitialization = function ({ value, balance }) {$/;"	f
+const	lib/murky/lib/openzeppelin-contracts/test/proxy/transparent/TransparentUpgradeableProxy.test.js	/^  const createProxy = function (logic, initData, opts = undefined) {$/;"	f
+const	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^  const assertProxyInitialization = function ({ value, balance }) {$/;"	f
+const	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^  const assertProxyInitialization = function ({ value, balance }) {$/;"	f
+const	lib/openzeppelin-contracts-upgradeable/test/proxy/Clones.behaviour.js	/^  const assertProxyInitialization = function ({ value, balance }) {$/;"	f
+const	lib/openzeppelin-contracts-upgradeable/test/proxy/Proxy.behaviour.js	/^  const assertProxyInitialization = function ({ value, balance }) {$/;"	f
+const	lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^  const assertProxyInitialization = function ({ value, balance }) {$/;"	f
+const	lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^  const assertProxyInitialization = function ({ value, balance }) {$/;"	f
+const.ADMIN	lib/murky/lib/openzeppelin-contracts/test/helpers/access-manager.js	/^    ADMIN: {$/;"	p
+const.ADMIN	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/access-manager.js	/^    ADMIN: {$/;"	p
+const.ADMIN	lib/openzeppelin-contracts-upgradeable/test/helpers/access-manager.js	/^    ADMIN: {$/;"	p
+const.ADMIN	lib/openzeppelin-contracts/test/helpers/access-manager.js	/^    ADMIN: {$/;"	p
+const.ERC165	lib/murky/lib/openzeppelin-contracts/test/utils/introspection/SupportsInterface.behavior.js	/^  ERC165: ['supportsInterface(bytes4)'],$/;"	p
+const.ERC165	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/introspection/SupportsInterface.behavior.js	/^  ERC165: ['supportsInterface(bytes4)'],$/;"	p
+const.ERC165	lib/openzeppelin-contracts-upgradeable/test/utils/introspection/SupportsInterface.behavior.js	/^  ERC165: ['supportsInterface(bytes4)'],$/;"	p
+const.ERC165	lib/openzeppelin-contracts/test/utils/introspection/SupportsInterface.behavior.js	/^  ERC165: ['supportsInterface(bytes4)'],$/;"	p
+const.address	lib/murky/lib/openzeppelin-contracts/test/helpers/random.js	/^  address: () => ethers.Wallet.createRandom().address,$/;"	p
+const.blockNumber	lib/murky/lib/openzeppelin-contracts/test/helpers/time.js	/^  blockNumber: mine,$/;"	p
+const.blocknumber	lib/murky/lib/openzeppelin-contracts/test/governance/utils/Votes.test.js	/^  blocknumber: '$VotesMock',$/;"	p
+const.blocknumber	lib/murky/lib/openzeppelin-contracts/test/helpers/time.js	/^  blocknumber: () => time.latestBlock().then(ethers.toBigInt),$/;"	p
+const.blocknumber	lib/murky/lib/openzeppelin-contracts/test/helpers/time.js	/^  blocknumber: mineUpTo,$/;"	p
+const.blocknumber	lib/murky/lib/openzeppelin-contracts/test/helpers/time.js	/^  blocknumber: receipt => Promise.resolve(ethers.toBigInt(receipt.blockNumber)),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/governance/utils/Votes.test.js	/^  blocknumber: artifacts.require('$VotesMock'),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC20/extensions/ERC20Votes.test.js	/^  blocknumber: artifacts.require('$ERC20Votes'),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC721/extensions/ERC721Votes.test.js	/^  blocknumber: artifacts.require('$ERC721Votes'),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts-upgradeable/test/governance/utils/Votes.test.js	/^  blocknumber: artifacts.require('$VotesMock'),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts-upgradeable/test/token/ERC20/extensions/ERC20Votes.test.js	/^  blocknumber: artifacts.require('$ERC20Votes'),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts-upgradeable/test/token/ERC721/extensions/ERC721Votes.test.js	/^  blocknumber: artifacts.require('$ERC721Votes'),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts/test/governance/utils/Votes.test.js	/^  blocknumber: artifacts.require('$VotesMock'),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts/test/token/ERC20/extensions/ERC20Votes.test.js	/^  blocknumber: artifacts.require('$ERC20Votes'),$/;"	p
+const.blocknumber	lib/openzeppelin-contracts/test/token/ERC721/extensions/ERC721Votes.test.js	/^  blocknumber: artifacts.require('$ERC721Votes'),$/;"	p
+const.correct	lib/murky/lib/openzeppelin-contracts/test/token/ERC1155/utils/ERC1155Utils.test.js	/^    correct: await deployReceiver(RevertType.None),$/;"	p
+const.correct	lib/murky/lib/openzeppelin-contracts/test/token/ERC721/utils/ERC721Utils.test.js	/^    correct: await deployReceiver(RevertType.None),$/;"	p
+const.decoded	lib/murky/lib/openzeppelin-contracts/test/governance/extensions/GovernorWithParams.test.js	/^  decoded: [42n, 'These are my params'],$/;"	p
+const.from	lib/murky/lib/openzeppelin-contracts/test/metatx/ERC2771Forwarder.test.js	/^      from: await signer.getAddress(),$/;"	p
+const.from	lib/murky/lib/openzeppelin-contracts/test/metatx/ERC2771Forwarder.test.js	/^  from: ethers.Wallet.createRandom().address,$/;"	p
+const.hasPendingChangesets	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^    hasPendingChangesets: changesets.length > 0,$/;"	p
+const.hasPendingChangesets	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^    hasPendingChangesets: changesets.length > 0,$/;"	p
+const.hasPendingChangesets	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/state.js	/^    hasPendingChangesets: changesets.length > 0,$/;"	p
+const.hasPendingChangesets	lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^    hasPendingChangesets: changesets.length > 0,$/;"	p
+const.proposalId	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/governance.js	/^    const message = { proposalId: proposal.id, support: vote.support, voter: vote.voter, nonce: vote.nonce };$/;"	p
+const.proposalId	lib/openzeppelin-contracts-upgradeable/test/helpers/governance.js	/^    const message = { proposalId: proposal.id, support: vote.support, voter: vote.voter, nonce: vote.nonce };$/;"	p
+const.proposalId	lib/openzeppelin-contracts/test/helpers/governance.js	/^    const message = { proposalId: proposal.id, support: vote.support, voter: vote.voter, nonce: vote.nonce };$/;"	p
+const.requiredRoleIsGranted	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^  requiredRoleIsGranted: {$/;"	p
+const.requiredRoleIsGranted	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  requiredRoleIsGranted: {$/;"	p
+const.requiredRoleIsGranted	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^  requiredRoleIsGranted: {$/;"	p
+const.requiredRoleIsGranted	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  requiredRoleIsGranted: {$/;"	p
+const.scheduled	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^  scheduled: {$/;"	p
+const.scheduled	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  scheduled: {$/;"	p
+const.scheduled	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^  scheduled: {$/;"	p
+const.scheduled	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  scheduled: {$/;"	p
+const.short	lib/murky/lib/openzeppelin-contracts/test/utils/cryptography/EIP712.test.js	/^  short: ['A Name', '1'],$/;"	p
+const.timestamp	lib/murky/lib/openzeppelin-contracts/test/governance/utils/Votes.test.js	/^  timestamp: '$VotesTimestampMock',$/;"	p
+const.timestamp	lib/murky/lib/openzeppelin-contracts/test/helpers/time.js	/^  timestamp: (delay, mine = true) =>$/;"	p
+const.timestamp	lib/murky/lib/openzeppelin-contracts/test/helpers/time.js	/^  timestamp: (to, mine = true) => (mine ? time.increaseTo(to) : time.setNextBlockTimestamp(to)),$/;"	p
+const.uintParam	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/governance/extensions/GovernorWithParams.test.js	/^  uintParam: web3.utils.toBN('42'),$/;"	p
+const.uintParam	lib/openzeppelin-contracts-upgradeable/test/governance/extensions/GovernorWithParams.test.js	/^  uintParam: web3.utils.toBN('42'),$/;"	p
+const.uintParam	lib/openzeppelin-contracts/test/governance/extensions/GovernorWithParams.test.js	/^  uintParam: web3.utils.toBN('42'),$/;"	p
+contents	lib/solady/ext/wake/test_eip712.py	/^    contents="Hello, Bob!",$/;"	v	class:Mail
+contractName	utils/addresses.py	/^    contractName = k["contractName"]$/;"	v
+contractNames	utils/addresses.py	/^contractNames = []$/;"	v
+copy	lib/forge-std/scripts/vm.py	/^import copy$/;"	i
+copy	lib/murky/lib/forge-std/scripts/vm.py	/^import copy$/;"	i
+copy	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^import copy$/;"	i
+copy	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^import copy$/;"	i
+d	utils/addresses.py	/^d = json.load(f)$/;"	v
+dataclass	lib/solady/ext/wake/test_eip712.py	/^from dataclasses import dataclass, field$/;"	i
+dataclass	lib/solady/ext/wake/test_eip712_fuzz.py	/^from dataclasses import dataclass, field$/;"	i
+decode	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/ShortStrings.test.js	/^function decode(sstr) {$/;"	f
+decode	lib/openzeppelin-contracts-upgradeable/test/utils/ShortStrings.test.js	/^function decode(sstr) {$/;"	f
+decode	lib/openzeppelin-contracts/test/utils/ShortStrings.test.js	/^function decode(sstr) {$/;"	f
+default	lib/forge-std/scripts/vm.py	/^    def default() -> "ItemOrder":$/;"	m	class:ItemOrder
+default	lib/murky/lib/forge-std/scripts/vm.py	/^    def default() -> "ItemOrder":$/;"	m	class:ItemOrder
+default	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def default() -> "ItemOrder":$/;"	m	class:ItemOrder
+default	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def default() -> "ItemOrder":$/;"	m	class:ItemOrder
+defaultdict	lib/solady/ext/wake/test_erc1155_fuzz.py	/^from collections import defaultdict$/;"	i
+delete_tag	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/publish.sh	/^delete_tag() {$/;"	f
+delete_tag	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/publish.sh	/^delete_tag() {$/;"	f
+delete_tag	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/publish.sh	/^delete_tag() {$/;"	f
+delete_tag	lib/openzeppelin-contracts/scripts/release/workflow/publish.sh	/^delete_tag() {$/;"	f
+dis_approve_owner	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def dis_approve_owner(self) -> None:$/;"	m	class:ERC721FuzzTest
+dist_tag	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/pack.sh	/^dist_tag() {$/;"	f
+dist_tag	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/pack.sh	/^dist_tag() {$/;"	f
+dist_tag	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/pack.sh	/^dist_tag() {$/;"	f
+dist_tag	lib/openzeppelin-contracts/scripts/release/workflow/pack.sh	/^dist_tag() {$/;"	f
+domainSeparator	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/eip712.js	/^function domainSeparator(domain) {$/;"	f
+domainSeparator	lib/openzeppelin-contracts-upgradeable/test/helpers/eip712.js	/^function domainSeparator(domain) {$/;"	f
+domainSeparator	lib/openzeppelin-contracts/test/helpers/eip712.js	/^function domainSeparator(domain) {$/;"	f
+domainType	lib/murky/lib/openzeppelin-contracts/test/helpers/eip712.js	/^function domainType(domain) {$/;"	f
+domainType	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/eip712.js	/^function domainType(domain) {$/;"	f
+domainType	lib/openzeppelin-contracts-upgradeable/test/helpers/eip712.js	/^function domainType(domain) {$/;"	f
+domainType	lib/openzeppelin-contracts/test/helpers/eip712.js	/^function domainType(domain) {$/;"	f
+error	lib/murky/lib/openzeppelin-contracts/scripts/upgradeable/patch-apply.sh	/^error() {$/;"	f
+error	lib/murky/lib/openzeppelin-contracts/scripts/upgradeable/patch-save.sh	/^error() {$/;"	f
+error	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/upgradeable/patch-apply.sh	/^error() {$/;"	f
+error	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/upgradeable/patch-save.sh	/^error() {$/;"	f
+error	lib/openzeppelin-contracts-upgradeable/scripts/upgradeable/patch-apply.sh	/^error() {$/;"	f
+error	lib/openzeppelin-contracts-upgradeable/scripts/upgradeable/patch-save.sh	/^error() {$/;"	f
+error	lib/openzeppelin-contracts/scripts/upgradeable/patch-apply.sh	/^error() {$/;"	f
+error	lib/openzeppelin-contracts/scripts/upgradeable/patch-save.sh	/^error() {$/;"	f
+expectRevert.padRandomWhitespace	lib/solady/js/solady.test.js	/^function padRandomWhitespace(data) {$/;"	f
+expectRevert.randomData	lib/solady/js/solady.test.js	/^function randomData() {$/;"	f
+expectRevert.testCompressDecompress	lib/solady/js/solady.test.js	/^function testCompressDecompress(compress, decompress) {$/;"	f
+expectStruct	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/math/Math.test.js	/^function expectStruct(value, expected) {$/;"	f
+expectStruct	lib/openzeppelin-contracts-upgradeable/test/utils/math/Math.test.js	/^function expectStruct(value, expected) {$/;"	f
+expectStruct	lib/openzeppelin-contracts/test/utils/math/Math.test.js	/^function expectStruct(value, expected) {$/;"	f
+extractLayouts	lib/murky/lib/openzeppelin-contracts/scripts/checks/extract-layout.js	/^function extractLayouts(path) {$/;"	f
+extractLayouts	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/extract-layout.js	/^function extractLayouts(path) {$/;"	f
+extractLayouts	lib/openzeppelin-contracts-upgradeable/scripts/checks/extract-layout.js	/^function extractLayouts(path) {$/;"	f
+extractLayouts	lib/openzeppelin-contracts/scripts/checks/extract-layout.js	/^function extractLayouts(path) {$/;"	f
+extractSection	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/github-release.js	/^function extractSection(document, wantedHeading) {$/;"	f
+extractSection	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/github-release.js	/^function extractSection(document, wantedHeading) {$/;"	f
+extractSection	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/github-release.js	/^function extractSection(document, wantedHeading) {$/;"	f
+extractSection	lib/openzeppelin-contracts/scripts/release/workflow/github-release.js	/^function extractSection(document, wantedHeading) {$/;"	f
+f	utils/addresses.py	/^f = open(P)$/;"	v
+field	lib/solady/ext/wake/test_eip712.py	/^from dataclasses import dataclass, field$/;"	i
+field	lib/solady/ext/wake/test_eip712_fuzz.py	/^from dataclasses import dataclass, field$/;"	i
+finish	lib/forge-std/scripts/vm.py	/^    def finish(self) -> str:$/;"	m	class:CheatcodesPrinter
+finish	lib/murky/lib/forge-std/scripts/vm.py	/^    def finish(self) -> str:$/;"	m	class:CheatcodesPrinter
+finish	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def finish(self) -> str:$/;"	m	class:CheatcodesPrinter
+finish	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def finish(self) -> str:$/;"	m	class:CheatcodesPrinter
+flow_batch_mint	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_batch_mint(self, payload: bytearray) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_burn	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_burn(self) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_burn_batch	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_burn_batch(self) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_burn_batch_unchecked	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_burn_batch_unchecked(self):$/;"	m	class:ERC1155FuzzTest
+flow_burn_unchecked	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_burn_unchecked(self) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_change_approval	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_change_approval(self) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_change_approval_unchecked	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_change_approval_unchecked(self) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_check_signature	lib/solady/ext/wake/test_signature_checker_fuzz.py	/^    def flow_check_signature(self) -> None:$/;"	m	class:SignatureCheckerFuzzTest
+flow_check_signature_invalid_modified	lib/solady/ext/wake/test_signature_checker_fuzz.py	/^    def flow_check_signature_invalid_modified(self) -> None:$/;"	m	class:SignatureCheckerFuzzTest
+flow_check_signature_invalid_random	lib/solady/ext/wake/test_signature_checker_fuzz.py	/^    def flow_check_signature_invalid_random(self, signer: Address, hash: bytes32) -> None:$/;"	m	class:SignatureCheckerFuzzTest
+flow_mint	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_mint(self, payload: bytearray) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_safe_batch_transfer	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_safe_batch_transfer(self, payload: bytearray) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_safe_batch_transfer_unchecked	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_safe_batch_transfer_unchecked(self, payload: bytearray) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_safe_transfer	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_safe_transfer(self, payload: bytearray):$/;"	m	class:ERC1155FuzzTest
+flow_safe_transfer_unchecked	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def flow_safe_transfer_unchecked(self, payload: bytearray) -> None:$/;"	m	class:ERC1155FuzzTest
+flow_verify	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^    def flow_verify(self) -> None:$/;"	m	class:MerkleProofFuzzTest
+flow_verify_invalid_modified	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^    def flow_verify_invalid_modified(self) -> None:$/;"	m	class:MerkleProofFuzzTest
+flow_verify_invalid_random	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^    def flow_verify_invalid_random(self, proof: List[bytes32], root: bytes32, leaf: bytes) -> None:$/;"	m	class:MerkleProofFuzzTest
+flow_verify_multiproof	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^    def flow_verify_multiproof(self) -> None:$/;"	m	class:MerkleProofFuzzTest
+flow_verify_multiproof_invalid_modified	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^    def flow_verify_multiproof_invalid_modified(self) -> None:$/;"	m	class:MerkleProofFuzzTest
+flow_verify_multiproof_invalid_random	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^    def flow_verify_multiproof_invalid_random(self, proof: List[bytes32], root: bytes32, leaves: List[bytes], flags: List[bool]) -> None:$/;"	m	class:MerkleProofFuzzTest
+forgeMessage.proposalId	lib/murky/lib/openzeppelin-contracts/test/helpers/governance.js	/^    const message = { proposalId: this.id, support: vote.support, voter: vote.voter, nonce: vote.nonce };$/;"	p
+formatCellMarkdown	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCellMarkdown(cell) {$/;"	f
+formatCellMarkdown	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCellMarkdown(cell) {$/;"	f
+formatCellMarkdown	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function formatCellMarkdown(cell) {$/;"	f
+formatCellMarkdown	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCellMarkdown(cell) {$/;"	f
+formatCellShell	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCellShell(cell) {$/;"	f
+formatCellShell	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCellShell(cell) {$/;"	f
+formatCellShell	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function formatCellShell(cell) {$/;"	f
+formatCellShell	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCellShell(cell) {$/;"	f
+formatCmpMarkdown	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCmpMarkdown(rows) {$/;"	f
+formatCmpMarkdown	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCmpMarkdown(rows) {$/;"	f
+formatCmpMarkdown	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function formatCmpMarkdown(rows) {$/;"	f
+formatCmpMarkdown	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCmpMarkdown(rows) {$/;"	f
+formatCmpShell	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCmpShell(rows) {$/;"	f
+formatCmpShell	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCmpShell(rows) {$/;"	f
+formatCmpShell	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function formatCmpShell(rows) {$/;"	f
+formatCmpShell	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function formatCmpShell(rows) {$/;"	f
+formatLines	lib/murky/lib/openzeppelin-contracts/scripts/generate/format-lines.js	/^function formatLines(...lines) {$/;"	f
+formatLines	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/generate/format-lines.js	/^function formatLines(...lines) {$/;"	f
+formatLines	lib/openzeppelin-contracts-upgradeable/scripts/generate/format-lines.js	/^function formatLines(...lines) {$/;"	f
+formatLines	lib/openzeppelin-contracts/scripts/generate/format-lines.js	/^function formatLines(...lines) {$/;"	f
+fromBytes32	lib/murky/lib/openzeppelin-contracts/scripts/generate/templates/conversion.js	/^function fromBytes32(type, value) {$/;"	f
+fromBytes32	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/generate/templates/conversion.js	/^function fromBytes32(type, value) {$/;"	f
+fromBytes32	lib/openzeppelin-contracts-upgradeable/scripts/generate/templates/conversion.js	/^function fromBytes32(type, value) {$/;"	f
+fromBytes32	lib/openzeppelin-contracts/scripts/generate/templates/conversion.js	/^function fromBytes32(type, value) {$/;"	f
+from_	lib/solady/ext/wake/test_eip712.py	/^    from_=Person("Cow", Address("0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826")),$/;"	v	class:Mail
+from_dict	lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Cheatcode":$/;"	m	class:Cheatcode
+from_dict	lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_dict	lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Enum":$/;"	m	class:Enum
+from_dict	lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Error":$/;"	m	class:Error
+from_dict	lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Event":$/;"	m	class:Event
+from_dict	lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Function":$/;"	m	class:Function
+from_dict	lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Struct":$/;"	m	class:Struct
+from_dict	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Cheatcode":$/;"	m	class:Cheatcode
+from_dict	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_dict	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Enum":$/;"	m	class:Enum
+from_dict	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Error":$/;"	m	class:Error
+from_dict	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Event":$/;"	m	class:Event
+from_dict	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Function":$/;"	m	class:Function
+from_dict	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Struct":$/;"	m	class:Struct
+from_dict	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Cheatcode":$/;"	m	class:Cheatcode
+from_dict	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_dict	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Enum":$/;"	m	class:Enum
+from_dict	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Error":$/;"	m	class:Error
+from_dict	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Event":$/;"	m	class:Event
+from_dict	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Function":$/;"	m	class:Function
+from_dict	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Struct":$/;"	m	class:Struct
+from_dict	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Cheatcode":$/;"	m	class:Cheatcode
+from_dict	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_dict	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Enum":$/;"	m	class:Enum
+from_dict	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Error":$/;"	m	class:Error
+from_dict	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Event":$/;"	m	class:Event
+from_dict	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Function":$/;"	m	class:Function
+from_dict	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_dict(d: dict) -> "Struct":$/;"	m	class:Struct
+from_json	lib/forge-std/scripts/vm.py	/^    def from_json(s) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_json	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_json(s) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_json	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_json(s) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_json	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_json(s) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_json_file	lib/forge-std/scripts/vm.py	/^    def from_json_file(file_path: str) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_json_file	lib/murky/lib/forge-std/scripts/vm.py	/^    def from_json_file(file_path: str) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_json_file	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def from_json_file(file_path: str) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+from_json_file	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def from_json_file(file_path: str) -> "Cheatcodes":$/;"	m	class:Cheatcodes
+function.setOutput	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^  function setOutput(key, value) {$/;"	f
+function.setOutput	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^  function setOutput(key, value) {$/;"	f
+function.setOutput	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/state.js	/^  function setOutput(key, value) {$/;"	f
+function.setOutput	lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^  function setOutput(key, value) {$/;"	f
+genOperation	lib/murky/lib/openzeppelin-contracts/test/governance/TimelockController.test.js	/^function genOperation(target, value, data, predecessor, salt) {$/;"	f
+genOperation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/governance/TimelockController.test.js	/^function genOperation(target, value, data, predecessor, salt) {$/;"	f
+genOperation	lib/openzeppelin-contracts-upgradeable/test/governance/TimelockController.test.js	/^function genOperation(target, value, data, predecessor, salt) {$/;"	f
+genOperation	lib/openzeppelin-contracts/test/governance/TimelockController.test.js	/^function genOperation(target, value, data, predecessor, salt) {$/;"	f
+genOperationBatch	lib/murky/lib/openzeppelin-contracts/test/governance/TimelockController.test.js	/^function genOperationBatch(targets, values, payloads, predecessor, salt) {$/;"	f
+genOperationBatch	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/governance/TimelockController.test.js	/^function genOperationBatch(targets, values, payloads, predecessor, salt) {$/;"	f
+genOperationBatch	lib/openzeppelin-contracts-upgradeable/test/governance/TimelockController.test.js	/^function genOperationBatch(targets, values, payloads, predecessor, salt) {$/;"	f
+genOperationBatch	lib/openzeppelin-contracts/test/governance/TimelockController.test.js	/^function genOperationBatch(targets, values, payloads, predecessor, salt) {$/;"	f
+generateFromTemplate	lib/murky/lib/openzeppelin-contracts/scripts/generate/run.js	/^function generateFromTemplate(file, template, outputPrefix = '') {$/;"	f
+generateFromTemplate	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/generate/run.js	/^function generateFromTemplate(file, template, outputPrefix = '') {$/;"	f
+generateFromTemplate	lib/openzeppelin-contracts-upgradeable/scripts/generate/run.js	/^function generateFromTemplate(file, template, outputPrefix = '') {$/;"	f
+generateFromTemplate	lib/openzeppelin-contracts/scripts/generate/run.js	/^function generateFromTemplate(file, template, outputPrefix = '') {$/;"	f
+getAccessPath.requiredRoleIsGranted.roleGrantingIsDelayed.callerHasAnExecutionDelay.afterGrantDelay	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  getAccessPath.requiredRoleIsGranted.roleGrantingIsDelayed.callerHasAnExecutionDelay.afterGrantDelay = function () {$/;"	f
+getAccessPath.requiredRoleIsGranted.roleGrantingIsDelayed.callerHasAnExecutionDelay.afterGrantDelay	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^  getAccessPath.requiredRoleIsGranted.roleGrantingIsDelayed.callerHasAnExecutionDelay.afterGrantDelay = function () {$/;"	f
+getAccessPath.requiredRoleIsGranted.roleGrantingIsDelayed.callerHasAnExecutionDelay.afterGrantDelay	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  getAccessPath.requiredRoleIsGranted.roleGrantingIsDelayed.callerHasAnExecutionDelay.afterGrantDelay = function () {$/;"	f
+getAccessPath.requiredRoleIsGranted.roleGrantingIsNotDelayed.callerHasAnExecutionDelay	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  getAccessPath.requiredRoleIsGranted.roleGrantingIsNotDelayed.callerHasAnExecutionDelay = function () {$/;"	f
+getAccessPath.requiredRoleIsGranted.roleGrantingIsNotDelayed.callerHasAnExecutionDelay	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  getAccessPath.requiredRoleIsGranted.roleGrantingIsNotDelayed.callerHasAnExecutionDelay = function () {$/;"	f
+getAccessPath.requiredRoleIsGranted.roleGrantingIsNotDelayed.callerHasAnExecutionDelay	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^  getAccessPath.requiredRoleIsGranted.roleGrantingIsNotDelayed.callerHasAnExecutionDelay = function () {$/;"	f
+getAccessPath.requiredRoleIsGranted.roleGrantingIsNotDelayed.callerHasAnExecutionDelay	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  getAccessPath.requiredRoleIsGranted.roleGrantingIsNotDelayed.callerHasAnExecutionDelay = function () {$/;"	f
+getAllLinks	lib/murky/lib/openzeppelin-contracts/docs/templates/helpers.js	/^function getAllLinks(items) {$/;"	f
+getAllLinks	lib/openzeppelin-contracts-upgradeable/docs/templates/helpers.js	/^function getAllLinks(items) {$/;"	f
+getAllLinks	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/templates/helpers.js	/^function getAllLinks(items) {$/;"	f
+getAllLinks	lib/openzeppelin-contracts/docs/templates/helpers.js	/^function getAllLinks(items) {$/;"	f
+getAllLinks	lib/openzeppelin-foundry-upgrades/docs/templates/helpers.js	/^function getAllLinks(items) {$/;"	f
+getPageTitle	lib/murky/lib/openzeppelin-contracts/scripts/gen-nav.js	/^function getPageTitle(directory) {$/;"	f
+getPageTitle	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/gen-nav.js	/^function getPageTitle(directory) {$/;"	f
+getPageTitle	lib/openzeppelin-contracts-upgradeable/scripts/gen-nav.js	/^function getPageTitle(directory) {$/;"	f
+getPageTitle	lib/openzeppelin-contracts/scripts/gen-nav.js	/^function getPageTitle(directory) {$/;"	f
+getSlot	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/erc1967.js	/^function getSlot(address, slot) {$/;"	f
+getSlot	lib/openzeppelin-contracts-upgradeable/test/helpers/erc1967.js	/^function getSlot(address, slot) {$/;"	f
+getSlot	lib/openzeppelin-contracts/test/helpers/erc1967.js	/^function getSlot(address, slot) {$/;"	f
+getVersion	lib/murky/lib/openzeppelin-contracts/scripts/generate/run.js	/^function getVersion(path) {$/;"	f
+getVersion	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/generate/run.js	/^function getVersion(path) {$/;"	f
+getVersion	lib/openzeppelin-contracts-upgradeable/scripts/generate/run.js	/^function getVersion(path) {$/;"	f
+getVersion	lib/openzeppelin-contracts/scripts/generate/run.js	/^function getVersion(path) {$/;"	f
+get_approved	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def get_approved(self, _token_id: uint):$/;"	m	class:ERC721
+get_list	lib/forge-std/scripts/vm.py	/^    def get_list(self) -> list[Item]:$/;"	m	class:ItemOrder
+get_list	lib/murky/lib/forge-std/scripts/vm.py	/^    def get_list(self) -> list[Item]:$/;"	m	class:ItemOrder
+get_list	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def get_list(self) -> list[Item]:$/;"	m	class:ItemOrder
+get_list	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def get_list(self) -> list[Item]:$/;"	m	class:ItemOrder
+get_multiproof	lib/solady/ext/wake/utils.py	/^    def get_multiproof(self, indexes: List[int]) -> Tuple[List[bytes], List[bool]]:$/;"	m	class:MerkleTree
+get_proof	lib/solady/ext/wake/utils.py	/^    def get_proof(self, index: int) -> List[bytes]:$/;"	m	class:MerkleTree
+group	lib/forge-std/scripts/vm.py	/^def group(s: str) -> str:$/;"	f
+group	lib/murky/lib/forge-std/scripts/vm.py	/^def group(s: str) -> str:$/;"	f
+group	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^def group(s: str) -> str:$/;"	f
+group	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^def group(s: str) -> str:$/;"	f
+hasFoundry	lib/openzeppelin-contracts-upgradeable/hardhat.config.js	/^function hasFoundry() {$/;"	f
+hasFoundry	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/hardhat.config.js	/^function hasFoundry() {$/;"	f
+hasFoundry	lib/openzeppelin-contracts/hardhat.config.js	/^function hasFoundry() {$/;"	f
+hashTypedData	lib/murky/lib/openzeppelin-contracts/test/helpers/eip712.js	/^function hashTypedData(domain, structHash) {$/;"	f
+hashTypedData	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/eip712.js	/^function hashTypedData(domain, structHash) {$/;"	f
+hashTypedData	lib/openzeppelin-contracts-upgradeable/test/helpers/eip712.js	/^function hashTypedData(domain, structHash) {$/;"	f
+hashTypedData	lib/openzeppelin-contracts/test/helpers/eip712.js	/^function hashTypedData(domain, structHash) {$/;"	f
+hash_message	lib/solady/ext/wake/test_eip712.py	/^from eth_account._utils.structured_data.hashing import hash_message$/;"	i
+hash_message	lib/solady/ext/wake/test_eip712_fuzz.py	/^from eth_account._utils.structured_data.hashing import hash_message$/;"	i
+hexStringToBuffer	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/eip712.js	/^function hexStringToBuffer(hexstr) {$/;"	f
+hexStringToBuffer	lib/openzeppelin-contracts-upgradeable/test/helpers/eip712.js	/^function hexStringToBuffer(hexstr) {$/;"	f
+hexStringToBuffer	lib/openzeppelin-contracts/test/helpers/eip712.js	/^function hexStringToBuffer(hexstr) {$/;"	f
+invariant_approvals	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def invariant_approvals(self) -> None:$/;"	m	class:ERC1155FuzzTest
+invariant_approvals	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def invariant_approvals(self) -> None:$/;"	m	class:ERC721FuzzTest
+invariant_balances	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def invariant_balances(self) -> None:$/;"	m	class:ERC1155FuzzTest
+invariant_balances	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def invariant_balances(self) -> None:$/;"	m	class:ERC721FuzzTest
+invariant_owners	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def invariant_owners(self) -> None:$/;"	m	class:ERC721FuzzTest
+isExpectedError	lib/murky/lib/openzeppelin-contracts/hardhat/env-artifacts.js	/^function isExpectedError(e, suffix) {$/;"	f
+is_approve_for_all	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def is_approve_for_all(self, _owner: Address, _operator: Address):$/;"	m	class:ERC721
+json	lib/forge-std/scripts/vm.py	/^import json$/;"	i
+json	lib/murky/lib/forge-std/scripts/vm.py	/^import json$/;"	i
+json	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^import json$/;"	i
+json	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^import json$/;"	i
+json	utils/addresses.py	/^import json$/;"	i
+keccak256	lib/solady/ext/wake/utils.py	/^from wake.testing import keccak256$/;"	i
+labelToSlot	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/erc1967.js	/^function labelToSlot(label) {$/;"	f
+labelToSlot	lib/openzeppelin-contracts-upgradeable/test/helpers/erc1967.js	/^function labelToSlot(label) {$/;"	f
+labelToSlot	lib/openzeppelin-contracts/test/helpers/erc1967.js	/^function labelToSlot(label) {$/;"	f
+length	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/ShortStrings.test.js	/^function length(sstr) {$/;"	f
+length	lib/openzeppelin-contracts-upgradeable/test/utils/ShortStrings.test.js	/^function length(sstr) {$/;"	f
+length	lib/openzeppelin-contracts/test/utils/ShortStrings.test.js	/^function length(sstr) {$/;"	f
+lengths.chainId	lib/murky/lib/openzeppelin-contracts/test/utils/cryptography/EIP712.test.js	/^      chainId: await ethers.provider.getNetwork().then(({ chainId }) => chainId),$/;"	p
+logger	lib/solady/ext/wake/test_erc1155_fuzz.py	/^logger = logging.getLogger(__name__)$/;"	v
+logging	lib/solady/ext/wake/test_erc1155_fuzz.py	/^import logging$/;"	i
+mail	lib/solady/ext/wake/test_eip712.py	/^mail = Mail($/;"	v
+main	lib/forge-std/scripts/vm.py	/^def main():$/;"	f
+main	lib/murky/lib/forge-std/scripts/vm.py	/^def main():$/;"	f
+main	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^def main():$/;"	f
+main	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^def main():$/;"	f
+makeWordRegExp	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/github-release.js	/^function makeWordRegExp(word) {$/;"	f
+makeWordRegExp	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/github-release.js	/^function makeWordRegExp(word) {$/;"	f
+makeWordRegExp	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/github-release.js	/^function makeWordRegExp(word) {$/;"	f
+makeWordRegExp	lib/openzeppelin-contracts/scripts/release/workflow/github-release.js	/^function makeWordRegExp(word) {$/;"	f
+match	lib/murky/lib/openzeppelin-contracts/certora/run.js	/^function match(entry, request) {$/;"	f
+match	lib/openzeppelin-contracts-upgradeable/certora/run.js	/^function match(entry, request) {$/;"	f
+match	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/certora/run.js	/^function match(entry, request) {$/;"	f
+match	lib/openzeppelin-contracts/certora/run.js	/^function match(entry, request) {$/;"	f
+matchFile	Makefile	/^  matchFile = --match-contract $(FILE)$/;"	m
+matchFunction	Makefile	/^  matchFunction = --match-test $(FUNC)$/;"	m
+memory_to_calldata	lib/forge-std/scripts/vm.py	/^    def memory_to_calldata(m: re.Match) -> str:$/;"	f	function:main
+memory_to_calldata	lib/murky/lib/forge-std/scripts/vm.py	/^    def memory_to_calldata(m: re.Match) -> str:$/;"	f	function:main
+memory_to_calldata	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def memory_to_calldata(m: re.Match) -> str:$/;"	f	function:main
+memory_to_calldata	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def memory_to_calldata(m: re.Match) -> str:$/;"	f	function:main
+mint	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def mint(self) -> None:$/;"	m	class:ERC721FuzzTest
+mint	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def mint(self, _to: Address, _token_id: int):$/;"	m	class:ERC721
+mkdirp	lib/murky/lib/openzeppelin-contracts/scripts/prepack.sh	/^mkdirp() {$/;"	f
+mkdirp	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/prepack.sh	/^mkdirp() {$/;"	f
+mkdirp	lib/openzeppelin-contracts-upgradeable/scripts/prepack.sh	/^mkdirp() {$/;"	f
+mkdirp	lib/openzeppelin-contracts/scripts/prepack.sh	/^mkdirp() {$/;"	f
+modExp	lib/murky/lib/openzeppelin-contracts/test/helpers/math.js	/^function modExp(b, e, m) {$/;"	f
+module.exports	lib/murky/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports['has-functions'] = function ({ item }) {$/;"	f
+module.exports	lib/murky/lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^module.exports = function shouldBehaveLikeClone() {$/;"	f
+module.exports	lib/murky/lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^module.exports = function shouldBehaveLikeProxy() {$/;"	f
+module.exports	lib/murky/lib/openzeppelin-contracts/test/proxy/transparent/TransparentUpgradeableProxy.behaviour.js	/^module.exports = function shouldBehaveLikeTransparentUpgradeableProxy() {$/;"	f
+module.exports	lib/openzeppelin-contracts-upgradeable/docs/templates/properties.js	/^module.exports['has-functions'] = function ({ item }) {$/;"	f
+module.exports	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports['has-functions'] = function ({ item }) {$/;"	f
+module.exports	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^module.exports = function shouldBehaveLikeClone(createClone) {$/;"	f
+module.exports	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^module.exports = function shouldBehaveLikeProxy(createProxy, accounts) {$/;"	f
+module.exports	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/proxy/transparent/TransparentUpgradeableProxy.behaviour.js	/^module.exports = function shouldBehaveLikeTransparentUpgradeableProxy(createProxy, initialOwner, accounts) {$/;"	f
+module.exports	lib/openzeppelin-contracts-upgradeable/test/proxy/Clones.behaviour.js	/^module.exports = function shouldBehaveLikeClone(createClone) {$/;"	f
+module.exports	lib/openzeppelin-contracts-upgradeable/test/proxy/Proxy.behaviour.js	/^module.exports = function shouldBehaveLikeProxy(createProxy, accounts) {$/;"	f
+module.exports	lib/openzeppelin-contracts-upgradeable/test/proxy/transparent/TransparentUpgradeableProxy.behaviour.js	/^module.exports = function shouldBehaveLikeTransparentUpgradeableProxy(createProxy, initialOwner, accounts) {$/;"	f
+module.exports	lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports['has-functions'] = function ({ item }) {$/;"	f
+module.exports	lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^module.exports = function shouldBehaveLikeClone(createClone) {$/;"	f
+module.exports	lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^module.exports = function shouldBehaveLikeProxy(createProxy, accounts) {$/;"	f
+module.exports	lib/openzeppelin-contracts/test/proxy/transparent/TransparentUpgradeableProxy.behaviour.js	/^module.exports = function shouldBehaveLikeTransparentUpgradeableProxy(createProxy, initialOwner, accounts) {$/;"	f
+module.exports	lib/openzeppelin-foundry-upgrades/docs/templates/properties.js	/^module.exports['has-functions'] = function ({ item }) {$/;"	f
+module.exports.ImplementationSlot	lib/murky/lib/openzeppelin-contracts/test/helpers/storage.js	/^  ImplementationSlot: erc1967Slot(ImplementationLabel),$/;"	p
+module.exports.ImplementationSlot	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/erc1967.js	/^  ImplementationSlot: labelToSlot(ImplementationLabel),$/;"	p
+module.exports.ImplementationSlot	lib/openzeppelin-contracts-upgradeable/test/helpers/erc1967.js	/^  ImplementationSlot: labelToSlot(ImplementationLabel),$/;"	p
+module.exports.ImplementationSlot	lib/openzeppelin-contracts/test/helpers/erc1967.js	/^  ImplementationSlot: labelToSlot(ImplementationLabel),$/;"	p
+module.exports.MAX_UINT48	lib/murky/lib/openzeppelin-contracts/test/helpers/constants.js	/^  MAX_UINT48: 2n ** 48n - 1n,$/;"	p
+module.exports.OPTS	lib/murky/lib/openzeppelin-contracts/scripts/generate/templates/Checkpoints.opts.js	/^  OPTS: VALUE_SIZES.map(size => defaultOpts(size)),$/;"	p
+module.exports.OPTS	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/generate/templates/Checkpoints.opts.js	/^  OPTS: VALUE_SIZES.map(size => defaultOpts(size)),$/;"	p
+module.exports.OPTS	lib/openzeppelin-contracts-upgradeable/scripts/generate/templates/Checkpoints.opts.js	/^  OPTS: VALUE_SIZES.map(size => defaultOpts(size)),$/;"	p
+module.exports.OPTS	lib/openzeppelin-contracts/scripts/generate/templates/Checkpoints.opts.js	/^  OPTS: VALUE_SIZES.map(size => defaultOpts(size)),$/;"	p
+module.exports.ProposalState	lib/murky/lib/openzeppelin-contracts/test/helpers/enums.js	/^  ProposalState: Enum('Pending', 'Active', 'Canceled', 'Defeated', 'Succeeded', 'Queued', 'Expired', 'Executed'),$/;"	p
+module.exports.ProposalState	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/enums.js	/^  ProposalState: Enum('Pending', 'Active', 'Canceled', 'Defeated', 'Succeeded', 'Queued', 'Expired', 'Executed'),$/;"	p
+module.exports.ProposalState	lib/openzeppelin-contracts-upgradeable/test/helpers/enums.js	/^  ProposalState: Enum('Pending', 'Active', 'Canceled', 'Defeated', 'Succeeded', 'Queued', 'Expired', 'Executed'),$/;"	p
+module.exports.ProposalState	lib/openzeppelin-contracts/test/helpers/enums.js	/^  ProposalState: Enum('Pending', 'Active', 'Canceled', 'Defeated', 'Succeeded', 'Queued', 'Expired', 'Executed'),$/;"	p
+module.exports.anchor	lib/murky/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+module.exports.anchor	lib/openzeppelin-contracts-upgradeable/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+module.exports.anchor	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+module.exports.anchor	lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+module.exports.anchor	lib/openzeppelin-foundry-upgrades/docs/templates/properties.js	/^module.exports.anchor = function anchor({ item, contract }) {$/;"	f
+module.exports.capitalize	lib/murky/lib/openzeppelin-contracts/scripts/helpers.js	/^  capitalize: str => str.charAt(0).toUpperCase() + str.slice(1),$/;"	p
+module.exports.chunk	lib/murky/lib/openzeppelin-contracts/test/helpers/iterate.js	/^  chunk: (array, size = 1) =>$/;"	p
+module.exports.clock	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/time.js	/^  clock: {$/;"	p
+module.exports.clock	lib/openzeppelin-contracts-upgradeable/test/helpers/time.js	/^  clock: {$/;"	p
+module.exports.clock	lib/openzeppelin-contracts/test/helpers/time.js	/^  clock: {$/;"	p
+module.exports.compileCommand	lib/murky/lib/openzeppelin-contracts/.solcover.js	/^  compileCommand: 'npm run compile',$/;"	p
+module.exports.compileCommand	lib/openzeppelin-contracts-upgradeable/.solcover.js	/^  compileCommand: 'npm run compile',$/;"	p
+module.exports.compileCommand	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/.solcover.js	/^  compileCommand: 'npm run compile',$/;"	p
+module.exports.compileCommand	lib/openzeppelin-contracts/.solcover.js	/^  compileCommand: 'npm run compile',$/;"	p
+module.exports.domainSeparator	lib/murky/lib/openzeppelin-contracts/test/helpers/eip712.js	/^  domainSeparator: ethers.TypedDataEncoder.hashDomain,$/;"	p
+module.exports.exclude	lib/murky/lib/openzeppelin-contracts/docs/config.js	/^  exclude: ['mocks'],$/;"	p
+module.exports.exclude	lib/openzeppelin-contracts-upgradeable/docs/config.js	/^  exclude: ['mocks'],$/;"	p
+module.exports.exclude	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/config.js	/^  exclude: ['mocks'],$/;"	p
+module.exports.exclude	lib/openzeppelin-contracts/docs/config.js	/^  exclude: ['mocks'],$/;"	p
+module.exports.exclude	lib/openzeppelin-foundry-upgrades/docs/config.js	/^  exclude: ['internal'],$/;"	p
+module.exports.functions	lib/murky/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.functions = function ({ item }) {$/;"	f
+module.exports.functions	lib/openzeppelin-contracts-upgradeable/docs/templates/properties.js	/^module.exports.functions = function ({ item }) {$/;"	f
+module.exports.functions	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.functions = function ({ item }) {$/;"	f
+module.exports.functions	lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.functions = function ({ item }) {$/;"	f
+module.exports.functions	lib/openzeppelin-foundry-upgrades/docs/templates/properties.js	/^module.exports.functions = function ({ item }) {$/;"	f
+module.exports.gasReporter.currency	lib/openzeppelin-contracts-upgradeable/hardhat.config.js	/^    currency: 'USD',$/;"	p
+module.exports.gasReporter.currency	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/hardhat.config.js	/^    currency: 'USD',$/;"	p
+module.exports.gasReporter.currency	lib/openzeppelin-contracts/hardhat.config.js	/^    currency: 'USD',$/;"	p
+module.exports.gasReporter.outputFile	lib/openzeppelin-contracts-upgradeable/hardhat.config.js	/^    outputFile: argv.gasReport,$/;"	p
+module.exports.gasReporter.outputFile	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/hardhat.config.js	/^    outputFile: argv.gasReport,$/;"	p
+module.exports.gasReporter.outputFile	lib/openzeppelin-contracts/hardhat.config.js	/^    outputFile: argv.gasReport,$/;"	p
+module.exports.gasReporter.showMethodSig	lib/openzeppelin-contracts-upgradeable/hardhat.config.js	/^    showMethodSig: true,$/;"	p
+module.exports.gasReporter.showMethodSig	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/hardhat.config.js	/^    showMethodSig: true,$/;"	p
+module.exports.gasReporter.showMethodSig	lib/openzeppelin-contracts/hardhat.config.js	/^    showMethodSig: true,$/;"	p
+module.exports.inheritance	lib/murky/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.inheritance = function ({ item, build }) {$/;"	f
+module.exports.inheritance	lib/openzeppelin-contracts-upgradeable/docs/templates/properties.js	/^module.exports.inheritance = function ({ item, build }) {$/;"	f
+module.exports.inheritance	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.inheritance = function ({ item, build }) {$/;"	f
+module.exports.inheritance	lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.inheritance = function ({ item, build }) {$/;"	f
+module.exports.inheritance	lib/openzeppelin-foundry-upgrades/docs/templates/properties.js	/^module.exports.inheritance = function ({ item, build }) {$/;"	f
+module.exports.norpc	lib/murky/lib/openzeppelin-contracts/.solcover.js	/^  norpc: true,$/;"	p
+module.exports.norpc	lib/openzeppelin-contracts-upgradeable/.solcover.js	/^  norpc: true,$/;"	p
+module.exports.norpc	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/.solcover.js	/^  norpc: true,$/;"	p
+module.exports.norpc	lib/openzeppelin-contracts/.solcover.js	/^  norpc: true,$/;"	p
+module.exports.outputDir	lib/murky/lib/openzeppelin-contracts/docs/config.js	/^  outputDir: 'docs\/modules\/api\/pages',$/;"	p
+module.exports.outputDir	lib/openzeppelin-contracts-upgradeable/docs/config.js	/^  outputDir: 'docs\/modules\/api\/pages',$/;"	p
+module.exports.outputDir	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/config.js	/^  outputDir: 'docs\/modules\/api\/pages',$/;"	p
+module.exports.outputDir	lib/openzeppelin-contracts/docs/config.js	/^  outputDir: 'docs\/modules\/api\/pages',$/;"	p
+module.exports.outputDir	lib/openzeppelin-foundry-upgrades/docs/config.js	/^  outputDir: 'docs\/modules\/api\/pages',$/;"	p
+module.exports.plugins	lib/murky/lib/openzeppelin-contracts/solhint.config.js	/^  plugins: ['openzeppelin'],$/;"	p
+module.exports.plugins	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/solhint.config.js	/^  plugins: ['openzeppelin'],$/;"	p
+module.exports.plugins	lib/openzeppelin-contracts-upgradeable/solhint.config.js	/^  plugins: ['openzeppelin'],$/;"	p
+module.exports.plugins	lib/openzeppelin-contracts/solhint.config.js	/^  plugins: ['openzeppelin'],$/;"	p
+module.exports.plugins	lib/openzeppelin-foundry-upgrades/solhint.config.js	/^  plugins: ['openzeppelin'],$/;"	p
+module.exports.require	lib/murky/lib/openzeppelin-contracts/.mocharc.js	/^  require: 'hardhat\/register',$/;"	p
+module.exports.require	lib/openzeppelin-contracts-upgradeable/.mocharc.js	/^  require: 'hardhat\/register',$/;"	p
+module.exports.require	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/.mocharc.js	/^  require: 'hardhat\/register',$/;"	p
+module.exports.require	lib/openzeppelin-contracts/.mocharc.js	/^  require: 'hardhat\/register',$/;"	p
+module.exports.returns2	lib/murky/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.returns2 = function ({ item }) {$/;"	f
+module.exports.returns2	lib/openzeppelin-contracts-upgradeable/docs/templates/properties.js	/^module.exports.returns2 = function ({ item }) {$/;"	f
+module.exports.returns2	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.returns2 = function ({ item }) {$/;"	f
+module.exports.returns2	lib/openzeppelin-contracts/docs/templates/properties.js	/^module.exports.returns2 = function ({ item }) {$/;"	f
+module.exports.returns2	lib/openzeppelin-foundry-upgrades/docs/templates/properties.js	/^module.exports.returns2 = function ({ item }) {$/;"	f
+module.exports.selector	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/methods.js	/^  selector: signature => soliditySha3(signature).substring(0, 10),$/;"	p
+module.exports.selector	lib/openzeppelin-contracts-upgradeable/test/helpers/methods.js	/^  selector: signature => soliditySha3(signature).substring(0, 10),$/;"	p
+module.exports.selector	lib/openzeppelin-contracts/test/helpers/methods.js	/^  selector: signature => soliditySha3(signature).substring(0, 10),$/;"	p
+module.exports.skipFiles	lib/murky/lib/openzeppelin-contracts/.solcover.js	/^  skipFiles: ['mocks'],$/;"	p
+module.exports.skipFiles	lib/openzeppelin-contracts-upgradeable/.solcover.js	/^  skipFiles: ['mocks'],$/;"	p
+module.exports.skipFiles	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/.solcover.js	/^  skipFiles: ['mocks'],$/;"	p
+module.exports.skipFiles	lib/openzeppelin-contracts/.solcover.js	/^  skipFiles: ['mocks'],$/;"	p
+module.exports.solidity	lib/murky/lib/openzeppelin-contracts/hardhat.config.js	/^  solidity: {$/;"	p
+module.exports.solidity	lib/openzeppelin-contracts-upgradeable/hardhat.config.js	/^  solidity: {$/;"	p
+module.exports.solidity	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/hardhat.config.js	/^  solidity: {$/;"	p
+module.exports.solidity	lib/openzeppelin-contracts/hardhat.config.js	/^  solidity: {$/;"	p
+module.exports.solidity	lib/openzeppelin-foundry-upgrades/hardhat.config.js	/^  solidity: {$/;"	p
+module.exports.sum	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/math.js	/^  sum: (...args) => args.reduce((acc, n) => acc + n, 0),$/;"	p
+module.exports.sum	lib/openzeppelin-contracts-upgradeable/test/helpers/math.js	/^  sum: (...args) => args.reduce((acc, n) => acc + n, 0),$/;"	p
+module.exports.sum	lib/openzeppelin-contracts/test/helpers/math.js	/^  sum: (...args) => args.reduce((acc, n) => acc + n, 0),$/;"	p
+module.exports.templates	lib/murky/lib/openzeppelin-contracts/docs/config.js	/^  templates: 'docs\/templates',$/;"	p
+module.exports.templates	lib/openzeppelin-contracts-upgradeable/docs/config.js	/^  templates: 'docs\/templates',$/;"	p
+module.exports.templates	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/docs/config.js	/^  templates: 'docs\/templates',$/;"	p
+module.exports.templates	lib/openzeppelin-contracts/docs/config.js	/^  templates: 'docs\/templates',$/;"	p
+module.exports.templates	lib/openzeppelin-foundry-upgrades/docs/config.js	/^  templates: 'docs\/templates',$/;"	p
+module.exports.testCommand	lib/murky/lib/openzeppelin-contracts/.solcover.js	/^  testCommand: 'npm test',$/;"	p
+module.exports.testCommand	lib/openzeppelin-contracts-upgradeable/.solcover.js	/^  testCommand: 'npm test',$/;"	p
+module.exports.testCommand	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/.solcover.js	/^  testCommand: 'npm test',$/;"	p
+module.exports.testCommand	lib/openzeppelin-contracts/.solcover.js	/^  testCommand: 'npm test',$/;"	p
+module.exports.timeout	lib/murky/lib/openzeppelin-contracts/.mocharc.js	/^  timeout: 4000,$/;"	p
+module.exports.timeout	lib/openzeppelin-contracts-upgradeable/.mocharc.js	/^  timeout: 4000,$/;"	p
+module.exports.timeout	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/.mocharc.js	/^  timeout: 4000,$/;"	p
+module.exports.timeout	lib/openzeppelin-contracts/.mocharc.js	/^  timeout: 4000,$/;"	p
+owner_of	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def owner_of(self, _token_id: uint):$/;"	m	class:ERC721
+p_contract	lib/forge-std/scripts/vm.py	/^    def p_contract(self, contract: Cheatcodes, name: str, inherits: str = ""):$/;"	m	class:CheatcodesPrinter
+p_contract	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_contract(self, contract: Cheatcodes, name: str, inherits: str = ""):$/;"	m	class:CheatcodesPrinter
+p_contract	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_contract(self, contract: Cheatcodes, name: str, inherits: str = ""):$/;"	m	class:CheatcodesPrinter
+p_contract	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_contract(self, contract: Cheatcodes, name: str, inherits: str = ""):$/;"	m	class:CheatcodesPrinter
+p_enum	lib/forge-std/scripts/vm.py	/^    def p_enum(self, enum: Enum):$/;"	m	class:CheatcodesPrinter
+p_enum	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_enum(self, enum: Enum):$/;"	m	class:CheatcodesPrinter
+p_enum	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_enum(self, enum: Enum):$/;"	m	class:CheatcodesPrinter
+p_enum	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_enum(self, enum: Enum):$/;"	m	class:CheatcodesPrinter
+p_enum_variants	lib/forge-std/scripts/vm.py	/^    def p_enum_variants(self, variants: list[EnumVariant]):$/;"	m	class:CheatcodesPrinter
+p_enum_variants	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_enum_variants(self, variants: list[EnumVariant]):$/;"	m	class:CheatcodesPrinter
+p_enum_variants	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_enum_variants(self, variants: list[EnumVariant]):$/;"	m	class:CheatcodesPrinter
+p_enum_variants	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_enum_variants(self, variants: list[EnumVariant]):$/;"	m	class:CheatcodesPrinter
+p_enums	lib/forge-std/scripts/vm.py	/^    def p_enums(self, enums: list[Enum]):$/;"	m	class:CheatcodesPrinter
+p_enums	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_enums(self, enums: list[Enum]):$/;"	m	class:CheatcodesPrinter
+p_enums	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_enums(self, enums: list[Enum]):$/;"	m	class:CheatcodesPrinter
+p_enums	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_enums(self, enums: list[Enum]):$/;"	m	class:CheatcodesPrinter
+p_error	lib/forge-std/scripts/vm.py	/^    def p_error(self, error: Error):$/;"	m	class:CheatcodesPrinter
+p_error	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_error(self, error: Error):$/;"	m	class:CheatcodesPrinter
+p_error	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_error(self, error: Error):$/;"	m	class:CheatcodesPrinter
+p_error	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_error(self, error: Error):$/;"	m	class:CheatcodesPrinter
+p_errors	lib/forge-std/scripts/vm.py	/^    def p_errors(self, errors: list[Error]):$/;"	m	class:CheatcodesPrinter
+p_errors	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_errors(self, errors: list[Error]):$/;"	m	class:CheatcodesPrinter
+p_errors	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_errors(self, errors: list[Error]):$/;"	m	class:CheatcodesPrinter
+p_errors	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_errors(self, errors: list[Error]):$/;"	m	class:CheatcodesPrinter
+p_event	lib/forge-std/scripts/vm.py	/^    def p_event(self, event: Event):$/;"	m	class:CheatcodesPrinter
+p_event	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_event(self, event: Event):$/;"	m	class:CheatcodesPrinter
+p_event	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_event(self, event: Event):$/;"	m	class:CheatcodesPrinter
+p_event	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_event(self, event: Event):$/;"	m	class:CheatcodesPrinter
+p_events	lib/forge-std/scripts/vm.py	/^    def p_events(self, events: list[Event]):$/;"	m	class:CheatcodesPrinter
+p_events	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_events(self, events: list[Event]):$/;"	m	class:CheatcodesPrinter
+p_events	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_events(self, events: list[Event]):$/;"	m	class:CheatcodesPrinter
+p_events	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_events(self, events: list[Event]):$/;"	m	class:CheatcodesPrinter
+p_function	lib/forge-std/scripts/vm.py	/^    def p_function(self, func: Function):$/;"	m	class:CheatcodesPrinter
+p_function	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_function(self, func: Function):$/;"	m	class:CheatcodesPrinter
+p_function	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_function(self, func: Function):$/;"	m	class:CheatcodesPrinter
+p_function	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_function(self, func: Function):$/;"	m	class:CheatcodesPrinter
+p_functions	lib/forge-std/scripts/vm.py	/^    def p_functions(self, cheatcodes: list[Cheatcode]):$/;"	m	class:CheatcodesPrinter
+p_functions	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_functions(self, cheatcodes: list[Cheatcode]):$/;"	m	class:CheatcodesPrinter
+p_functions	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_functions(self, cheatcodes: list[Cheatcode]):$/;"	m	class:CheatcodesPrinter
+p_functions	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_functions(self, cheatcodes: list[Cheatcode]):$/;"	m	class:CheatcodesPrinter
+p_prelude	lib/forge-std/scripts/vm.py	/^    def p_prelude(self, contract: Cheatcodes | None = None):$/;"	m	class:CheatcodesPrinter
+p_prelude	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_prelude(self, contract: Cheatcodes | None = None):$/;"	m	class:CheatcodesPrinter
+p_prelude	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_prelude(self, contract: Cheatcodes | None = None):$/;"	m	class:CheatcodesPrinter
+p_prelude	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_prelude(self, contract: Cheatcodes | None = None):$/;"	m	class:CheatcodesPrinter
+p_struct	lib/forge-std/scripts/vm.py	/^    def p_struct(self, struct: Struct):$/;"	m	class:CheatcodesPrinter
+p_struct	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_struct(self, struct: Struct):$/;"	m	class:CheatcodesPrinter
+p_struct	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_struct(self, struct: Struct):$/;"	m	class:CheatcodesPrinter
+p_struct	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_struct(self, struct: Struct):$/;"	m	class:CheatcodesPrinter
+p_struct_field	lib/forge-std/scripts/vm.py	/^    def p_struct_field(self, field: StructField):$/;"	m	class:CheatcodesPrinter
+p_struct_field	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_struct_field(self, field: StructField):$/;"	m	class:CheatcodesPrinter
+p_struct_field	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_struct_field(self, field: StructField):$/;"	m	class:CheatcodesPrinter
+p_struct_field	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_struct_field(self, field: StructField):$/;"	m	class:CheatcodesPrinter
+p_struct_fields	lib/forge-std/scripts/vm.py	/^    def p_struct_fields(self, fields: list[StructField]):$/;"	m	class:CheatcodesPrinter
+p_struct_fields	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_struct_fields(self, fields: list[StructField]):$/;"	m	class:CheatcodesPrinter
+p_struct_fields	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_struct_fields(self, fields: list[StructField]):$/;"	m	class:CheatcodesPrinter
+p_struct_fields	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_struct_fields(self, fields: list[StructField]):$/;"	m	class:CheatcodesPrinter
+p_structs	lib/forge-std/scripts/vm.py	/^    def p_structs(self, structs: list[Struct]):$/;"	m	class:CheatcodesPrinter
+p_structs	lib/murky/lib/forge-std/scripts/vm.py	/^    def p_structs(self, structs: list[Struct]):$/;"	m	class:CheatcodesPrinter
+p_structs	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^    def p_structs(self, structs: list[Struct]):$/;"	m	class:CheatcodesPrinter
+p_structs	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^    def p_structs(self, structs: list[Struct]):$/;"	m	class:CheatcodesPrinter
+plusSign	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function plusSign(num) {$/;"	f
+plusSign	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function plusSign(num) {$/;"	f
+plusSign	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function plusSign(num) {$/;"	f
+plusSign	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function plusSign(num) {$/;"	f
+pre_sequence	lib/solady/ext/wake/test_eip712_fuzz.py	/^    def pre_sequence(self) -> None:$/;"	m	class:Eip712FuzzTest
+pre_sequence	lib/solady/ext/wake/test_erc1155_fuzz.py	/^    def pre_sequence(self) -> None:$/;"	m	class:ERC1155FuzzTest
+pre_sequence	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def pre_sequence(self) -> None:$/;"	m	class:ERC721FuzzTest
+pre_sequence	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^    def pre_sequence(self) -> None:$/;"	m	class:MerkleProofFuzzTest
+pre_sequence	lib/solady/ext/wake/test_signature_checker_fuzz.py	/^    def pre_sequence(self) -> None:$/;"	m	class:SignatureCheckerFuzzTest
+prefix_with_group_headers	lib/forge-std/scripts/vm.py	/^def prefix_with_group_headers(cheats: list["Cheatcode"]):$/;"	f
+prefix_with_group_headers	lib/murky/lib/forge-std/scripts/vm.py	/^def prefix_with_group_headers(cheats: list["Cheatcode"]):$/;"	f
+prefix_with_group_headers	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^def prefix_with_group_headers(cheats: list["Cheatcode"]):$/;"	f
+prefix_with_group_headers	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^def prefix_with_group_headers(cheats: list["Cheatcode"]):$/;"	f
+prepareOperation	lib/murky/lib/openzeppelin-contracts/test/governance/extensions/GovernorTimelockAccess.test.js	/^function prepareOperation({ sender, target, value = 0n, data = '0x' }) {$/;"	f
+proposalStatesToBitMap	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/governance.js	/^function proposalStatesToBitMap(proposalStates, options = {}) {$/;"	f
+proposalStatesToBitMap	lib/openzeppelin-contracts-upgradeable/test/helpers/governance.js	/^function proposalStatesToBitMap(proposalStates, options = {}) {$/;"	f
+proposalStatesToBitMap	lib/openzeppelin-contracts/test/helpers/governance.js	/^function proposalStatesToBitMap(proposalStates, options = {}) {$/;"	f
+random	lib/solady/ext/wake/test_erc1155_fuzz.py	/^import random$/;"	i
+random	lib/solady/ext/wake/test_erc721_fuzz.py	/^import random$/;"	i
+random	lib/solady/ext/wake/test_merkle_proof.py	/^import random$/;"	i
+random	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^import random$/;"	i
+random_bytes	lib/solady/ext/wake/test_merkle_proof.py	/^from wake.testing.fuzzing import random_bytes, random_int$/;"	i
+random_int	lib/solady/ext/wake/test_merkle_proof.py	/^from wake.testing.fuzzing import random_bytes, random_int$/;"	i
+range	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/helpers.js	/^function range(start, stop = undefined, step = 1) {$/;"	f
+range	lib/openzeppelin-contracts-upgradeable/scripts/helpers.js	/^function range(start, stop = undefined, step = 1) {$/;"	f
+range	lib/openzeppelin-contracts/scripts/helpers.js	/^function range(start, stop = undefined, step = 1) {$/;"	f
+re	lib/forge-std/scripts/vm.py	/^import re$/;"	i
+re	lib/murky/lib/forge-std/scripts/vm.py	/^import re$/;"	i
+re	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^import re$/;"	i
+re	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^import re$/;"	i
+readJSON	lib/murky/lib/openzeppelin-contracts/scripts/remove-ignored-artifacts.js	/^function readJSON(path) {$/;"	f
+readJSON	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/remove-ignored-artifacts.js	/^function readJSON(path) {$/;"	f
+readJSON	lib/openzeppelin-contracts-upgradeable/scripts/remove-ignored-artifacts.js	/^function readJSON(path) {$/;"	f
+readJSON	lib/openzeppelin-contracts/scripts/remove-ignored-artifacts.js	/^function readJSON(path) {$/;"	f
+releasedEvent	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/finance/VestingWallet.behavior.js	/^function releasedEvent(token, amount) {$/;"	f
+releasedEvent	lib/openzeppelin-contracts-upgradeable/test/finance/VestingWallet.behavior.js	/^function releasedEvent(token, amount) {$/;"	f
+releasedEvent	lib/openzeppelin-contracts/test/finance/VestingWallet.behavior.js	/^function releasedEvent(token, amount) {$/;"	f
+request	lib/forge-std/scripts/vm.py	/^from urllib import request$/;"	i
+request	lib/murky/lib/forge-std/scripts/vm.py	/^from urllib import request$/;"	i
+request	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^from urllib import request$/;"	i
+request	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^from urllib import request$/;"	i
+root	lib/solady/ext/wake/utils.py	/^    def root(self) -> bytes:$/;"	m	class:MerkleTree
+safe_transfer_from	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def safe_transfer_from(_from: Address, _to: Address, _token_id: uint):$/;"	m	class:ERC721
+safe_transfer_from	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def safe_transfer_from(_from: Address, _to: Address, _token_id: uint, _data: bytes):$/;"	m	class:ERC721
+safe_transfer_weird	lib/solady/ext/wake/test_erc20.py	/^def safe_transfer_weird(weird: Account):$/;"	f
+setSlot	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/erc1967.js	/^function setSlot(address, slot, value) {$/;"	f
+setSlot	lib/openzeppelin-contracts-upgradeable/test/helpers/erc1967.js	/^function setSlot(address, slot, value) {$/;"	f
+setSlot	lib/openzeppelin-contracts/test/helpers/erc1967.js	/^function setSlot(address, slot, value) {$/;"	f
+setVersion	lib/murky/lib/openzeppelin-contracts/scripts/release/synchronize-versions.js	/^function setVersion(from, to) {$/;"	f
+setVersion	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/synchronize-versions.js	/^function setVersion(from, to) {$/;"	f
+setVersion	lib/openzeppelin-contracts-upgradeable/scripts/release/synchronize-versions.js	/^function setVersion(from, to) {$/;"	f
+setVersion	lib/openzeppelin-contracts/scripts/release/synchronize-versions.js	/^function setVersion(from, to) {$/;"	f
+set_approval_for_all	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def set_approval_for_all(self, _operator: Address, _owner: Address):$/;"	m	class:ERC721
+shouldBehaveLikeAManagedRestrictedOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeAManagedRestrictedOperation() {$/;"	f
+shouldBehaveLikeAManagedRestrictedOperation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeAManagedRestrictedOperation() {$/;"	f
+shouldBehaveLikeAManagedRestrictedOperation	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeAManagedRestrictedOperation() {$/;"	f
+shouldBehaveLikeAManagedRestrictedOperation	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeAManagedRestrictedOperation() {$/;"	f
+shouldBehaveLikeAManagedRestrictedOperation.revertUnauthorized	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  function revertUnauthorized() {$/;"	f
+shouldBehaveLikeAManagedRestrictedOperation.revertUnauthorized	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  function revertUnauthorized() {$/;"	f
+shouldBehaveLikeAManagedRestrictedOperation.revertUnauthorized	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^  function revertUnauthorized() {$/;"	f
+shouldBehaveLikeAManagedRestrictedOperation.revertUnauthorized	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  function revertUnauthorized() {$/;"	f
+shouldBehaveLikeAManagedRestrictedOperation.testScheduleOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  function testScheduleOperation(mineDelay) {$/;"	f
+shouldBehaveLikeARestrictedOperation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeARestrictedOperation({ callerIsNotTheManager, callerIsTheManager }) {$/;"	f
+shouldBehaveLikeARestrictedOperation	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeARestrictedOperation({ callerIsNotTheManager, callerIsTheManager }) {$/;"	f
+shouldBehaveLikeARestrictedOperation	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeARestrictedOperation({ callerIsNotTheManager, callerIsTheManager }) {$/;"	f
+shouldBehaveLikeAccessControl	lib/murky/lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControl() {$/;"	f
+shouldBehaveLikeAccessControl	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControl(admin, authorized, other, otherAdmin) {$/;"	f
+shouldBehaveLikeAccessControl	lib/openzeppelin-contracts-upgradeable/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControl(admin, authorized, other, otherAdmin) {$/;"	f
+shouldBehaveLikeAccessControl	lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControl(admin, authorized, other, otherAdmin) {$/;"	f
+shouldBehaveLikeAccessControlDefaultAdminRules	lib/murky/lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControlDefaultAdminRules() {$/;"	f
+shouldBehaveLikeAccessControlDefaultAdminRules	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControlDefaultAdminRules(delay, defaultAdmin, newDefaultAdmin, other) {$/;"	f
+shouldBehaveLikeAccessControlDefaultAdminRules	lib/openzeppelin-contracts-upgradeable/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControlDefaultAdminRules(delay, defaultAdmin, newDefaultAdmin, other) {$/;"	f
+shouldBehaveLikeAccessControlDefaultAdminRules	lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControlDefaultAdminRules(delay, defaultAdmin, newDefaultAdmin, other) {$/;"	f
+shouldBehaveLikeAccessControlEnumerable	lib/murky/lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControlEnumerable() {$/;"	f
+shouldBehaveLikeAccessControlEnumerable	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControlEnumerable(admin, authorized, other, otherAdmin, otherAuthorized) {$/;"	f
+shouldBehaveLikeAccessControlEnumerable	lib/openzeppelin-contracts-upgradeable/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControlEnumerable(admin, authorized, other, otherAdmin, otherAuthorized) {$/;"	f
+shouldBehaveLikeAccessControlEnumerable	lib/openzeppelin-contracts/test/access/AccessControl.behavior.js	/^function shouldBehaveLikeAccessControlEnumerable(admin, authorized, other, otherAdmin, otherAuthorized) {$/;"	f
+shouldBehaveLikeCanCall	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeCanCall({$/;"	f
+shouldBehaveLikeCanCall	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeCanCall({$/;"	f
+shouldBehaveLikeCanCall	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeCanCall({$/;"	f
+shouldBehaveLikeCanCallExecuting	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeCanCallExecuting({ executing, notExecuting }) {$/;"	f
+shouldBehaveLikeCanCallExecuting	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeCanCallExecuting({ executing, notExecuting }) {$/;"	f
+shouldBehaveLikeCanCallExecuting	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeCanCallExecuting({ executing, notExecuting }) {$/;"	f
+shouldBehaveLikeClone	lib/murky/lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^module.exports = function shouldBehaveLikeClone() {$/;"	f
+shouldBehaveLikeClone	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^module.exports = function shouldBehaveLikeClone(createClone) {$/;"	f
+shouldBehaveLikeClone	lib/openzeppelin-contracts-upgradeable/test/proxy/Clones.behaviour.js	/^module.exports = function shouldBehaveLikeClone(createClone) {$/;"	f
+shouldBehaveLikeClone	lib/openzeppelin-contracts/test/proxy/Clones.behaviour.js	/^module.exports = function shouldBehaveLikeClone(createClone) {$/;"	f
+shouldBehaveLikeClosable	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeClosable({ closed, open }) {$/;"	f
+shouldBehaveLikeClosable	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeClosable({ closed, open }) {$/;"	f
+shouldBehaveLikeClosable	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeClosable({ closed, open }) {$/;"	f
+shouldBehaveLikeDelay	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelay(type, { before, after }) {$/;"	f
+shouldBehaveLikeDelay	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelay(type, { before, after }) {$/;"	f
+shouldBehaveLikeDelay	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelay(type, { before, after }) {$/;"	f
+shouldBehaveLikeDelayedAdminOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelayedAdminOperation() {$/;"	f
+shouldBehaveLikeDelayedAdminOperation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelayedAdminOperation() {$/;"	f
+shouldBehaveLikeDelayedAdminOperation	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelayedAdminOperation() {$/;"	f
+shouldBehaveLikeDelayedAdminOperation	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelayedAdminOperation() {$/;"	f
+shouldBehaveLikeDelayedOperation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelayedOperation() {$/;"	f
+shouldBehaveLikeDelayedOperation	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelayedOperation() {$/;"	f
+shouldBehaveLikeDelayedOperation	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeDelayedOperation() {$/;"	f
+shouldBehaveLikeEIP6372	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/governance/utils/EIP6372.behavior.js	/^function shouldBehaveLikeEIP6372(mode = 'blocknumber') {$/;"	f
+shouldBehaveLikeEIP6372	lib/openzeppelin-contracts-upgradeable/test/governance/utils/EIP6372.behavior.js	/^function shouldBehaveLikeEIP6372(mode = 'blocknumber') {$/;"	f
+shouldBehaveLikeEIP6372	lib/openzeppelin-contracts/test/governance/utils/EIP6372.behavior.js	/^function shouldBehaveLikeEIP6372(mode = 'blocknumber') {$/;"	f
+shouldBehaveLikeERC1155	lib/murky/lib/openzeppelin-contracts/test/token/ERC1155/ERC1155.behavior.js	/^function shouldBehaveLikeERC1155() {$/;"	f
+shouldBehaveLikeERC1155	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC1155/ERC1155.behavior.js	/^function shouldBehaveLikeERC1155([minter, firstTokenHolder, secondTokenHolder, multiTokenHolder, recipient, proxy]) {$/;"	f
+shouldBehaveLikeERC1155	lib/openzeppelin-contracts-upgradeable/test/token/ERC1155/ERC1155.behavior.js	/^function shouldBehaveLikeERC1155([minter, firstTokenHolder, secondTokenHolder, multiTokenHolder, recipient, proxy]) {$/;"	f
+shouldBehaveLikeERC1155	lib/openzeppelin-contracts/test/token/ERC1155/ERC1155.behavior.js	/^function shouldBehaveLikeERC1155([minter, firstTokenHolder, secondTokenHolder, multiTokenHolder, recipient, proxy]) {$/;"	f
+shouldBehaveLikeERC20	lib/murky/lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20(initialSupply, opts = {}) {$/;"	f
+shouldBehaveLikeERC20	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20(initialSupply, accounts, opts = {}) {$/;"	f
+shouldBehaveLikeERC20	lib/openzeppelin-contracts-upgradeable/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20(initialSupply, accounts, opts = {}) {$/;"	f
+shouldBehaveLikeERC20	lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20(initialSupply, accounts, opts = {}) {$/;"	f
+shouldBehaveLikeERC20Approve	lib/murky/lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20Approve(supply) {$/;"	f
+shouldBehaveLikeERC20Approve	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20Approve(owner, spender, supply, approve) {$/;"	f
+shouldBehaveLikeERC20Approve	lib/openzeppelin-contracts-upgradeable/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20Approve(owner, spender, supply, approve) {$/;"	f
+shouldBehaveLikeERC20Approve	lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20Approve(owner, spender, supply, approve) {$/;"	f
+shouldBehaveLikeERC20Burnable	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC20/extensions/ERC20Burnable.behavior.js	/^function shouldBehaveLikeERC20Burnable(owner, initialBalance, [burner]) {$/;"	f
+shouldBehaveLikeERC20Burnable	lib/openzeppelin-contracts-upgradeable/test/token/ERC20/extensions/ERC20Burnable.behavior.js	/^function shouldBehaveLikeERC20Burnable(owner, initialBalance, [burner]) {$/;"	f
+shouldBehaveLikeERC20Burnable	lib/openzeppelin-contracts/test/token/ERC20/extensions/ERC20Burnable.behavior.js	/^function shouldBehaveLikeERC20Burnable(owner, initialBalance, [burner]) {$/;"	f
+shouldBehaveLikeERC20Capped	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC20/extensions/ERC20Capped.behavior.js	/^function shouldBehaveLikeERC20Capped(accounts, cap) {$/;"	f
+shouldBehaveLikeERC20Capped	lib/openzeppelin-contracts-upgradeable/test/token/ERC20/extensions/ERC20Capped.behavior.js	/^function shouldBehaveLikeERC20Capped(accounts, cap) {$/;"	f
+shouldBehaveLikeERC20Capped	lib/openzeppelin-contracts/test/token/ERC20/extensions/ERC20Capped.behavior.js	/^function shouldBehaveLikeERC20Capped(accounts, cap) {$/;"	f
+shouldBehaveLikeERC20Transfer	lib/murky/lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20Transfer(balance) {$/;"	f
+shouldBehaveLikeERC20Transfer	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20Transfer(from, to, balance, transfer) {$/;"	f
+shouldBehaveLikeERC20Transfer	lib/openzeppelin-contracts-upgradeable/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20Transfer(from, to, balance, transfer) {$/;"	f
+shouldBehaveLikeERC20Transfer	lib/openzeppelin-contracts/test/token/ERC20/ERC20.behavior.js	/^function shouldBehaveLikeERC20Transfer(from, to, balance, transfer) {$/;"	f
+shouldBehaveLikeERC2981	lib/murky/lib/openzeppelin-contracts/test/token/common/ERC2981.behavior.js	/^function shouldBehaveLikeERC2981() {$/;"	f
+shouldBehaveLikeERC2981	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/common/ERC2981.behavior.js	/^function shouldBehaveLikeERC2981() {$/;"	f
+shouldBehaveLikeERC2981	lib/openzeppelin-contracts-upgradeable/test/token/common/ERC2981.behavior.js	/^function shouldBehaveLikeERC2981() {$/;"	f
+shouldBehaveLikeERC2981	lib/openzeppelin-contracts/test/token/common/ERC2981.behavior.js	/^function shouldBehaveLikeERC2981() {$/;"	f
+shouldBehaveLikeERC6372	lib/murky/lib/openzeppelin-contracts/test/governance/utils/ERC6372.behavior.js	/^function shouldBehaveLikeERC6372(mode = 'blocknumber') {$/;"	f
+shouldBehaveLikeERC721	lib/murky/lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721() {$/;"	f
+shouldBehaveLikeERC721	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721(owner, newOwner, approved, anotherApproved, operator, other) {$/;"	f
+shouldBehaveLikeERC721	lib/openzeppelin-contracts-upgradeable/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721(owner, newOwner, approved, anotherApproved, operator, other) {$/;"	f
+shouldBehaveLikeERC721	lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721(owner, newOwner, approved, anotherApproved, operator, other) {$/;"	f
+shouldBehaveLikeERC721Enumerable	lib/murky/lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721Enumerable() {$/;"	f
+shouldBehaveLikeERC721Enumerable	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721Enumerable(owner, newOwner, approved, anotherApproved, operator, other) {$/;"	f
+shouldBehaveLikeERC721Enumerable	lib/openzeppelin-contracts-upgradeable/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721Enumerable(owner, newOwner, approved, anotherApproved, operator, other) {$/;"	f
+shouldBehaveLikeERC721Enumerable	lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721Enumerable(owner, newOwner, approved, anotherApproved, operator, other) {$/;"	f
+shouldBehaveLikeERC721Metadata	lib/murky/lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721Metadata(name, symbol) {$/;"	f
+shouldBehaveLikeERC721Metadata	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721Metadata(name, symbol, owner) {$/;"	f
+shouldBehaveLikeERC721Metadata	lib/openzeppelin-contracts-upgradeable/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721Metadata(name, symbol, owner) {$/;"	f
+shouldBehaveLikeERC721Metadata	lib/openzeppelin-contracts/test/token/ERC721/ERC721.behavior.js	/^function shouldBehaveLikeERC721Metadata(name, symbol, owner) {$/;"	f
+shouldBehaveLikeGetAccess	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeGetAccess({$/;"	f
+shouldBehaveLikeGetAccess	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeGetAccess({$/;"	f
+shouldBehaveLikeGetAccess	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeGetAccess({$/;"	f
+shouldBehaveLikeHasRole	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeHasRole({ publicRoleIsRequired, specificRoleIsRequired }) {$/;"	f
+shouldBehaveLikeHasRole	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeHasRole({ publicRoleIsRequired, specificRoleIsRequired }) {$/;"	f
+shouldBehaveLikeHasRole	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeHasRole({ publicRoleIsRequired, specificRoleIsRequired }) {$/;"	f
+shouldBehaveLikeMap	lib/murky/lib/openzeppelin-contracts/test/utils/structs/EnumerableMap.behavior.js	/^function shouldBehaveLikeMap() {$/;"	f
+shouldBehaveLikeMap	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/structs/EnumerableMap.behavior.js	/^function shouldBehaveLikeMap(keys, values, zeroValue, methods, events) {$/;"	f
+shouldBehaveLikeMap	lib/openzeppelin-contracts-upgradeable/test/utils/structs/EnumerableMap.behavior.js	/^function shouldBehaveLikeMap(keys, values, zeroValue, methods, events) {$/;"	f
+shouldBehaveLikeMap	lib/openzeppelin-contracts/test/utils/structs/EnumerableMap.behavior.js	/^function shouldBehaveLikeMap(keys, values, zeroValue, methods, events) {$/;"	f
+shouldBehaveLikeNotDelayedAdminOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeNotDelayedAdminOperation() {$/;"	f
+shouldBehaveLikeNotDelayedAdminOperation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeNotDelayedAdminOperation() {$/;"	f
+shouldBehaveLikeNotDelayedAdminOperation	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeNotDelayedAdminOperation() {$/;"	f
+shouldBehaveLikeNotDelayedAdminOperation	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeNotDelayedAdminOperation() {$/;"	f
+shouldBehaveLikeNotDelayedAdminOperation.testScheduleOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  function testScheduleOperation(mineDelay) {$/;"	f
+shouldBehaveLikeProxy	lib/murky/lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^module.exports = function shouldBehaveLikeProxy() {$/;"	f
+shouldBehaveLikeProxy	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^module.exports = function shouldBehaveLikeProxy(createProxy, accounts) {$/;"	f
+shouldBehaveLikeProxy	lib/openzeppelin-contracts-upgradeable/test/proxy/Proxy.behaviour.js	/^module.exports = function shouldBehaveLikeProxy(createProxy, accounts) {$/;"	f
+shouldBehaveLikeProxy	lib/openzeppelin-contracts/test/proxy/Proxy.behaviour.js	/^module.exports = function shouldBehaveLikeProxy(createProxy, accounts) {$/;"	f
+shouldBehaveLikeRegularContext	lib/murky/lib/openzeppelin-contracts/test/utils/Context.behavior.js	/^function shouldBehaveLikeRegularContext() {$/;"	f
+shouldBehaveLikeRegularContext	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/Context.behavior.js	/^function shouldBehaveLikeRegularContext(sender) {$/;"	f
+shouldBehaveLikeRegularContext	lib/openzeppelin-contracts-upgradeable/test/utils/Context.behavior.js	/^function shouldBehaveLikeRegularContext(sender) {$/;"	f
+shouldBehaveLikeRegularContext	lib/openzeppelin-contracts/test/utils/Context.behavior.js	/^function shouldBehaveLikeRegularContext(sender) {$/;"	f
+shouldBehaveLikeRoleAdminOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeRoleAdminOperation(roleAdmin) {$/;"	f
+shouldBehaveLikeRoleAdminOperation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeRoleAdminOperation(roleAdmin) {$/;"	f
+shouldBehaveLikeRoleAdminOperation	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeRoleAdminOperation(roleAdmin) {$/;"	f
+shouldBehaveLikeRoleAdminOperation	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeRoleAdminOperation(roleAdmin) {$/;"	f
+shouldBehaveLikeRoleAdminOperation.afterGrantDelay	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^  function afterGrantDelay() {$/;"	f
+shouldBehaveLikeSchedulableOperation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeSchedulableOperation({ scheduled: { before, after, expired }, notScheduled }) {$/;"	f
+shouldBehaveLikeSchedulableOperation	lib/openzeppelin-contracts-upgradeable/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeSchedulableOperation({ scheduled: { before, after, expired }, notScheduled }) {$/;"	f
+shouldBehaveLikeSchedulableOperation	lib/openzeppelin-contracts/test/access/manager/AccessManager.behavior.js	/^function shouldBehaveLikeSchedulableOperation({ scheduled: { before, after, expired }, notScheduled }) {$/;"	f
+shouldBehaveLikeSet	lib/murky/lib/openzeppelin-contracts/test/utils/structs/EnumerableSet.behavior.js	/^function shouldBehaveLikeSet() {$/;"	f
+shouldBehaveLikeSet	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/structs/EnumerableSet.behavior.js	/^function shouldBehaveLikeSet(values, methods, events) {$/;"	f
+shouldBehaveLikeSet	lib/openzeppelin-contracts-upgradeable/test/utils/structs/EnumerableSet.behavior.js	/^function shouldBehaveLikeSet(values, methods, events) {$/;"	f
+shouldBehaveLikeSet	lib/openzeppelin-contracts/test/utils/structs/EnumerableSet.behavior.js	/^function shouldBehaveLikeSet(values, methods, events) {$/;"	f
+shouldBehaveLikeTransparentUpgradeableProxy	lib/murky/lib/openzeppelin-contracts/test/proxy/transparent/TransparentUpgradeableProxy.behaviour.js	/^module.exports = function shouldBehaveLikeTransparentUpgradeableProxy() {$/;"	f
+shouldBehaveLikeTransparentUpgradeableProxy	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/proxy/transparent/TransparentUpgradeableProxy.behaviour.js	/^module.exports = function shouldBehaveLikeTransparentUpgradeableProxy(createProxy, initialOwner, accounts) {$/;"	f
+shouldBehaveLikeTransparentUpgradeableProxy	lib/openzeppelin-contracts-upgradeable/test/proxy/transparent/TransparentUpgradeableProxy.behaviour.js	/^module.exports = function shouldBehaveLikeTransparentUpgradeableProxy(createProxy, initialOwner, accounts) {$/;"	f
+shouldBehaveLikeTransparentUpgradeableProxy	lib/openzeppelin-contracts/test/proxy/transparent/TransparentUpgradeableProxy.behaviour.js	/^module.exports = function shouldBehaveLikeTransparentUpgradeableProxy(createProxy, initialOwner, accounts) {$/;"	f
+shouldBehaveLikeVesting	lib/murky/lib/openzeppelin-contracts/test/finance/VestingWallet.behavior.js	/^function shouldBehaveLikeVesting() {$/;"	f
+shouldBehaveLikeVesting	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/finance/VestingWallet.behavior.js	/^function shouldBehaveLikeVesting(beneficiary) {$/;"	f
+shouldBehaveLikeVesting	lib/openzeppelin-contracts-upgradeable/test/finance/VestingWallet.behavior.js	/^function shouldBehaveLikeVesting(beneficiary) {$/;"	f
+shouldBehaveLikeVesting	lib/openzeppelin-contracts/test/finance/VestingWallet.behavior.js	/^function shouldBehaveLikeVesting(beneficiary) {$/;"	f
+shouldBehaveLikeVotes	lib/murky/lib/openzeppelin-contracts/test/governance/utils/Votes.behavior.js	/^function shouldBehaveLikeVotes(tokens, { mode = 'blocknumber', fungible = true }) {$/;"	f
+shouldBehaveLikeVotes	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/governance/utils/Votes.behavior.js	/^function shouldBehaveLikeVotes(accounts, tokens, { mode = 'blocknumber', fungible = true }) {$/;"	f
+shouldBehaveLikeVotes	lib/openzeppelin-contracts-upgradeable/test/governance/utils/Votes.behavior.js	/^function shouldBehaveLikeVotes(accounts, tokens, { mode = 'blocknumber', fungible = true }) {$/;"	f
+shouldBehaveLikeVotes	lib/openzeppelin-contracts/test/governance/utils/Votes.behavior.js	/^function shouldBehaveLikeVotes(accounts, tokens, { mode = 'blocknumber', fungible = true }) {$/;"	f
+shouldOnlyRevertOnErrors	lib/murky/lib/openzeppelin-contracts/test/token/ERC20/utils/SafeERC20.test.js	/^function shouldOnlyRevertOnErrors() {$/;"	f
+shouldOnlyRevertOnErrors	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/token/ERC20/utils/SafeERC20.test.js	/^function shouldOnlyRevertOnErrors([owner, receiver, spender]) {$/;"	f
+shouldOnlyRevertOnErrors	lib/openzeppelin-contracts-upgradeable/test/token/ERC20/utils/SafeERC20.test.js	/^function shouldOnlyRevertOnErrors([owner, receiver, spender]) {$/;"	f
+shouldOnlyRevertOnErrors	lib/openzeppelin-contracts/test/token/ERC20/utils/SafeERC20.test.js	/^function shouldOnlyRevertOnErrors([owner, receiver, spender]) {$/;"	f
+shouldRunChangesets	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunChangesets({ isReleaseBranch, isPush, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunChangesets	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunChangesets({ isReleaseBranch, isPush, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunChangesets	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/state.js	/^function shouldRunChangesets({ isReleaseBranch, isPush, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunChangesets	lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunChangesets({ isReleaseBranch, isPush, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunMerge	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunMerge({$/;"	f
+shouldRunMerge	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunMerge({$/;"	f
+shouldRunMerge	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/state.js	/^function shouldRunMerge({$/;"	f
+shouldRunMerge	lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunMerge({$/;"	f
+shouldRunPromote	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunPromote({ isReleaseBranch, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunPromote	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunPromote({ isReleaseBranch, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunPromote	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/state.js	/^function shouldRunPromote({ isReleaseBranch, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunPromote	lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunPromote({ isReleaseBranch, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunPublish	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunPublish({ isReleaseBranch, isPush, hasPendingChangesets, isPublishedOnNpm }) {$/;"	f
+shouldRunPublish	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunPublish({ isReleaseBranch, isPush, hasPendingChangesets, isPublishedOnNpm }) {$/;"	f
+shouldRunPublish	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/state.js	/^function shouldRunPublish({ isReleaseBranch, isPush, hasPendingChangesets, isPublishedOnNpm }) {$/;"	f
+shouldRunPublish	lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunPublish({ isReleaseBranch, isPush, hasPendingChangesets, isPublishedOnNpm }) {$/;"	f
+shouldRunStart	lib/murky/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunStart({ isMaster, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunStart	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunStart({ isMaster, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunStart	lib/openzeppelin-contracts-upgradeable/scripts/release/workflow/state.js	/^function shouldRunStart({ isMaster, isWorkflowDispatch, botRun }) {$/;"	f
+shouldRunStart	lib/openzeppelin-contracts/scripts/release/workflow/state.js	/^function shouldRunStart({ isMaster, isWorkflowDispatch, botRun }) {$/;"	f
+shouldSupportInterfaces	lib/murky/lib/openzeppelin-contracts/test/utils/introspection/SupportsInterface.behavior.js	/^function shouldSupportInterfaces(interfaces = []) {$/;"	f
+shouldSupportInterfaces	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/introspection/SupportsInterface.behavior.js	/^function shouldSupportInterfaces(interfaces = []) {$/;"	f
+shouldSupportInterfaces	lib/openzeppelin-contracts-upgradeable/test/utils/introspection/SupportsInterface.behavior.js	/^function shouldSupportInterfaces(interfaces = []) {$/;"	f
+shouldSupportInterfaces	lib/openzeppelin-contracts/test/utils/introspection/SupportsInterface.behavior.js	/^function shouldSupportInterfaces(interfaces = []) {$/;"	f
+sign_flow	lib/solady/ext/wake/test_eip712_fuzz.py	/^    def sign_flow(self, mail: Mail) -> None:$/;"	m	class:Eip712FuzzTest
+solady	lib/solady/js/solady.test.js	/^var solady = require(".\/solady.js");$/;"	v
+split	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/cryptography/ECDSA.test.js	/^function split(signature) {$/;"	f
+split	lib/openzeppelin-contracts-upgradeable/test/utils/cryptography/ECDSA.test.js	/^function split(signature) {$/;"	f
+split	lib/openzeppelin-contracts/test/utils/cryptography/ECDSA.test.js	/^function split(signature) {$/;"	f
+subprocess	lib/forge-std/scripts/vm.py	/^import subprocess$/;"	i
+subprocess	lib/murky/lib/forge-std/scripts/vm.py	/^import subprocess$/;"	i
+subprocess	lib/murky/lib/openzeppelin-contracts/lib/forge-std/scripts/vm.py	/^import subprocess$/;"	i
+subprocess	lib/openzeppelin-foundry-upgrades/lib/forge-std/scripts/vm.py	/^import subprocess$/;"	i
+sum	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function sum(...args) {$/;"	f
+sum	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function sum(...args) {$/;"	f
+sum	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function sum(...args) {$/;"	f
+sum	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function sum(...args) {$/;"	f
+test	Makefile	/^test = forge test $(matchFile) $(matchFunction)$/;"	m
+test	lib/solady/js/solady.test.js	/^function test(msg, fn) {$/;"	f
+testAsCanCall	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^function testAsCanCall({$/;"	f
+testAsClosable	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^function testAsClosable({ closed, open }) {$/;"	f
+testAsDelay	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^function testAsDelay(type, { before, after }) {$/;"	f
+testAsDelayedOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^function testAsDelayedOperation() {$/;"	f
+testAsGetAccess	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^function testAsGetAccess({$/;"	f
+testAsHasRole	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^function testAsHasRole({ publicRoleIsRequired, specificRoleIsRequired }) {$/;"	f
+testAsRestrictedOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^function testAsRestrictedOperation({ callerIsTheManager: { executing, notExecuting }, callerIsNotTheManager }) {$/;"	f
+testAsSchedulableOperation	lib/murky/lib/openzeppelin-contracts/test/access/manager/AccessManager.predicate.js	/^function testAsSchedulableOperation({ scheduled: { before, after, expired }, notScheduled }) {$/;"	f
+testCompressDecompress.checkRevertOnInvalidInputs	lib/solady/js/solady.test.js	/^    function checkRevertOnInvalidInputs(fn) {$/;"	f
+testDeriveMapping$	lib/murky/lib/openzeppelin-contracts/scripts/generate/templates/SlotDerivation.t.js	/^function testDeriveMapping${name}(${type} ${isValueType ? '' : 'memory'} key) public {$/;"	f
+test_eip712	lib/solady/ext/wake/test_eip712.py	/^def test_eip712():$/;"	f
+test_eip712_fuzz	lib/solady/ext/wake/test_eip712_fuzz.py	/^def test_eip712_fuzz():$/;"	f
+test_eip712_fuzz	lib/solady/ext/wake/test_erc721_fuzz.py	/^def test_eip712_fuzz():$/;"	f
+test_eip712_proxy	lib/solady/ext/wake/test_eip712.py	/^def test_eip712_proxy():$/;"	f
+test_erc1155_contract_receiver	lib/solady/ext/wake/test_erc1155.py	/^def test_erc1155_contract_receiver():$/;"	f
+test_erc1155_events	lib/solady/ext/wake/test_erc1155.py	/^def test_erc1155_events():$/;"	f
+test_erc1155_fuzz	lib/solady/ext/wake/test_erc1155_fuzz.py	/^def test_erc1155_fuzz():$/;"	f
+test_erc1155_mint_burn	lib/solady/ext/wake/test_erc1155.py	/^def test_erc1155_mint_burn():$/;"	f
+test_erc1155_misc	lib/solady/ext/wake/test_erc1155.py	/^def test_erc1155_misc():$/;"	f
+test_erc1155_transfers	lib/solady/ext/wake/test_erc1155.py	/^def test_erc1155_transfers():$/;"	f
+test_erc1155_unchecked	lib/solady/ext/wake/test_erc1155.py	/^def test_erc1155_unchecked():$/;"	f
+test_erc20	lib/solady/ext/wake/test_erc20.py	/^def test_erc20():$/;"	f
+test_merkle_multiproof	lib/solady/ext/wake/test_merkle_proof.py	/^def test_merkle_multiproof():$/;"	f
+test_merkle_multiproof_single	lib/solady/ext/wake/test_merkle_proof.py	/^def test_merkle_multiproof_single():$/;"	f
+test_merkle_proof	lib/solady/ext/wake/test_merkle_proof.py	/^def test_merkle_proof():$/;"	f
+test_merkle_proof_fuzz	lib/solady/ext/wake/test_merkle_proof_fuzz.py	/^def test_merkle_proof_fuzz():$/;"	f
+test_mint_to_zero_address	lib/solady/ext/wake/test_erc20.py	/^def test_mint_to_zero_address():$/;"	f
+test_safe_transfer	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer():$/;"	f
+test_safe_transfer_eth	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_eth():$/;"	f
+test_safe_transfer_weird_1	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_1():$/;"	f
+test_safe_transfer_weird_10	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_10():$/;"	f
+test_safe_transfer_weird_11	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_11():$/;"	f
+test_safe_transfer_weird_12	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_12():$/;"	f
+test_safe_transfer_weird_13	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_13():$/;"	f
+test_safe_transfer_weird_14	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_14():$/;"	f
+test_safe_transfer_weird_2	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_2():$/;"	f
+test_safe_transfer_weird_3	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_3():$/;"	f
+test_safe_transfer_weird_4	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_4():$/;"	f
+test_safe_transfer_weird_5	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_5():$/;"	f
+test_safe_transfer_weird_6	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_6():$/;"	f
+test_safe_transfer_weird_7	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_7():$/;"	f
+test_safe_transfer_weird_8	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_8():$/;"	f
+test_safe_transfer_weird_9	lib/solady/ext/wake/test_erc20.py	/^def test_safe_transfer_weird_9():$/;"	f
+test_signature_checker	lib/solady/ext/wake/test_signature_checker_fuzz.py	/^def test_signature_checker():$/;"	f
+to	lib/solady/ext/wake/test_eip712.py	/^    to=Person("Bob", Address("0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB")),$/;"	v	class:Mail
+to2098Format	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/utils/cryptography/ECDSA.test.js	/^function to2098Format(signature) {$/;"	f
+to2098Format	lib/openzeppelin-contracts-upgradeable/test/utils/cryptography/ECDSA.test.js	/^function to2098Format(signature) {$/;"	f
+to2098Format	lib/openzeppelin-contracts/test/utils/cryptography/ECDSA.test.js	/^function to2098Format(signature) {$/;"	f
+toBytes32	lib/murky/lib/openzeppelin-contracts/scripts/generate/templates/conversion.js	/^function toBytes32(type, value) {$/;"	f
+toBytes32	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/generate/templates/conversion.js	/^function toBytes32(type, value) {$/;"	f
+toBytes32	lib/openzeppelin-contracts-upgradeable/scripts/generate/templates/conversion.js	/^function toBytes32(type, value) {$/;"	f
+toBytes32	lib/openzeppelin-contracts/scripts/generate/templates/conversion.js	/^function toBytes32(type, value) {$/;"	f
+toDataWithIntendedValidatorHash	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/sign.js	/^function toDataWithIntendedValidatorHash(validatorAddress, dataHex) {$/;"	f
+toDataWithIntendedValidatorHash	lib/openzeppelin-contracts-upgradeable/test/helpers/sign.js	/^function toDataWithIntendedValidatorHash(validatorAddress, dataHex) {$/;"	f
+toDataWithIntendedValidatorHash	lib/openzeppelin-contracts/test/helpers/sign.js	/^function toDataWithIntendedValidatorHash(validatorAddress, dataHex) {$/;"	f
+toEthSignedMessageHash	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/sign.js	/^function toEthSignedMessageHash(messageHex) {$/;"	f
+toEthSignedMessageHash	lib/openzeppelin-contracts-upgradeable/test/helpers/sign.js	/^function toEthSignedMessageHash(messageHex) {$/;"	f
+toEthSignedMessageHash	lib/openzeppelin-contracts/test/helpers/sign.js	/^function toEthSignedMessageHash(messageHex) {$/;"	f
+transfer	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def transfer(self, _by: Address, _from: Address, _to: Address, _token_id: uint):$/;"	m	class:ERC721
+transfer_approved	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def transfer_approved(self) -> None:$/;"	m	class:ERC721FuzzTest
+transfer_from	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def transfer_from(self,_by: Address, _from: Address, _to: Address, _token_id: uint):$/;"	m	class:ERC721
+transfer_from_approved	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def transfer_from_approved(self) -> None:$/;"	m	class:ERC721FuzzTest
+transfer_from_operator	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def transfer_from_operator(self) -> None:$/;"	m	class:ERC721FuzzTest
+transfer_from_owner	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def transfer_from_owner(self) -> None:$/;"	m	class:ERC721FuzzTest
+transfer_operator	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def transfer_operator(self) -> None:$/;"	m	class:ERC721FuzzTest
+transfer_owner	lib/solady/ext/wake/test_erc721_fuzz.py	/^    def transfer_owner(self) -> None:$/;"	m	class:ERC721FuzzTest
+trend	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function trend(value) {$/;"	f
+trend	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function trend(value) {$/;"	f
+trend	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function trend(value) {$/;"	f
+trend	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function trend(value) {$/;"	f
+unique	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/helpers.js	/^function unique(array, op = x => x) {$/;"	f
+unique	lib/openzeppelin-contracts-upgradeable/scripts/helpers.js	/^function unique(array, op = x => x) {$/;"	f
+unique	lib/openzeppelin-contracts/scripts/helpers.js	/^function unique(array, op = x => x) {$/;"	f
+values	lib/solady/ext/wake/utils.py	/^    def values(self) -> Tuple[bytes, ...]:$/;"	m	class:MerkleTree
+variation	lib/murky/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function variation(current, previous, offset = 0) {$/;"	f
+variation	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function variation(current, previous, offset = 0) {$/;"	f
+variation	lib/openzeppelin-contracts-upgradeable/scripts/checks/compareGasReports.js	/^function variation(current, previous, offset = 0) {$/;"	f
+variation	lib/openzeppelin-contracts/scripts/checks/compareGasReports.js	/^function variation(current, previous, offset = 0) {$/;"	f
+zip	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/scripts/helpers.js	/^function zip(...args) {$/;"	f
+zip	lib/openzeppelin-contracts-upgradeable/lib/openzeppelin-contracts/test/helpers/governance.js	/^function zip(...args) {$/;"	f
+zip	lib/openzeppelin-contracts-upgradeable/scripts/helpers.js	/^function zip(...args) {$/;"	f
+zip	lib/openzeppelin-contracts-upgradeable/test/helpers/governance.js	/^function zip(...args) {$/;"	f
+zip	lib/openzeppelin-contracts/scripts/helpers.js	/^function zip(...args) {$/;"	f
+zip	lib/openzeppelin-contracts/test/helpers/governance.js	/^function zip(...args) {$/;"	f

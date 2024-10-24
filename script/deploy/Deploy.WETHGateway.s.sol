@@ -10,13 +10,7 @@ contract DeployVault is Script, Parameters {
     function run() public {
         vm.startBroadcast(); // ----------------------
 
-        new WETHGateway(
-            MAINNET_V2_DYAD,
-            MAINNET_DNFT,
-            MAINNET_WETH,
-            MAINNET_V2_VAULT_MANAGER,
-            MAINNET_V2_WETH_VAULT
-        );
+        new WETHGateway(MAINNET_V2_DYAD, MAINNET_DNFT, MAINNET_WETH, MAINNET_V2_VAULT_MANAGER, MAINNET_V2_WETH_VAULT);
 
         vm.stopBroadcast(); // ----------------------------
     }
