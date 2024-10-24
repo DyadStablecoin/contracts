@@ -58,7 +58,7 @@ contract Parameters {
 
     // ---------------- POOLS ----------------
     address MAINNET_CURVE_M0_DYAD = 0xa969cFCd9e583edb8c8B270Dc8CaFB33d6Cf662D;
-    
+
     // ---------------- STAKING ----------------
     address MAINNET_STAKING_FACTORY = 0xD19DCbB8B82805d779a6A2182d8F4355275CC30a;
     address MAINNEt_CURVE_M0_DYAD_STAKING = 0xe48c80CF20C7fCE3458896BB263D9D8D6404b39f;

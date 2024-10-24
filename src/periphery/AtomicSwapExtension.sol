@@ -9,7 +9,6 @@ import {DyadHooks} from "../core/DyadHooks.sol";
 import {ERC20} from "solmate/tokens/ERC20.sol";
 import {SafeTransferLib} from "solmate/utils/SafeTransferLib.sol";
 
-
 contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
     using SafeTransferLib for ERC20;
 
@@ -47,7 +46,7 @@ contract AtomicSwapExtension is IExtension, IAfterWithdrawHook {
         bytes calldata swapData
     ) external {
         if (dnft.ownerOf(noteId) != msg.sender) revert NotOwnerOfNote();
-        
+
         // tstore swap data
         assembly {
             let size := calldatasize()

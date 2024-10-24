@@ -12,15 +12,10 @@ contract DeployStaking is Script, Parameters {
         vm.startBroadcast(); // ----------------------
 
         DyadLPStakingFactory factory = new DyadLPStakingFactory(
-            MAINNET_KEROSENE, 
-            MAINNET_DNFT,
-            MAINNET_V2_KEROSENE_V2_VAULT,
-            MAINNET_V2_VAULT_MANAGER
+            MAINNET_KEROSENE, MAINNET_DNFT, MAINNET_V2_KEROSENE_V2_VAULT, MAINNET_V2_VAULT_MANAGER
         );
 
-        DyadLPStaking staking = DyadLPStaking(
-          factory.createPoolStaking(MAINNET_CURVE_M0_DYAD)
-        );
+        DyadLPStaking staking = DyadLPStaking(factory.createPoolStaking(MAINNET_CURVE_M0_DYAD));
 
         staking.transferOwnership(MAINNET_OWNER);
         factory.transferOwnership(MAINNET_OWNER);
@@ -28,4 +23,3 @@ contract DeployStaking is Script, Parameters {
         vm.stopBroadcast(); // ----------------------------
     }
 }
-
