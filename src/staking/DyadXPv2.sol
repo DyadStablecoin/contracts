@@ -49,11 +49,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     uint40 public halvingStart;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(
-        address vaultManager,
-        address keroseneVault,
-        address dnft
-    ) {
+    constructor(address vaultManager, address keroseneVault, address dnft) {
         VAULT_MANAGER = IVaultManager(vaultManager);
         DNFT = IERC721Enumerable(dnft);
         KEROSENE_VAULT = IVault(keroseneVault);
@@ -115,19 +111,15 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
     /// @notice Moves `amount` tokens from `from` to `to` using the allowance mechanism.
     /// `amount` is then deducted from the caller's allowance.
-    function transferFrom(
-        address,
-        address,
-        uint256
-    ) external pure returns (bool) {
+    function transferFrom(address, address, uint256) external pure returns (bool) {
         revert TransferNotAllowed();
     }
 
-    function afterNoteUpdated(uint256 noteId) external {
-      if (msg.sender != address(VAULT_MANAGER)) {
-          revert NotVaultManager();
-      }
-      _updateNoteBalance(noteId);
+    function afterKeroseneDeposited(uint256 noteId, uint256) external {
+        if (msg.sender != address(VAULT_MANAGER)) {
+            revert NotVaultManager();
+        }
+        _updateNoteBalance(noteId);
     }
 
     function forceUpdateXPBalance(uint256 noteId) external onlyOwner {
@@ -139,10 +131,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _updateNoteBalance(noteId);
     }
 
-    function beforeKeroseneWithdrawn(
-        uint256 noteId,
-        uint256 amountWithdrawn
-    ) external {
+    function beforeKeroseneWithdrawn(uint256 noteId, uint256 amountWithdrawn) external {
         if (msg.sender != address(VAULT_MANAGER)) {
             revert NotVaultManager();
         }
@@ -152,23 +141,15 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         uint256 xp = _computeXP(lastUpdate.accrualRate, lastUpdate.lastAction, lastUpdate.lastXP);
         uint256 keroseneDeposited = KEROSENE_VAULT.id2asset(noteId);
 
-        uint256 slashedXP = xp.mulDivUp(
-            amountWithdrawn,
-            keroseneDeposited
-        );
+        uint256 slashedXP = xp.mulDivUp(amountWithdrawn, keroseneDeposited);
         if (slashedXP > xp) {
             slashedXP = xp;
         }
         uint120 newXP = uint120(xp - slashedXP);
-        uint256 newAccrualRate = _computeAccrualRate(
-            keroseneDeposited - amountWithdrawn
-        );
+        uint256 newAccrualRate = _computeAccrualRate(keroseneDeposited - amountWithdrawn);
 
-        noteData[noteId] = NoteXPData({
-            lastAction: uint40(block.timestamp),
-            accrualRate: uint96(newAccrualRate),
-            lastXP: newXP
-        });
+        noteData[noteId] =
+            NoteXPData({lastAction: uint40(block.timestamp), accrualRate: uint96(newAccrualRate), lastXP: newXP});
 
         globalLastXP = uint192(totalSupply() - slashedXP);
         globalLastUpdate = uint40(block.timestamp);
@@ -177,10 +158,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
     }
 
-    function setHalvingConfiguration(
-        uint40 _halvingStart,
-        uint40 _halvingCadence
-    ) external onlyOwner {
+    function setHalvingConfiguration(uint40 _halvingStart, uint40 _halvingCadence) external onlyOwner {
         if (halvingStart != 0) {
             uint256 dnftSupply = DNFT.totalSupply();
             for (uint256 i = 0; i < dnftSupply; ++i) {
@@ -213,9 +191,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
 
         uint256 keroseneDeposited = KEROSENE_VAULT.id2asset(noteId);
 
-        uint256 newAccrualRate = _computeAccrualRate(
-            keroseneDeposited
-        );
+        uint256 newAccrualRate = _computeAccrualRate(keroseneDeposited);
 
         noteData[noteId] = NoteXPData({
             lastAction: uint40(block.timestamp),
@@ -230,11 +206,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _emitTransfer(DNFT.ownerOf(noteId), lastUpdate.lastXP, newXP);
     }
 
-    function _emitTransfer(
-        address user,
-        uint256 oldBalance,
-        uint256 newBalance
-    ) internal {
+    function _emitTransfer(address user, uint256 oldBalance, uint256 newBalance) internal {
         if (newBalance > oldBalance) {
             emit Transfer(address(0), user, newBalance - oldBalance);
         } else {
@@ -242,11 +214,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         }
     }
 
-    function _computeXP(
-        uint256 rate,
-        uint256 lastUpdate,
-        uint256 lastXP
-    ) internal view returns (uint256) {
+    function _computeXP(uint256 rate, uint256 lastUpdate, uint256 lastXP) internal view returns (uint256) {
         if (halvingCadence > 0) {
             uint256 start = halvingStart;
             if (start < block.timestamp) {
@@ -258,9 +226,8 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                 }
                 // get the start of the last halving period
                 uint256 mostRecentHalvingStart = start + halvings * halvingCadence;
-                
+
                 if (lastUpdate < mostRecentHalvingStart) {
-                    
                     uint256 halvingsAlreadyProcessed = 1 + (lastUpdate - start) / halvingCadence;
                     uint256 _nextHalving = start + (halvingsAlreadyProcessed) * halvingCadence;
 
@@ -269,7 +236,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
                         uint256 elapsed = (_nextHalving - lastUpdate);
                         lastXP = uint120(lastXP + elapsed * rate >> 1);
                     }
-                    
+
                     // if there are more halvings to process, process them
                     if (halvings > halvingsAlreadyProcessed) {
                         uint256 halvingsToProcess = halvings - halvingsAlreadyProcessed;
@@ -295,9 +262,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         return halvingStart + (completedHalvings + 1) * halvingCadence;
     }
 
-    function _computeAccrualRate(
-        uint256 keroDeposited
-    ) internal pure returns (uint256) {
+    function _computeAccrualRate(uint256 keroDeposited) internal pure returns (uint256) {
         return keroDeposited;
     }
 }
