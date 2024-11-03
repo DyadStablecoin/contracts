@@ -18,7 +18,7 @@ contract DeployTimelock is Script, Parameters {
         vm.startBroadcast(); // ----------------------
 
         Timelock timelock = new Timelock(
-          3 days,
+          7 days,
           proposers,
           executors,
           MAINNET_OWNER
