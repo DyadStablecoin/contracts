@@ -14,7 +14,7 @@ import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 import {Test} from "forge-std/Test.sol";
 import {Vault} from "../../../src/core/Vault.sol";
-import {KeroseneVault} from "../../../src/core/VaultKerosene.sol";  
+import {KeroseneVault} from "../../../src/core/VaultKerosene.sol";
 import {DNft} from "../../../src/core/DNft.sol";
 import {Dyad} from "../../../src/core/Dyad.sol";
 import {VaultWstEth} from "../../../src/core/Vault.wsteth.sol";
@@ -49,7 +49,6 @@ contract BaseTestV5 is Test, Modifiers, Parameters {
     address bob = address(0x42);
 
     function setUp() public {
-
         vm.createSelectFork(vm.envString("RPC_URL"), 20930795);
 
         VaultManagerV5 impl = new VaultManagerV5();
@@ -60,7 +59,7 @@ contract BaseTestV5 is Test, Modifiers, Parameters {
 
         weth = ERC20(MAINNET_WETH);
         alice = address(this);
-        
+
         contracts = Contracts({
             dNft: DNft(MAINNET_DNFT),
             dyad: Dyad(MAINNET_V2_DYAD),
