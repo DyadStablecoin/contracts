@@ -88,8 +88,8 @@ contract LiquidateTest is BaseTestV6 {
         uint256 ethAfter_Liquidatee = contracts.ethVault.id2asset(alice0);
         uint256 dyadAfter_Liquidatee = contracts.dyad.mintedDyad(alice0);
 
-        assertTrue(ethAfter_Liquidator > 0);
-        assertTrue(ethAfter_Liquidatee == 0);
+        assertGt(ethAfter_Liquidator, 0);
+        assertEq(ethAfter_Liquidatee, 0);
 
         assertEq(getMintedDyad(alice0), 0);
         assertEq(getCR(alice0), type(uint256).max);
@@ -112,8 +112,8 @@ contract LiquidateTest is BaseTestV6 {
         uint256 ethAfter_Liquidatee = contracts.ethVault.id2asset(alice0);
         uint256 dyadAfter_Liquidatee = contracts.dyad.mintedDyad(alice0);
 
-        assertTrue(ethAfter_Liquidator > 0);
-        assertTrue(ethAfter_Liquidatee > 0);
+        assertGt(ethAfter_Liquidator, 0);
+        assertGt(ethAfter_Liquidatee, 0);
 
         assertEq(getMintedDyad(alice0), 0);
         assertEq(getCR(alice0), type(uint256).max);
