@@ -20,6 +20,8 @@ contract SwapAndDeposit is IExtension {
 
   error NotDnftOwner();
 
+  event SwappedAndDeposited(uint tokenId, address tokenIn, uint256 amountIn, uint256 amountOut);
+
   constructor(
     address _dNft,
     address _kerosene,
@@ -34,7 +36,6 @@ contract SwapAndDeposit is IExtension {
     WETH9 = _WETH9;
     wethVault = _wethVault;
     vaultManager = VaultManagerV5(_vaultManager);
-    kerosene.approve(_vaultManager, type(uint256).max);
   }
 
   function name() external pure override returns (string memory) {
@@ -46,18 +47,17 @@ contract SwapAndDeposit is IExtension {
   }
 
   function getHookFlags() external pure override returns (uint256) {
-      // no hooks needed for this extension
-      return 0;
+      return 0; // no hooks needed for this extension
   }
 
-  function swapToKerosene(
+  function _swapToKerosene(
       address tokenIn,
       uint256 amountIn,
       uint256 amountOutMin,
       uint24 fee1,
       uint24 fee2,
       address to
-  ) public returns (uint amountOut) {
+  ) internal returns (uint amountOut) {
       require(amountIn > 0, "INSUFFICIENT_INPUT_AMOUNT");
       require(tokenIn != address(kerosene), "INVALID_PATH");
 
@@ -67,10 +67,9 @@ contract SwapAndDeposit is IExtension {
       // Approve the Uniswap router to spend the input tokens
       ERC20(tokenIn).approve(address(swapRouter), amountIn);
 
-      // Determine the path for the swap
       bytes memory path;
 
-      if (tokenIn == WETH9 || address(kerosene) == WETH9) {
+      if (tokenIn == WETH9) {
           // Single-hop swap
           path = abi.encodePacked(tokenIn, fee1, address(kerosene));
       } else {
@@ -102,7 +101,9 @@ contract SwapAndDeposit is IExtension {
       if (dNft.ownerOf(tokenId) != msg.sender) {
         revert NotDnftOwner();
       }
-      uint amountSwapped = swapToKerosene(tokenIn, amountIn, amountOutMin, fee1, fee2, address(this));
+      uint amountSwapped = _swapToKerosene(tokenIn, amountIn, amountOutMin, fee1, fee2, address(this));
+      kerosene.approve(address(vaultManager), amountSwapped);
       vaultManager.deposit(tokenId, wethVault, amountSwapped);
+      emit SwappedAndDeposited(tokenId, tokenIn, amountIn, amountSwapped);
   }
 }
