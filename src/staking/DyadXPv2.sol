@@ -159,18 +159,23 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
     }
 
     function setHalvingConfiguration(uint40 _halvingStart, uint40 _halvingCadence) external onlyOwner {
-        if (halvingStart != 0) {
-            uint256 dnftSupply = DNFT.totalSupply();
-            for (uint256 i = 0; i < dnftSupply; ++i) {
-                _updateNoteBalance(i);
-            }
-        } else if (_halvingStart < halvingStart) {
+        if (_halvingStart < halvingStart) {
             revert InvalidConfiguration();
-        } else if (_halvingStart < block.timestamp) {
+        }
+        if (_halvingStart < block.timestamp) {
             revert InvalidConfiguration();
         }
         if (_halvingCadence == 0) {
             revert InvalidConfiguration();
+        }
+        
+        if (halvingStart != 0) {
+            uint256 dnftSupply = DNFT.totalSupply();
+            for (uint256 i; i < dnftSupply; ++i) {
+                if (noteData[i].accrualRate != 0) {
+                    _updateNoteBalance(i);
+                }
+            }
         }
 
         halvingStart = _halvingStart;
