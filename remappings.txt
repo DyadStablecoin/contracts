@@ -2,3 +2,4 @@
 @openzeppelin/contracts-upgradeable/=lib/openzeppelin-contracts-upgradeable/contracts/
 @solmate/=lib/solmate/
 @murky/=lib/murky/src/
+@uniswap/=lib/uniswap-v3-core/contracts/
