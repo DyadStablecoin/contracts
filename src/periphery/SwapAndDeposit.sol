@@ -7,8 +7,9 @@ import {IExtension} from "../interfaces/IExtension.sol";
 import {ISwapRouter} from "../interfaces/ISwapRouter.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract SwapAndDeposit is IExtension {
+contract SwapAndDeposit is IExtension, ReentrancyGuard {
   using SafeTransferLib for ERC20;
 
   DNft public immutable dNft;
@@ -97,7 +98,7 @@ contract SwapAndDeposit is IExtension {
       uint256 amountOutMin,
       uint24 fee1,
       uint24 fee2
-  ) external {
+  ) external nonReentrant {
       if (dNft.ownerOf(tokenId) != msg.sender) {
         revert NotDnftOwner();
       }
