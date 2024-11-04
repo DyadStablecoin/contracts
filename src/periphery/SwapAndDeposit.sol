@@ -5,11 +5,14 @@ import {DNft} from "../core/DNft.sol";
 import {VaultManagerV5} from "../core/VaultManagerV5.sol";
 import {IExtension} from "../interfaces/IExtension.sol";
 import {ISwapRouter} from "../interfaces/ISwapRouter.sol";
-import {IERC20} from "forge-std/interfaces/IERC20.sol";
+import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 
 contract SwapAndDeposit is IExtension {
+  using SafeTransferLib for ERC20;
+
   DNft public immutable dNft;
-  IERC20 public immutable kerosene;
+  ERC20 public immutable kerosene;
   ISwapRouter public immutable swapRouter;
   address public immutable WETH9;
   address public immutable wethVault;
@@ -26,7 +29,7 @@ contract SwapAndDeposit is IExtension {
     address _vaultManager
   ) {
     dNft = DNft(_dNft);
-    kerosene = IERC20(_kerosene);
+    kerosene = ERC20(_kerosene);
     swapRouter = ISwapRouter(_swapRouter);
     WETH9 = _WETH9;
     wethVault = _wethVault;
@@ -54,21 +57,18 @@ contract SwapAndDeposit is IExtension {
       uint24 fee1,
       uint24 fee2,
       address to
-  ) public {
+  ) public returns (uint amountOut) {
+      require(amountIn > 0, "INSUFFICIENT_INPUT_AMOUNT");
+      require(tokenIn != address(kerosene), "INVALID_PATH");
+
       // Transfer the input tokens from the sender to this contract
-      IERC20(tokenIn).transferFrom(msg.sender, address(this), amountIn);
+      ERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
 
       // Approve the Uniswap router to spend the input tokens
-      IERC20(tokenIn).approve(address(swapRouter), amountIn);
+      ERC20(tokenIn).approve(address(swapRouter), amountIn);
 
       // Determine the path for the swap
       bytes memory path;
-
-      if (tokenIn == address(kerosene)) {
-          // No swap needed if tokenIn is already Kerosene
-          kerosene.transfer(to, amountIn);
-          return;
-      }
 
       if (tokenIn == WETH9 || address(kerosene) == WETH9) {
           // Single-hop swap
@@ -88,7 +88,7 @@ contract SwapAndDeposit is IExtension {
       });
 
       // Execute the swap
-      swapRouter.exactInput(params);
+      amountOut = swapRouter.exactInput(params);
   }
 
   function swapAndDeposit(
@@ -102,7 +102,7 @@ contract SwapAndDeposit is IExtension {
       if (dNft.ownerOf(tokenId) != msg.sender) {
         revert NotDnftOwner();
       }
-      swapToKerosene(tokenIn, amountIn, amountOutMin, fee1, fee2, address(this));
-      vaultManager.deposit(tokenId, wethVault, kerosene.balanceOf(address(this)));
+      uint amountSwapped = swapToKerosene(tokenIn, amountIn, amountOutMin, fee1, fee2, address(this));
+      vaultManager.deposit(tokenId, wethVault, amountSwapped);
   }
 }
