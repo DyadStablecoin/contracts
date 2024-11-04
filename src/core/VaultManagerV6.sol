@@ -168,27 +168,40 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             return (vaultAddresses, vaultAmounts);
         }
 
+        uint256 amountMoved;
         for (uint256 i; i < numberOfVaults; ++i) {
             Vault vault = Vault(vaults[id].at(i));
+            if (address(vault) == KEROSENE_VAULT) {
+                continue;
+            }
             vaultAddresses[i] = address(vault);
             if (vaultLicenser.isLicensed(address(vault))) {
                 uint256 value = vaultsValues[i];
                 if (value == 0) continue;
                 uint256 depositAmount = vault.id2asset(id);
                 uint256 asset;
+                uint256 amountShare;
                 if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
                     asset = _getPartialLiquidationAmount(amount, debt, depositAmount, cr);
                 } else {
-                    asset = _getFullLiquidationAmount(amount, debt, depositAmount, value, totalValue);
+                    (asset, amountShare) = _getFullLiquidationAmount(amount, debt, depositAmount, value, exoValue);
+                    amountMoved += amountShare;
                 }
                 vaultAmounts[i] = asset;
-                if (address(vault) == KEROSENE_VAULT) {
-                    dyadXP.beforeKeroseneWithdrawn(id, asset);
-                }
                 vault.move(id, to, asset);
-                if (address(vault) == KEROSENE_VAULT) {
-                    dyadXP.afterKeroseneDeposited(to, asset);
-                }
+            }
+        }
+
+        if(keroValue > 0) {
+            vaultAddresses[numberOfVaults - 1] = KEROSENE_VAULT;
+            if (amountMoved < amount) {
+                uint256 amountRemaining = amount - amountMoved;
+                uint256 keroDeposited = Vault(KEROSENE_VAULT).id2asset(id);
+                (uint256 keroToMove, ) = _getFullLiquidationAmount(amountRemaining, debt, keroDeposited, keroValue, keroValue);
+                vaultAmounts[numberOfVaults - 1] = keroToMove;
+                dyadXP.beforeKeroseneWithdrawn(id, keroToMove);
+                Vault(KEROSENE_VAULT).move(id, to, keroToMove);
+                dyadXP.afterKeroseneDeposited(to, keroToMove);
             }
         }
 
@@ -215,15 +228,14 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         uint256 depositAmount,
         uint256 value,
         uint256 totalValue
-    ) private view returns (uint256) {
-        uint256 amountShare = value.divWadDown(totalValue).mulWadUp(amount); // amount of asset in dollars represented by the share
+    ) private view returns (uint256 asset, uint256 amountShare) {
+        amountShare = value.divWadDown(totalValue).mulWadUp(amount); // amount of asset in dollars represented by the share
         uint256 rewardRate = amount.divWadDown(debt).mulWadDown(LIQUIDATION_REWARD);
         uint256 valueToMove = amountShare + amountShare.mulWadUp(rewardRate);
-        uint256 asset = depositAmount.mulWadDown(valueToMove).divWadDown(value);
+        asset = depositAmount.mulWadDown(valueToMove).divWadDown(value);
         if (asset > depositAmount) {
             asset = depositAmount;
         }
-        return asset;
     }
 
     /// @notice Returns the collateral ratio for the specified note.
