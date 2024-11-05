@@ -21,8 +21,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   VaultManagerV5 public immutable vaultManager;
   VaultLicenser public immutable vaultLicenser;
 
-  error NotDnftOwner();
-
   event SwappedAndDeposited(
     uint tokenId,
     address tokenIn,
@@ -106,11 +104,9 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       uint24 fee1,
       uint24 fee2
   ) external nonReentrant {
+      require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
       require(amountIn > 0, "INSUFFICIENT_INPUT_AMOUNT");
       require(amountOutMin > 0, "INSUFFICIENT_OUTPUT_AMOUNT");
-      if (dNft.ownerOf(tokenId) != msg.sender) {
-        revert NotDnftOwner();
-      }
       require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
       ERC20 asset = IVault(vault).asset();
       require(address(asset) != tokenIn, "SAME_TOKEN");
