@@ -45,12 +45,17 @@ contract MintAndStake is IExtension, ReentrancyGuard {
       uint minAmountOut
   ) external nonReentrant {
       require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
+      // mint dyad
       vaultManager.mintDyad(tokenId, amount, address(this));
+
+      // add liquidity
       dyad.approve(pool, amount);
       uint256[] memory amounts = new uint256[](ICurvePool(pool).N_COINS());
       amounts[dyadIndex] = amount;
       uint lpAmount = ICurvePool(pool).add_liquidity(amounts, minAmountOut, address(this));
-      dyad.approve(stakingContract, lpAmount);
+
+      // stake LP tokens
+      IERC20(address(pool)).approve(stakingContract, lpAmount);
       IDyadLPStaking(stakingContract).deposit(tokenId, lpAmount);
   }
 }
