@@ -62,7 +62,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
 
   function _swapToCollateral(
       address tokenIn,
-      address tokenOut,
+      address tokenOut, 
       uint256 amountIn,
       uint256 amountOutMin,
       uint24 fee1,
@@ -104,7 +104,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   function swapAndDeposit(
       uint tokenId,
       address tokenIn,
-      address tokenOut,
       uint256 amountIn,
       uint256 amountOutMin,
       uint24 fee1,
@@ -115,9 +114,17 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         revert NotDnftOwner();
       }
       require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
-      uint amountSwapped = _swapToCollateral(tokenIn, tokenOut, amountIn, amountOutMin, fee1, fee2);
-      IVault(vault).asset().approve(address(vaultManager), amountSwapped);
+      ERC20 asset = IVault(vault).asset();
+      uint amountSwapped = _swapToCollateral(
+        tokenIn,
+        address(vault),
+        amountIn,
+        amountOutMin,
+        fee1,
+        fee2
+      );
+      asset.approve(address(vaultManager), amountSwapped);
       vaultManager.deposit(tokenId, vault, amountSwapped);
-      emit SwappedAndDeposited(tokenId, tokenIn, tokenOut, amountIn, amountSwapped, vault);
+      emit SwappedAndDeposited(tokenId, tokenIn, address(asset), amountIn, amountSwapped, vault);
   }
 }
