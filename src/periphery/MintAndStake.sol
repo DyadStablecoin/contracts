@@ -8,8 +8,12 @@ import {DNft} from "../core/DNft.sol";
 import {VaultManagerV5} from "../core/VaultManagerV5.sol";
 import {Dyad} from "../core/Dyad.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import {ERC20} from "@solmate/src/tokens/ERC20.sol";
+import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 
 contract MintAndStake is IExtension, ReentrancyGuard {
+  using SafeTransferLib for ERC20;
+
   DNft public immutable dNft;
   VaultManagerV5 public immutable vaultManager;
   Dyad public immutable dyad;
@@ -55,7 +59,32 @@ contract MintAndStake is IExtension, ReentrancyGuard {
       uint lpAmount = ICurvePool(pool).add_liquidity(amounts, minAmountOut, address(this));
 
       // stake LP tokens
-      IERC20(address(pool)).approve(stakingContract, lpAmount);
+      ERC20(address(pool)).approve(stakingContract, lpAmount);
       IDyadLPStaking(stakingContract).deposit(tokenId, lpAmount);
+  }
+
+  function unstakeAndBurn(
+      uint tokenId,
+      uint amount,
+      address pool,
+      uint dyadIndex,
+      address stakingContract,
+      uint minDyadOut
+  ) external nonReentrant {
+      require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
+      // Unstake LP tokens (LP tokens are sent to msg.sender)
+      IDyadLPStaking(stakingContract).withdraw(tokenId, amount);
+
+      ERC20(pool).safeTransferFrom(msg.sender, address(this), amount);
+
+      // Remove liquidity (DYAD tokens are sent to msg.sender)
+      uint dyadAmount = ICurvePool(pool).remove_liquidity_one_coin(
+          amount,
+          int128(int256(dyadIndex)),
+          minDyadOut,
+          msg.sender
+      );
+
+      vaultManager.burnDyad(tokenId, dyadAmount);
   }
 }
