@@ -63,6 +63,8 @@ contract MintAndStake is IExtension, ReentrancyGuard {
       IDyadLPStaking(stakingContract).deposit(tokenId, lpAmount);
   }
 
+  // THIS NEEDS 2 APPROVALS, ONE FOR THE STAKING CONTRACT AND ONE FOR THE POOL
+  // AND IS THEREFORE NOT VERY PRATICAL
   function unstakeAndBurn(
       uint tokenId,
       uint amount,
