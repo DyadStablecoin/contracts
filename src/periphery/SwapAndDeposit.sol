@@ -4,6 +4,7 @@ pragma solidity ^0.8.20;
 import {DNft} from "../core/DNft.sol";
 import {VaultManagerV5} from "../core/VaultManagerV5.sol";
 import {VaultLicenser} from "../core/VaultLicenser.sol";
+import {IVault} from "../interfaces/IVault.sol";
 import {IExtension} from "../interfaces/IExtension.sol";
 import {ISwapRouter} from "../interfaces/ISwapRouter.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -115,7 +116,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       }
       require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
       uint amountSwapped = _swapToCollateral(tokenIn, tokenOut, amountIn, amountOutMin, fee1, fee2);
-      kerosene.approve(address(vaultManager), amountSwapped);
+      IVault(vault).asset().approve(address(vaultManager), amountSwapped);
       vaultManager.deposit(tokenId, vault, amountSwapped);
       emit SwappedAndDeposited(tokenId, tokenIn, tokenOut, amountIn, amountSwapped, vault);
   }
