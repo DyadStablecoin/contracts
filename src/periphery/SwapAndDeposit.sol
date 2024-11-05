@@ -68,10 +68,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       uint24 fee1,
       uint24 fee2
   ) internal returns (uint amountOut) {
-      require(amountIn > 0, "INSUFFICIENT_INPUT_AMOUNT");
-      require(amountOutMin > 0, "INSUFFICIENT_OUTPUT_AMOUNT");
-      require(tokenIn != tokenOut, "IDENTICAL_ADDRESSES");
-
       // Transfer the input tokens from the sender to this contract
       ERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
 
@@ -104,20 +100,23 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   function swapAndDeposit(
       uint tokenId,
       address tokenIn,
+      address vault,
       uint256 amountIn,
       uint256 amountOutMin,
       uint24 fee1,
-      uint24 fee2,
-      address vault
+      uint24 fee2
   ) external nonReentrant {
+      require(amountIn > 0, "INSUFFICIENT_INPUT_AMOUNT");
+      require(amountOutMin > 0, "INSUFFICIENT_OUTPUT_AMOUNT");
       if (dNft.ownerOf(tokenId) != msg.sender) {
         revert NotDnftOwner();
       }
       require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
       ERC20 asset = IVault(vault).asset();
+      require(address(asset) != tokenIn, "SAME_TOKEN");
       uint amountSwapped = _swapToCollateral(
         tokenIn,
-        address(vault),
+        address(asset),
         amountIn,
         amountOutMin,
         fee1,
