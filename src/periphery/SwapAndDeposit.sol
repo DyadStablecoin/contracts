@@ -99,14 +99,11 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       uint256 amountIn,
       uint256 amountOutMin,
       uint24 fee1,
-      uint24 fee2
+      uint24 fee2,
   ) external nonReentrant {
       require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
-      require(amountIn > 0, "INSUFFICIENT_INPUT_AMOUNT");
-      require(amountOutMin > 0, "INSUFFICIENT_OUTPUT_AMOUNT");
       require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
       ERC20 asset = IVault(vault).asset();
-      require(address(asset) != tokenIn, "SAME_TOKEN");
       uint amountSwapped = _swapToCollateral(
         tokenIn,
         address(asset),
