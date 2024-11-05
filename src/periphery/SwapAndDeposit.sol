@@ -63,10 +63,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       uint24 fee1,
       uint24 fee2
   ) internal returns (uint amountOut) {
-      // Transfer the input tokens from the sender to this contract
       ERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
-
-      // Approve the Uniswap router to spend the input tokens
       ERC20(tokenIn).approve(address(swapRouter), amountIn);
 
       bytes memory path;
