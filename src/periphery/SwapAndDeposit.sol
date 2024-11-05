@@ -17,7 +17,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   ERC20 public immutable kerosene;
   ISwapRouter public immutable swapRouter;
   address public immutable WETH9;
-  address public immutable wethVault;
   VaultManagerV5 public immutable vaultManager;
   VaultLicenser public immutable vaultLicenser;
 
@@ -28,7 +27,8 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
     address tokenIn,
     address tokenOut,
     uint256 amountIn,
-    uint256 amountOut
+    uint256 amountOut,
+    address vault
   );
 
   constructor(
@@ -36,7 +36,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
     address _kerosene,
     address _swapRouter,
     address _WETH9,
-    address _wethVault,
     address _vaultManager,
     address _vaultLicenser
   ) {
@@ -44,7 +43,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
     kerosene = ERC20(_kerosene);
     swapRouter = ISwapRouter(_swapRouter);
     WETH9 = _WETH9;
-    wethVault = _wethVault;
     vaultManager = VaultManagerV5(_vaultManager);
     vaultLicenser = VaultLicenser(_vaultLicenser);
   }
@@ -109,15 +107,16 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       uint256 amountIn,
       uint256 amountOutMin,
       uint24 fee1,
-      uint24 fee2
+      uint24 fee2,
+      address vault
   ) external nonReentrant {
       if (dNft.ownerOf(tokenId) != msg.sender) {
         revert NotDnftOwner();
       }
-      require(vaultLicenser.isLicensed(tokenOut), "UNLICENSED_VAULT");
+      require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
       uint amountSwapped = _swapToCollateral(tokenIn, tokenOut, amountIn, amountOutMin, fee1, fee2);
       kerosene.approve(address(vaultManager), amountSwapped);
-      vaultManager.deposit(tokenId, wethVault, amountSwapped);
-      emit SwappedAndDeposited(tokenId, tokenIn, tokenOut, amountIn, amountSwapped);
+      vaultManager.deposit(tokenId, vault, amountSwapped);
+      emit SwappedAndDeposited(tokenId, tokenIn, tokenOut, amountIn, amountSwapped, vault);
   }
 }
