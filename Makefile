@@ -226,3 +226,15 @@ deployWETHGateway:
 		--via-ir \
 		--verify \
 		--optimize
+
+deployTimelock:
+	forge clean
+	forge script script/deploy/Deploy.Timelock.s.sol \
+		--rpc-url $(MAINNET_RPC) \
+		--sender 0x6e151819F002Bd1fE71DBa461a294D28A1A88CB5 \
+		--broadcast \
+		-i 1 \
+		-vvvv \
+		--via-ir \
+		--verify \
+		--optimize
