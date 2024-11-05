@@ -3,6 +3,7 @@ pragma solidity ^0.8.20;
 
 import {DNft} from "../core/DNft.sol";
 import {VaultManagerV5} from "../core/VaultManagerV5.sol";
+import {VaultLicenser} from "../core/VaultLicenser.sol";
 import {IExtension} from "../interfaces/IExtension.sol";
 import {ISwapRouter} from "../interfaces/ISwapRouter.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -18,10 +19,17 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   address public immutable WETH9;
   address public immutable wethVault;
   VaultManagerV5 public immutable vaultManager;
+  VaultLicenser public immutable vaultLicenser;
 
   error NotDnftOwner();
 
-  event SwappedAndDeposited(uint tokenId, address tokenIn, uint256 amountIn, uint256 amountOut);
+  event SwappedAndDeposited(
+    uint tokenId,
+    address tokenIn,
+    address tokenOut,
+    uint256 amountIn,
+    uint256 amountOut
+  );
 
   constructor(
     address _dNft,
@@ -29,7 +37,8 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
     address _swapRouter,
     address _WETH9,
     address _wethVault,
-    address _vaultManager
+    address _vaultManager,
+    address _vaultLicenser
   ) {
     dNft = DNft(_dNft);
     kerosene = ERC20(_kerosene);
@@ -37,6 +46,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
     WETH9 = _WETH9;
     wethVault = _wethVault;
     vaultManager = VaultManagerV5(_vaultManager);
+    vaultLicenser = VaultLicenser(_vaultLicenser);
   }
 
   function name() external pure override returns (string memory) {
@@ -51,16 +61,17 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       return 0; // no hooks needed for this extension
   }
 
-  function _swapToKerosene(
+  function _swapToCollateral(
       address tokenIn,
+      address tokenOut,
       uint256 amountIn,
       uint256 amountOutMin,
       uint24 fee1,
-      uint24 fee2,
-      address to
+      uint24 fee2
   ) internal returns (uint amountOut) {
       require(amountIn > 0, "INSUFFICIENT_INPUT_AMOUNT");
-      require(tokenIn != address(kerosene), "INVALID_PATH");
+      require(amountOutMin > 0, "INSUFFICIENT_OUTPUT_AMOUNT");
+      require(tokenIn != tokenOut, "IDENTICAL_ADDRESSES");
 
       // Transfer the input tokens from the sender to this contract
       ERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
@@ -72,16 +83,16 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
 
       if (tokenIn == WETH9) {
           // Single-hop swap
-          path = abi.encodePacked(tokenIn, fee1, address(kerosene));
+          path = abi.encodePacked(tokenIn, fee1, tokenOut);
       } else {
           // Multi-hop swap via WETH9
-          path = abi.encodePacked(tokenIn, fee1, WETH9, fee2, address(kerosene));
+          path = abi.encodePacked(tokenIn, fee1, WETH9, fee2, tokenOut);
       }
 
       // Set up the swap parameters
       ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
           path: path,
-          recipient: to,
+          recipient: address(this),
           deadline: block.timestamp + 15, // Using a 15-second deadline for safety
           amountIn: amountIn,
           amountOutMinimum: amountOutMin
@@ -94,6 +105,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   function swapAndDeposit(
       uint tokenId,
       address tokenIn,
+      address tokenOut,
       uint256 amountIn,
       uint256 amountOutMin,
       uint24 fee1,
@@ -102,9 +114,10 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       if (dNft.ownerOf(tokenId) != msg.sender) {
         revert NotDnftOwner();
       }
-      uint amountSwapped = _swapToKerosene(tokenIn, amountIn, amountOutMin, fee1, fee2, address(this));
+      require(vaultLicenser.isLicensed(tokenOut), "UNLICENSED_VAULT");
+      uint amountSwapped = _swapToCollateral(tokenIn, tokenOut, amountIn, amountOutMin, fee1, fee2);
       kerosene.approve(address(vaultManager), amountSwapped);
       vaultManager.deposit(tokenId, wethVault, amountSwapped);
-      emit SwappedAndDeposited(tokenId, tokenIn, amountIn, amountSwapped);
+      emit SwappedAndDeposited(tokenId, tokenIn, tokenOut, amountIn, amountSwapped);
   }
 }
