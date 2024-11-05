@@ -7,8 +7,9 @@ import {IDyadLPStaking} from "../interfaces/IDyadLPStaking.sol";
 import {DNft} from "../core/DNft.sol";
 import {VaultManagerV5} from "../core/VaultManagerV5.sol";
 import {Dyad} from "../core/Dyad.sol";
+import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract MintAndStake is IExtension {
+contract MintAndStake is IExtension, ReentrancyGuard {
   DNft public immutable dNft;
   VaultManagerV5 public immutable vaultManager;
   Dyad public immutable dyad;
@@ -42,7 +43,7 @@ contract MintAndStake is IExtension {
       uint dyadIndex,
       address stakingContract,
       uint minAmountOut
-  ) external {
+  ) external nonReentrant {
       require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
       vaultManager.mintDyad(tokenId, amount, address(this));
       dyad.approve(pool, amount);
