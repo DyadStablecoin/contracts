@@ -76,7 +76,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
           path = abi.encodePacked(tokenIn, fee1, WETH9, fee2, tokenOut);
       }
 
-      // Set up the swap parameters
       ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
           path: path,
           recipient: address(this),
@@ -85,7 +84,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
           amountOutMinimum: amountOutMin
       });
 
-      // Execute the swap
       amountOut = swapRouter.exactInput(params);
   }
 
@@ -100,7 +98,9 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   ) external nonReentrant {
       require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
       require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
+
       ERC20 asset = IVault(vault).asset();
+
       uint amountSwapped = _swapToCollateral(
         tokenIn,
         address(asset),
@@ -109,8 +109,10 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         fee1,
         fee2
       );
+
       asset.approve(address(vaultManager), amountSwapped);
       vaultManager.deposit(tokenId, vault, amountSwapped);
+
       emit SwappedAndDeposited(tokenId, tokenIn, address(asset), amountIn, amountSwapped, vault);
   }
 }
