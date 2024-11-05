@@ -12,107 +12,89 @@ import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract SwapAndDeposit is IExtension, ReentrancyGuard {
-  using SafeTransferLib for ERC20;
+    using SafeTransferLib for ERC20;
 
-  DNft public immutable dNft;
-  ISwapRouter public immutable swapRouter;
-  address public immutable WETH9;
-  VaultManagerV5 public immutable vaultManager;
-  VaultLicenser public immutable vaultLicenser;
+    DNft public immutable dNft;
+    ISwapRouter public immutable swapRouter;
+    address public immutable WETH9;
+    VaultManagerV5 public immutable vaultManager;
+    VaultLicenser public immutable vaultLicenser;
 
-  event SwappedAndDeposited(
-    uint tokenId,
-    address tokenIn,
-    address tokenOut,
-    uint256 amountIn,
-    uint256 amountOut,
-    address vault
-  );
+    event SwappedAndDeposited(
+        uint256 tokenId, address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut, address vault
+    );
 
-  constructor(
-    address _dNft,
-    address _swapRouter,
-    address _WETH9,
-    address _vaultManager,
-    address _vaultLicenser
-  ) {
-    dNft = DNft(_dNft);
-    swapRouter = ISwapRouter(_swapRouter);
-    WETH9 = _WETH9;
-    vaultManager = VaultManagerV5(_vaultManager);
-    vaultLicenser = VaultLicenser(_vaultLicenser);
-  }
+    constructor(address _dNft, address _swapRouter, address _WETH9, address _vaultManager, address _vaultLicenser) {
+        dNft = DNft(_dNft);
+        swapRouter = ISwapRouter(_swapRouter);
+        WETH9 = _WETH9;
+        vaultManager = VaultManagerV5(_vaultManager);
+        vaultLicenser = VaultLicenser(_vaultLicenser);
+    }
 
-  function name() external pure override returns (string memory) {
-    return "Swap and Deposit";
-  }
+    function name() external pure override returns (string memory) {
+        return "Swap and Deposit";
+    }
 
-  function description() external pure override returns (string memory) {
-    return "Extension for swapping to a vault's asset and directly depositing in a Note";
-  }
+    function description() external pure override returns (string memory) {
+        return "Extension for swapping to a vault's asset and directly depositing in a Note";
+    }
 
-  function getHookFlags() external pure override returns (uint256) {
-      return 0; // no hooks needed for this extension
-  }
+    function getHookFlags() external pure override returns (uint256) {
+        return 0; // no hooks needed for this extension
+    }
 
-  function _swapToCollateral(
-      address tokenIn,
-      address tokenOut, 
-      uint256 amountIn,
-      uint256 amountOutMin,
-      uint24 fee1,
-      uint24 fee2
-  ) internal returns (uint amountOut) {
-      ERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
-      ERC20(tokenIn).approve(address(swapRouter), amountIn);
+    function _swapToCollateral(
+        address tokenIn,
+        address tokenOut,
+        uint256 amountIn,
+        uint256 amountOutMin,
+        uint24 fee1,
+        uint24 fee2
+    ) internal returns (uint256 amountOut) {
+        ERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
+        ERC20(tokenIn).approve(address(swapRouter), amountIn);
 
-      bytes memory path;
+        bytes memory path;
 
-      if (tokenIn == WETH9) {
-          // Single-hop swap
-          path = abi.encodePacked(tokenIn, fee1, tokenOut);
-      } else {
-          // Multi-hop swap via WETH9
-          path = abi.encodePacked(tokenIn, fee1, WETH9, fee2, tokenOut);
-      }
+        if (tokenIn == WETH9) {
+            // Single-hop swap
+            path = abi.encodePacked(tokenIn, fee1, tokenOut);
+        } else {
+            // Multi-hop swap via WETH9
+            path = abi.encodePacked(tokenIn, fee1, WETH9, fee2, tokenOut);
+        }
 
-      ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
-          path: path,
-          recipient: address(this),
-          deadline: block.timestamp + 300, // Using a 5-minute deadline
-          amountIn: amountIn,
-          amountOutMinimum: amountOutMin
-      });
+        ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
+            path: path,
+            recipient: address(this),
+            deadline: block.timestamp + 300, // Using a 5-minute deadline
+            amountIn: amountIn,
+            amountOutMinimum: amountOutMin
+        });
 
-      amountOut = swapRouter.exactInput(params);
-  }
+        amountOut = swapRouter.exactInput(params);
+    }
 
-  function swapAndDeposit(
-      uint tokenId,
-      address tokenIn,
-      address vault,
-      uint256 amountIn,
-      uint256 amountOutMin,
-      uint24 fee1,
-      uint24 fee2,
-  ) external nonReentrant {
-      require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
-      require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
+    function swapAndDeposit(
+        uint256 tokenId,
+        address tokenIn,
+        address vault,
+        uint256 amountIn,
+        uint256 amountOutMin,
+        uint24 fee1,
+        uint24 fee2
+    ) external nonReentrant {
+        require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
+        require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
 
-      ERC20 asset = IVault(vault).asset();
+        ERC20 asset = IVault(vault).asset();
 
-      uint amountSwapped = _swapToCollateral(
-        tokenIn,
-        address(asset),
-        amountIn,
-        amountOutMin,
-        fee1,
-        fee2
-      );
+        uint256 amountSwapped = _swapToCollateral(tokenIn, address(asset), amountIn, amountOutMin, fee1, fee2);
 
-      asset.approve(address(vaultManager), amountSwapped);
-      vaultManager.deposit(tokenId, vault, amountSwapped);
+        asset.approve(address(vaultManager), amountSwapped);
+        vaultManager.deposit(tokenId, vault, amountSwapped);
 
-      emit SwappedAndDeposited(tokenId, tokenIn, address(asset), amountIn, amountSwapped, vault);
-  }
+        emit SwappedAndDeposited(tokenId, tokenIn, address(asset), amountIn, amountSwapped, vault);
+    }
 }
