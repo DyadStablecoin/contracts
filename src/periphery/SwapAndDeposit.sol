@@ -15,7 +15,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   using SafeTransferLib for ERC20;
 
   DNft public immutable dNft;
-  ERC20 public immutable kerosene;
   ISwapRouter public immutable swapRouter;
   address public immutable WETH9;
   VaultManagerV5 public immutable vaultManager;
@@ -32,14 +31,12 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
 
   constructor(
     address _dNft,
-    address _kerosene,
     address _swapRouter,
     address _WETH9,
     address _vaultManager,
     address _vaultLicenser
   ) {
     dNft = DNft(_dNft);
-    kerosene = ERC20(_kerosene);
     swapRouter = ISwapRouter(_swapRouter);
     WETH9 = _WETH9;
     vaultManager = VaultManagerV5(_vaultManager);
@@ -51,7 +48,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
   }
 
   function description() external pure override returns (string memory) {
-    return "Extension for swapping to Kerosene and directly depositing in a Note";
+    return "Extension for swapping to a vault's asset and directly depositing in a Note";
   }
 
   function getHookFlags() external pure override returns (uint256) {
@@ -86,7 +83,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
       ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
           path: path,
           recipient: address(this),
-          deadline: block.timestamp + 15, // Using a 15-second deadline for safety
+          deadline: block.timestamp + 300, // Using a 5-minute deadline
           amountIn: amountIn,
           amountOutMinimum: amountOutMin
       });
