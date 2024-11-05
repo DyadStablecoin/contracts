@@ -3,7 +3,7 @@ pragma solidity ^0.8.20;
 
 import "forge-std/Script.sol";
 
-import {Timelock} from "../../src/periphery/Timelock.sol";
+import "@openzeppelin/contracts/governance/TimelockController.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
 import {Parameters} from "../../src/params/Parameters.sol";
 
@@ -17,7 +17,7 @@ contract DeployTimelock is Script, Parameters {
 
         vm.startBroadcast(); // ----------------------
 
-        Timelock timelock = new Timelock(
+        TimelockController timelock = new TimelockController(
           7 days,
           proposers,
           executors,
