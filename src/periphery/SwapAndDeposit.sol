@@ -16,18 +16,31 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
 
     DNft public immutable dNft;
     ISwapRouter public immutable swapRouter;
-    address public immutable WETH9;
     VaultManagerV5 public immutable vaultManager;
     VaultLicenser public immutable vaultLicenser;
 
+    error NotDNftOwner();
+    error UnlicensedVault();
+    error SwapFailed();
+    error InsufficientAmountOut();
+
     event SwappedAndDeposited(
-        uint256 tokenId, address tokenIn, address tokenOut, uint256 amountIn, uint256 amountOut, address vault
+        uint256 indexed tokenId,
+        address indexed tokenIn,
+        address indexed tokenOut,
+        uint256 amountIn,
+        uint256 amountOut,
+        address vault
     );
 
-    constructor(address _dNft, address _swapRouter, address _WETH9, address _vaultManager, address _vaultLicenser) {
+    constructor(
+        address _dNft,
+        address _swapRouter,
+        address _vaultManager,
+        address _vaultLicenser
+    ) {
         dNft = DNft(_dNft);
         swapRouter = ISwapRouter(_swapRouter);
-        WETH9 = _WETH9;
         vaultManager = VaultManagerV5(_vaultManager);
         vaultLicenser = VaultLicenser(_vaultLicenser);
     }
@@ -37,43 +50,41 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
     }
 
     function description() external pure override returns (string memory) {
-        return "Extension for swapping to a vault's asset and directly depositing in a Note";
+        return "Extension for swapping to a vault's asset and directly depositing into a Note";
     }
 
     function getHookFlags() external pure override returns (uint256) {
-        return 0; // no hooks needed for this extension
+        return 0; // No hooks needed for this extension
     }
 
     function _swapToCollateral(
         address tokenIn,
-        address tokenOut,
         uint256 amountIn,
         uint256 amountOutMin,
-        uint24 fee1,
-        uint24 fee2
+        bytes calldata route,
+        uint256 deadline
     ) internal returns (uint256 amountOut) {
+        // Transfer tokenIn from the user to this contract, handling fee-on-transfer tokens
+        uint256 balanceBefore = ERC20(tokenIn).balanceOf(address(this));
         ERC20(tokenIn).safeTransferFrom(msg.sender, address(this), amountIn);
-        ERC20(tokenIn).approve(address(swapRouter), amountIn);
+        uint256 balanceAfter = ERC20(tokenIn).balanceOf(address(this));
+        uint256 actualAmountIn = balanceAfter - balanceBefore;
 
-        bytes memory path;
-
-        if (tokenIn == WETH9) {
-            // Single-hop swap
-            path = abi.encodePacked(tokenIn, fee1, tokenOut);
-        } else {
-            // Multi-hop swap via WETH9
-            path = abi.encodePacked(tokenIn, fee1, WETH9, fee2, tokenOut);
-        }
+        // Approve the swapRouter to spend tokenIn using the safe approval pattern
+        ERC20(tokenIn).safeApprove(address(swapRouter), 0);
+        ERC20(tokenIn).safeApprove(address(swapRouter), actualAmountIn);
 
         ISwapRouter.ExactInputParams memory params = ISwapRouter.ExactInputParams({
-            path: path,
+            path: route,
             recipient: address(this),
-            deadline: block.timestamp + 300, // Using a 5-minute deadline
-            amountIn: amountIn,
+            deadline: deadline,
+            amountIn: actualAmountIn,
             amountOutMinimum: amountOutMin
         });
 
         amountOut = swapRouter.exactInput(params);
+
+        if (amountOut < amountOutMin) revert InsufficientAmountOut();
     }
 
     function swapAndDeposit(
@@ -82,19 +93,36 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         address vault,
         uint256 amountIn,
         uint256 amountOutMin,
-        uint24 fee1,
-        uint24 fee2
+        bytes calldata route,
+        uint256 deadline
     ) external nonReentrant {
-        require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
-        require(vaultLicenser.isLicensed(vault), "UNLICENSED_VAULT");
+        if (dNft.ownerOf(tokenId) != msg.sender) revert NotDNftOwner();
+        if (!vaultLicenser.isLicensed(vault)) revert UnlicensedVault();
 
         ERC20 asset = IVault(vault).asset();
 
-        uint256 amountSwapped = _swapToCollateral(tokenIn, address(asset), amountIn, amountOutMin, fee1, fee2);
+        uint256 amountSwapped = _swapToCollateral(
+            tokenIn,
+            amountIn,
+            amountOutMin,
+            route,
+            deadline
+        );
 
-        asset.approve(address(vaultManager), amountSwapped);
+        // Approve the vaultManager to spend the swapped tokens using the safe approval pattern
+        asset.safeApprove(address(vaultManager), 0);
+        asset.safeApprove(address(vaultManager), amountSwapped);
+
+        // Deposit the swapped tokens into the vault
         vaultManager.deposit(tokenId, vault, amountSwapped);
 
-        emit SwappedAndDeposited(tokenId, tokenIn, address(asset), amountIn, amountSwapped, vault);
+        emit SwappedAndDeposited(
+            tokenId,
+            tokenIn,
+            address(asset),
+            amountIn,
+            amountSwapped,
+            vault
+        );
     }
 }
