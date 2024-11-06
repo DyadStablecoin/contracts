@@ -78,15 +78,8 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         // Record balance of tokenOut before swap
         uint256 tokenOutBalanceBefore = ERC20(tokenOut).balanceOf(address(this));
 
-        (bool success, bytes memory result) = address(augustusSwapper).call{value: msg.value}(callData);
-        if (!success) {
-            // Get the revert reason
-            if (result.length < 68) revert SwapFailed();
-            assembly {
-                result := add(result, 0x04)
-            }
-            revert(abi.decode(result, (string)));
-        }
+        (bool success, ) = address(augustusSwapper).call(callData);
+        require(success, SwapFailed());
 
         // Get the amountOut by checking the balance of the tokenOut after the swap
         uint256 tokenOutBalanceAfter = ERC20(tokenOut).balanceOf(address(this));
@@ -102,7 +95,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         uint256 amountIn,
         uint256 minAmountOut,
         bytes calldata callData
-    ) external payable nonReentrant {
+    ) external nonReentrant {
         if (dNft.ownerOf(tokenId) != msg.sender) revert NotDNftOwner();
         if (!vaultLicenser.isLicensed(vault)) revert UnlicensedVault();
 
