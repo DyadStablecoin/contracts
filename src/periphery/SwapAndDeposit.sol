@@ -71,7 +71,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         // Record balance of tokenOut before swap
         uint256 tokenOutBalanceBefore = ERC20(tokenOut).balanceOf(address(this));
 
-        (bool success, ) = address(augustusSwapper).call(swapData);
+        (bool success,) = address(augustusSwapper).call(swapData);
         require(success, SwapFailed());
 
         // Get the amountOut by checking the balance of the tokenOut after the swap
