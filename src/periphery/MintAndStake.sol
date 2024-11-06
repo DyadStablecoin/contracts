@@ -18,6 +18,8 @@ contract MintAndStake is IExtension, ReentrancyGuard {
     VaultManagerV5 public immutable vaultManager;
     Dyad public immutable dyad;
 
+    error NotDNftOwner();
+
     constructor(address _dNft, address _vaultManager, address _dyad) {
         dNft = DNft(_dNft);
         vaultManager = VaultManagerV5(_vaultManager);
@@ -44,7 +46,9 @@ contract MintAndStake is IExtension, ReentrancyGuard {
         address stakingContract,
         uint256 minAmountOut
     ) external nonReentrant {
-        require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
+        if (dNft.ownerOf(tokenId) != msg.sender) {
+            revert NotDNftOwner();
+        }
         // mint dyad
         vaultManager.mintDyad(tokenId, amount, address(this));
 
@@ -69,7 +73,9 @@ contract MintAndStake is IExtension, ReentrancyGuard {
         address stakingContract,
         uint256 minDyadOut
     ) external nonReentrant {
-        require(dNft.ownerOf(tokenId) == msg.sender, "NOT_DNFT_OWNER");
+        if (dNft.ownerOf(tokenId) != msg.sender) {
+            revert NotDNftOwner();
+        }
         // Unstake LP tokens (LP tokens are sent to msg.sender)
         IDyadLPStaking(stakingContract).withdraw(tokenId, amount);
 
