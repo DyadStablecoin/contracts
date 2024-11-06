@@ -55,7 +55,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         address tokenIn,
         uint256 amountIn,
         uint256 minAmountOut,
-        bytes calldata callData,
+        bytes calldata swapData,
         address tokenOut
     ) internal returns (uint256 amountOut) {
         // Transfer tokenIn from the user to this contract, handling fee-on-transfer tokens
@@ -71,7 +71,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         // Record balance of tokenOut before swap
         uint256 tokenOutBalanceBefore = ERC20(tokenOut).balanceOf(address(this));
 
-        (bool success, ) = address(augustusSwapper).call(callData);
+        (bool success, ) = address(augustusSwapper).call(swapData);
         require(success, SwapFailed());
 
         // Get the amountOut by checking the balance of the tokenOut after the swap
@@ -87,14 +87,14 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         address vault,
         uint256 amountIn,
         uint256 minAmountOut,
-        bytes calldata callData
+        bytes calldata swapData
     ) external nonReentrant {
         if (dNft.ownerOf(tokenId) != msg.sender) revert NotDNftOwner();
         if (!vaultLicenser.isLicensed(vault)) revert UnlicensedVault();
 
         ERC20 asset = IVault(vault).asset();
 
-        uint256 amountSwapped = _swapToCollateral(tokenIn, amountIn, minAmountOut, callData, address(asset));
+        uint256 amountSwapped = _swapToCollateral(tokenIn, amountIn, minAmountOut, swapData, address(asset));
 
         // Approve the vaultManager to spend the swapped tokens using the safe approval pattern
         asset.safeApprove(address(vaultManager), 0);
