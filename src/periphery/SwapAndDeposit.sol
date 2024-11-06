@@ -10,15 +10,11 @@ import {ERC20} from "@solmate/src/tokens/ERC20.sol";
 import {SafeTransferLib} from "@solmate/src/utils/SafeTransferLib.sol";
 import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-interface IAugustusSwapper {
-    function getTokenTransferProxy() external view returns (address);
-}
-
 contract SwapAndDeposit is IExtension, ReentrancyGuard {
     using SafeTransferLib for ERC20;
 
     DNft public immutable dNft;
-    IAugustusSwapper public immutable augustusSwapper;
+    address public immutable augustusSwapper;
     VaultManagerV5 public immutable vaultManager;
     VaultLicenser public immutable vaultLicenser;
 
@@ -38,7 +34,7 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
 
     constructor(address _dNft, address _augustusSwapper, address _vaultManager, address _vaultLicenser) {
         dNft = DNft(_dNft);
-        augustusSwapper = IAugustusSwapper(_augustusSwapper);
+        augustusSwapper = _augustusSwapper;
         vaultManager = VaultManagerV5(_vaultManager);
         vaultLicenser = VaultLicenser(_vaultLicenser);
     }
@@ -55,8 +51,6 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         return 0; // No hooks needed for this extension
     }
 
-    receive() external payable {}
-
     function _swapToCollateral(
         address tokenIn,
         uint256 amountIn,
@@ -71,9 +65,8 @@ contract SwapAndDeposit is IExtension, ReentrancyGuard {
         uint256 actualAmountIn = balanceAfter - balanceBefore;
 
         // Approve the tokenTransferProxy to spend tokenIn using the safe approval pattern
-        address tokenTransferProxy = augustusSwapper.getTokenTransferProxy();
-        ERC20(tokenIn).safeApprove(tokenTransferProxy, 0);
-        ERC20(tokenIn).safeApprove(tokenTransferProxy, actualAmountIn);
+        ERC20(tokenIn).safeApprove(augustusSwapper, 0);
+        ERC20(tokenIn).safeApprove(augustusSwapper, actualAmountIn);
 
         // Record balance of tokenOut before swap
         uint256 tokenOutBalanceBefore = ERC20(tokenOut).balanceOf(address(this));
