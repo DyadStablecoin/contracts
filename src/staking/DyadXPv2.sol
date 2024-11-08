@@ -122,7 +122,7 @@ contract DyadXPv2 is IERC20, UUPSUpgradeable, OwnableUpgradeable {
         _updateNoteBalance(noteId);
     }
 
-    function forceUpdateXPBalance(uint256 noteId) external onlyOwner {
+    function forceUpdateXPBalance(uint256 noteId) external {
         if (msg.sender != owner()) {
             if (msg.sender != DNFT.ownerOf(noteId)) {
                 revert Unauthorized();
