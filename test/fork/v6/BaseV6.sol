@@ -49,7 +49,7 @@ contract BaseTestV6 is Test, Modifiers, Parameters {
     address bob = address(0x42);
 
     function setUp() public {
-        vm.createSelectFork(vm.envString("RPC_URL"), 21109036);
+        vm.createSelectFork(vm.envString("RPC_URL"), 21086097);
 
         VaultManagerV6 impl = new VaultManagerV6();
         vm.prank(MAINNET_FEE_RECIPIENT);

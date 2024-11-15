@@ -9,6 +9,7 @@ import {VaultManagerV3} from "../../../src/core/VaultManagerV3.sol";
 import {Parameters} from "../../../src/params/Parameters.sol";
 import {DeployVaultManagerV3} from "../../../script/deploy/DeployVaultManagerV3.s.sol";
 import {Upgrades} from "openzeppelin-foundry-upgrades/Upgrades.sol";
+import {IVault} from "../../../src/interfaces/IVault.sol";
 
 contract LiquidateTest is BaseTestV6 {
     modifier mintDyad(uint256 id, uint256 amount) {
@@ -147,5 +148,41 @@ contract LiquidateTest is BaseTestV6 {
 
         uint256 debtAfter = getMintedDyad(alice0);
         console.log("debtAfter: ", debtAfter / 1e18);
+    }
+
+    function test_LiquidateFromV5() public {
+        IVault keroseneVault = IVault(MAINNET_V2_KEROSENE_V2_VAULT);
+        IVault apxVault = IVault(MAINNET_APXETH_VAULT);
+
+        uint256 keroBefore = keroseneVault.id2asset(511);
+        uint256 apxBefore = apxVault.id2asset(511);
+
+        console.log("debt before: ", contracts.dyad.mintedDyad(511));
+
+        vm.prank(0xBA1aAd8B27e841C8E3298e4ceadB0524b4d4B978);
+        (address[] memory vaults, uint256[] memory amounts) =
+            contracts.vaultManager.liquidate(511, 108, 3_238_833_231_264_062_800_000); // $3238 dyad
+        vm.assertEq(4, vaults.length);
+
+        console.log("debt after: ", contracts.dyad.mintedDyad(511));
+
+        vm.assertEq(vaults[2], MAINNET_V2_KEROSENE_V2_VAULT);
+        vm.assertLt(amounts[2], 9643113711581927460479);
+
+        vm.assertEq(vaults[3], MAINNET_APXETH_VAULT);
+        vm.assertGt(amounts[3], 1029566515236775113);
+
+        uint256 keroAfter = keroseneVault.id2asset(511);
+        uint256 apxAfter = apxVault.id2asset(511);
+
+        console.log("keroBefore: ", keroBefore);
+        console.log("apxBefore: ", apxBefore);
+        console.log("keroAfter: ", keroAfter);
+        console.log("apxAfter: ", apxAfter);
+
+        console.log("keroLoss: ", keroBefore - keroAfter);
+        console.log("apxLoss: ", apxBefore - apxAfter);
+
+        console.log("apxPrice: ", apxVault.assetPrice());
     }
 }

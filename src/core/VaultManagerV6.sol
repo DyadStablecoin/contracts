@@ -168,74 +168,59 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             return (vaultAddresses, vaultAmounts);
         }
 
+        uint256 totalLiquidationReward;
+        if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
+            uint256 cappedCr = cr < 1e18 ? 1e18 : cr;
+            uint256 liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
+            uint256 liquidationAssetShare = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
+            uint256 allAsset = totalValue.mulWadUp(liquidationAssetShare);
+            totalLiquidationReward = allAsset.mulWadDown(amount).divWadDown(debt);
+        } else {
+            totalLiquidationReward = amount + amount.mulWadDown(LIQUIDATION_REWARD);
+            if (totalLiquidationReward < totalValue) {
+                totalLiquidationReward = totalValue;
+            }
+        }
+
         uint256 amountMoved;
+        uint256 keroIndex;
         for (uint256 i; i < numberOfVaults; ++i) {
             Vault vault = Vault(vaults[id].at(i));
+            vaultAddresses[i] = address(vault);
             if (address(vault) == KEROSENE_VAULT) {
+                keroIndex = i;
                 continue;
             }
-            vaultAddresses[i] = address(vault);
             if (vaultLicenser.isLicensed(address(vault))) {
                 uint256 value = vaultsValues[i];
                 if (value == 0) continue;
                 uint256 depositAmount = vault.id2asset(id);
-                uint256 asset;
-                uint256 amountShare;
-                if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
-                    asset = _getPartialLiquidationAmount(amount, debt, depositAmount, cr);
+                uint256 percentageOfValue = value.divWadDown(exoValue);
+                uint256 valueToMove = percentageOfValue.mulWadDown(totalLiquidationReward);
+                uint256 asset = depositAmount.mulWadDown(valueToMove).divWadDown(value);
+                if (asset > depositAmount) {
+                    asset = depositAmount;
+                    amountMoved += value;
                 } else {
-                    (asset, amountShare) = _getFullLiquidationAmount(amount, debt, depositAmount, value, exoValue);
-                    amountMoved += amountShare;
+                    amountMoved += valueToMove;
                 }
-                vaultAmounts[i] = asset;
                 vault.move(id, to, asset);
             }
         }
 
-        if(keroValue > 0) {
-            vaultAddresses[numberOfVaults - 1] = KEROSENE_VAULT;
-            if (amountMoved < amount) {
-                uint256 amountRemaining = amount - amountMoved;
-                uint256 keroDeposited = Vault(KEROSENE_VAULT).id2asset(id);
-                (uint256 keroToMove, ) = _getFullLiquidationAmount(amountRemaining, debt, keroDeposited, keroValue, keroValue);
-                vaultAmounts[numberOfVaults - 1] = keroToMove;
-                dyadXP.beforeKeroseneWithdrawn(id, keroToMove);
-                Vault(KEROSENE_VAULT).move(id, to, keroToMove);
-                dyadXP.afterKeroseneDeposited(to, keroToMove);
-            }
+        if (keroValue > 0 && amountMoved < totalLiquidationReward) {
+            uint256 amountRemaining = totalLiquidationReward - amountMoved;
+            uint256 keroDeposited = Vault(KEROSENE_VAULT).id2asset(id);
+            uint256 keroToMove = keroDeposited.mulWadDown(amountRemaining).divWadDown(keroValue);
+            vaultAmounts[keroIndex] = keroToMove;
+            dyadXP.beforeKeroseneWithdrawn(id, keroToMove);
+            Vault(KEROSENE_VAULT).move(id, to, keroToMove);
+            dyadXP.afterKeroseneDeposited(to, keroToMove);
         }
 
         emit Liquidate(id, msg.sender, to, amount);
 
         return (vaultAddresses, vaultAmounts);
-    }
-
-    function _getPartialLiquidationAmount(uint256 amount, uint256 debt, uint256 depositAmount, uint256 cr)
-        private
-        view
-        returns (uint256)
-    {
-        uint256 cappedCr = cr < 1e18 ? 1e18 : cr;
-        uint256 liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
-        uint256 liquidationAssetShare = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
-        uint256 allAsset = depositAmount.mulWadUp(liquidationAssetShare);
-        return allAsset.mulWadDown(amount).divWadDown(debt);
-    }
-
-    function _getFullLiquidationAmount(
-        uint256 amount,
-        uint256 debt,
-        uint256 depositAmount,
-        uint256 value,
-        uint256 totalValue
-    ) private view returns (uint256 asset, uint256 amountShare) {
-        amountShare = value.divWadDown(totalValue).mulWadUp(amount); // amount of asset in dollars represented by the share
-        uint256 rewardRate = amount.divWadDown(debt).mulWadDown(LIQUIDATION_REWARD);
-        uint256 valueToMove = amountShare + amountShare.mulWadUp(rewardRate);
-        asset = depositAmount.mulWadDown(valueToMove).divWadDown(value);
-        if (asset > depositAmount) {
-            asset = depositAmount;
-        }
     }
 
     /// @notice Returns the collateral ratio for the specified note.
