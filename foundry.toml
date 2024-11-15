@@ -4,6 +4,7 @@
 src = 'src'
 out = 'out'
 libs = ['lib']
+evm_version = 'cancun'
 
 # copy/pasta from https://docs.openzeppelin.com/upgrades-plugins/1.x/foundry-upgrades
 ffi = true
