@@ -134,12 +134,16 @@ contract ZapExtension is IExtension {
         bytes calldata swapData
     ) internal {
         ERC20 asset = IVault(vault).asset();
+
         uint256 balance = ERC20(tokenIn).balanceOf(address(this));
         ERC20(tokenIn).safeApprove(augustusSwapper, balance);
+
         (bool success, bytes memory returnData) = address(augustusSwapper).call(swapData);
         require(success, SwapFailed());
+
         (uint256 receivedAmount,,) = abi.decode(returnData, (uint256, uint256, uint256));
         require(receivedAmount >= minAmountOut, InsufficientAmountOut());
+
         asset.safeApprove(address(vaultManager), receivedAmount);
         vaultManager.deposit(tokenId, vault, receivedAmount);
 
@@ -157,13 +161,12 @@ contract ZapExtension is IExtension {
         ERC20 asset = IVault(vault).asset();
 
         vaultManager.withdraw(tokenId, vault, amountIn, address(this));
-        asset.approve(augustusSwapper, amountIn);
+        asset.safeApprove(augustusSwapper, amountIn);
 
         (bool success, bytes memory returnData) = address(augustusSwapper).call(swapData);
         require(success, SwapFailed());
 
         (uint256 receivedAmount,,) = abi.decode(returnData, (uint256, uint256, uint256));
-
         require(receivedAmount >= minAmountOut, InsufficientAmountOut());
 
         emit WithdrawnAndSwapped(tokenId, address(asset), tokenOut, amountIn, receivedAmount, vault);
