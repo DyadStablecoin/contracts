@@ -60,6 +60,19 @@ contract FakeVaultManager {
     function getVaults() external view returns (address[] memory) {
         return _vaults;
     }
+
+    function getTvl() external view returns (uint256) {
+        uint256 tvl;
+        uint256 numberOfVaults = _vaults.length;
+        for (uint256 i = 0; i < numberOfVaults; i++) {
+            FakeVault vault = FakeVault(_vaults[i]);
+            FakeAsset asset = vault.asset();
+            tvl += asset.balanceOf(address(vault)) * vault.assetPrice() * 1e18 / (10 ** asset.decimals())
+                / (10 ** vault.oracle().decimals());
+        }
+
+        return tvl;
+    }
 }
 
 contract KerosineDenominatorV3Test is Test {
@@ -67,16 +80,17 @@ contract KerosineDenominatorV3Test is Test {
     address ALICE = makeAddr("ALICE");
 
     KerosineDenominatorV3 keroDenominator;
+    Kerosine kerosine;
     FakeDyad dyad;
     FakeVaultManager manager;
 
     function setUp() external {
         dyad = new FakeDyad();
-        dyad.setTotalSupply(100_00e18);
+        dyad.setTotalSupply(100_000_000e18);
         manager = new FakeVaultManager();
         manager.addVault(new FakeVault());
-        keroDenominator =
-            new KerosineDenominatorV3(new Kerosine(), Dyad(address(dyad)), KerosineManager(address(manager)));
+        kerosine = new Kerosine();
+        keroDenominator = new KerosineDenominatorV3(kerosine, Dyad(address(dyad)), KerosineManager(address(manager)));
         OWNER = keroDenominator.owner();
     }
 
@@ -161,14 +175,24 @@ contract KerosineDenominatorV3Test is Test {
         assertEq(keroDenominator.currentDyadMultiplier(), newMultiplier);
     }
 
-    function test_returns_multiplier() external {
+    function test_kerosine_deterministic_value() external {
+        uint64 multiplier = 2e12;
         vm.prank(OWNER);
-        keroDenominator.setTargetDyadMultiplier(2e12, 10 seconds);
+        keroDenominator.setTargetDyadMultiplier(multiplier, 0);
 
-        for (uint256 i; i < 10; i++) {
-            uint256 denominator = keroDenominator.denominator();
-            console2.log("DENOMINATOR", denominator);
-            vm.warp(vm.getBlockTimestamp() + 1);
-        }
+        // Default is $1 billion
+        uint256 tvl = manager.getTvl();
+        // Default is $100 millions
+        uint256 dyadSupply = dyad.totalSupply();
+
+        // expected deterministic price
+        // (tvl - x * dyad supply) / kero supply
+        uint256 expectedPrice = ((tvl - (multiplier * dyadSupply) / 1e12) * 1e8) / kerosine.totalSupply();
+
+        uint256 denominator = keroDenominator.denominator();
+
+        uint256 actualPrice = ((tvl - dyadSupply) * 1e8) / denominator;
+
+        assertEq(actualPrice, expectedPrice);
     }
 }
