@@ -100,7 +100,7 @@ contract KerosineDenominatorV3 is Owned {
         return (tvl - dyadSupply).mulDiv(adjustedKerosineSupply, tvl - normalizedSupply);
     }
 
-    function _getTvl() public view returns (uint256) {
+    function _getTvl() internal view returns (uint256) {
         uint256 tvl;
         address[] memory vaults = MANAGER.getVaults();
         uint256 numberOfVaults = vaults.length;

@@ -165,11 +165,9 @@ contract KerosineDenominatorV3Test is Test {
         vm.prank(OWNER);
         keroDenominator.setTargetDyadMultiplier(2e12, 10 seconds);
 
-        for (uint256 i; i < 15; i++) {
-            uint256 numerator = keroDenominator._getTvl() - dyad.totalSupply();
+        for (uint256 i; i < 10; i++) {
             uint256 denominator = keroDenominator.denominator();
             console2.log("DENOMINATOR", denominator);
-            console2.log("KERO PRICE", (numerator * 1e8) / denominator);
             vm.warp(vm.getBlockTimestamp() + 1);
         }
     }
