@@ -87,6 +87,11 @@ contract KerosineDenominatorV3 is Owned {
 
         uint256 dyadMultiplier = _getDyadSupplyMultiplier();
 
+        // Return early if multiplier is 1
+        if (dyadMultiplier == 1e12) {
+            return adjustedKerosineSupply;
+        }
+
         uint256 dyadSupply = DYAD.totalSupply();
 
         uint256 tvl = _getTvl();
