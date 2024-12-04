@@ -50,7 +50,7 @@ contract KerosineDenominatorV3 is Owned {
     }
 
     function setTargetDyadMultiplier(uint64 _targetMultiplier, uint32 _duration) external onlyOwner {
-        if (_targetMultiplier <= 1e12) {
+        if (_targetMultiplier < 1e12) {
             revert TargetMultiplierTooSmall();
         }
 
@@ -98,10 +98,13 @@ contract KerosineDenominatorV3 is Owned {
 
         uint256 normalizedSupply = dyadSupply.mulDiv(dyadMultiplier, 1e12);
 
-        if (normalizedSupply > tvl) {
+        // Return uint256 max to make kero DV = 0
+        if (normalizedSupply >= tvl) {
             return type(uint256).max;
         }
 
+        // By using this denominator the new Kero DV is:
+        // (tvl - x * dyad supply) / kero supply
         return (tvl - dyadSupply).mulDiv(adjustedKerosineSupply, tvl - normalizedSupply);
     }
 
