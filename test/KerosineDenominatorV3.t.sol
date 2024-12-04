@@ -2,58 +2,45 @@
 pragma solidity ^0.8.20;
 
 import {Test, console2} from "forge-std/Test.sol";
+import {ERC20Mock} from "./ERC20Mock.sol";
 import {KerosineDenominatorV3} from "../src/staking/KerosineDenominatorV3.sol";
 import {Kerosine} from "../src/staking/Kerosine.sol";
 import {Dyad} from "../src/core/Dyad.sol";
 import {OracleMock} from "./OracleMock.sol";
 import {KerosineManager} from "../src/core/KerosineManager.sol";
 
-contract FakeAsset {
-    mapping(address account => uint256 balance) _balances;
+contract TokenMock is ERC20Mock {
+    constructor(string memory _name, string memory _symbol) ERC20Mock(_name, _symbol) {}
 
-    function decimals() external pure returns (uint8) {
-        return 18;
-    }
-
-    function balanceOf(address _account) external view returns (uint256) {
-        return _balances[_account];
-    }
-
-    function setBalance(address _target, uint256 _balance) external {
-        _balances[_target] = _balance;
+    function setBalance(address _target, uint256 _amount) external {
+        _burn(_target, balanceOf[_target]);
+        _mint(_target, _amount);
     }
 }
 
-contract FakeVault {
+contract VaultMock {
     OracleMock public oracle = new OracleMock(1e8);
-    FakeAsset public asset = new FakeAsset();
+    TokenMock public asset = new TokenMock("Asset", "AST");
 
-    constructor() {
-        asset.setBalance(address(this), 1_000_000_000e18);
-    }
-
-    function assetPrice() external view returns (uint256) {
+    function assetPrice() public view returns (uint256) {
         (, uint256 answer,,,) = oracle.latestRoundData();
         return answer;
     }
-}
 
-contract FakeDyad {
-    uint256 _totalSupply;
-
-    function setTotalSupply(uint256 _newTotalSupply) external {
-        _totalSupply = _newTotalSupply;
+    function setAssetBalance(uint256 _balance) external {
+        asset.setBalance(address(this), _balance);
     }
 
-    function totalSupply() external view returns (uint256) {
-        return _totalSupply;
+    function getTvl() external view returns (uint256) {
+        return
+            asset.balanceOf(address(this)) * assetPrice() * 1e18 / (10 ** asset.decimals()) / (10 ** oracle.decimals());
     }
 }
 
-contract FakeVaultManager {
+contract VaultManagerMock {
     address[] _vaults;
 
-    function addVault(FakeVault _vault) external {
+    function addVault(VaultMock _vault) external {
         _vaults.push(address(_vault));
     }
 
@@ -65,10 +52,8 @@ contract FakeVaultManager {
         uint256 tvl;
         uint256 numberOfVaults = _vaults.length;
         for (uint256 i = 0; i < numberOfVaults; i++) {
-            FakeVault vault = FakeVault(_vaults[i]);
-            FakeAsset asset = vault.asset();
-            tvl += asset.balanceOf(address(vault)) * vault.assetPrice() * 1e18 / (10 ** asset.decimals())
-                / (10 ** vault.oracle().decimals());
+            VaultMock vault = VaultMock(_vaults[i]);
+            tvl += vault.getTvl();
         }
 
         return tvl;
@@ -80,17 +65,26 @@ contract KerosineDenominatorV3Test is Test {
     address ALICE = makeAddr("ALICE");
 
     KerosineDenominatorV3 keroDenominator;
-    Kerosine kerosine;
-    FakeDyad dyad;
-    FakeVaultManager manager;
+    TokenMock kerosine;
+    TokenMock dyad;
+    VaultManagerMock manager;
 
     function setUp() external {
-        dyad = new FakeDyad();
-        dyad.setTotalSupply(100_000_000e18);
-        manager = new FakeVaultManager();
-        manager.addVault(new FakeVault());
-        kerosine = new Kerosine();
-        keroDenominator = new KerosineDenominatorV3(kerosine, Dyad(address(dyad)), KerosineManager(address(manager)));
+        dyad = new TokenMock("DyadMock", "Dyad");
+        dyad.mint(address(this), 100_000_000e18);
+
+        kerosine = new TokenMock("KerosineMock", "Kerosine");
+        kerosine.mint(address(this), 1_000_000_000e18);
+
+        manager = new VaultManagerMock();
+        VaultMock vault = new VaultMock();
+        vault.setAssetBalance(1_000_000_000e18);
+        manager.addVault(vault);
+
+        keroDenominator = new KerosineDenominatorV3(
+            Kerosine(address(kerosine)), Dyad(address(dyad)), KerosineManager(address(manager))
+        );
+
         OWNER = keroDenominator.owner();
     }
 
@@ -176,23 +170,89 @@ contract KerosineDenominatorV3Test is Test {
     }
 
     function test_kerosine_deterministic_value() external {
-        uint64 multiplier = 2e12;
+        uint64 multiplier = 1.25e12;
         vm.prank(OWNER);
         keroDenominator.setTargetDyadMultiplier(multiplier, 0);
 
-        // Default is $1 billion
-        uint256 tvl = manager.getTvl();
-        // Default is $100 millions
+        // Set Dyad total supply
+        dyad.setBalance(address(this), 10_000e18);
+
         uint256 dyadSupply = dyad.totalSupply();
 
-        // expected deterministic price
-        // (tvl - x * dyad supply) / kero supply
-        uint256 expectedPrice = ((tvl - (multiplier * dyadSupply) / 1e12) * 1e8) / kerosine.totalSupply();
+        // Set kero total supply
+        kerosine.setBalance(address(this), 100_000e18);
 
-        uint256 denominator = keroDenominator.denominator();
+        uint80[25] memory systemTvls = [
+            100000e18,
+            95000e18,
+            90000e18,
+            85000e18,
+            80000e18,
+            75000e18,
+            70000e18,
+            65000e18,
+            60000e18,
+            55000e18,
+            50000e18,
+            45000e18,
+            40000e18,
+            35000e18,
+            30000e18,
+            25000e18,
+            20000e18,
+            15000e18,
+            14000e18,
+            13000e18,
+            12750e18,
+            12500e18,
+            12250e18,
+            12000e18,
+            10000e18
+        ];
 
-        uint256 actualPrice = ((tvl - dyadSupply) * 1e8) / denominator;
+        uint32[25] memory expectedPrices = [
+            0.875e8,
+            0.825e8,
+            0.775e8,
+            0.725e8,
+            0.675e8,
+            0.625e8,
+            0.575e8,
+            0.525e8,
+            0.475e8,
+            0.425e8,
+            0.375e8,
+            0.325e8,
+            0.275e8,
+            0.225e8,
+            0.175e8,
+            0.125e8,
+            0.075e8,
+            0.025e8,
+            0.015e8,
+            0.005e8,
+            0.0025e8,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ];
 
-        assertEq(actualPrice, expectedPrice);
+        VaultMock vault = VaultMock(manager.getVaults()[0]);
+
+        for (uint256 i; i < systemTvls.length; i++) {
+            // Set TVL
+            vault.setAssetBalance(systemTvls[i]);
+
+            uint256 tvl = manager.getTvl();
+
+            uint256 expectedPrice = expectedPrices[i];
+
+            uint256 denominator = keroDenominator.denominator();
+
+            uint256 actualPrice = ((tvl - dyadSupply) * 1e8) / denominator;
+
+            assertEq(actualPrice, expectedPrice);
+        }
     }
 }
