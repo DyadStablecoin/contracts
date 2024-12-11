@@ -216,10 +216,11 @@ deployV5:
 		--verify \
 		--optimize
 
-deployWETHGateway:
-	forge script script/deploy/Deploy.WETHGateway.s.sol \
+deployStaking:
+	forge clean
+	forge script script/deploy/Deploy.Staking.s.sol \
 		--rpc-url $(MAINNET_RPC) \
-		--sender 0x6e151819F002Bd1fE71DBa461a294D28A1A88CB5 \
+		--sender 0x43f95890eB5ABE84E5C6d28d84cFcA4c87C486a0 \
 		--broadcast \
 		-i 1 \
 		-vvvv \
