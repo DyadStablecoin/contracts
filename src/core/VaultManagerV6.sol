@@ -9,6 +9,8 @@ import {DyadXP} from "../staking/DyadXP.sol";
 import {IVaultManagerV5} from "../interfaces/IVaultManagerV5.sol";
 import {DyadHooks} from "./DyadHooks.sol";
 import "../interfaces/IExtension.sol";
+import {KeroseneValuer} from "../staking/KeroseneValuer.sol";
+import {KerosineManager} from "../core/KerosineManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -47,6 +49,9 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     /// @notice Extensions authorized by a user for use on their notes
     mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
+    KeroseneValuer public keroseneValuer;
+    KerosineManager public keroseneManager;
+
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
         _;
@@ -57,8 +62,13 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         _disableInitializers();
     }
 
-    function initialize() public reinitializer(6) {
-        // Nothing to initialize right now
+    function initialize(address _keroseneValuer, address _keroseneManager) public reinitializer(6) {
+        keroseneValuer = KeroseneValuer(_keroseneValuer);
+        keroseneManager = KerosineManager(_keroseneManager);
+    }
+
+    function setKeroseneValuer(address _newKeroseneValuer) external onlyOwner {
+        keroseneValuer = KeroseneValuer(_newKeroseneValuer);
     }
 
     /// @inheritdoc IVaultManagerV5
@@ -344,20 +354,42 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         uint256 numberOfVaults = vaults[id].length();
         vaultValues = new uint256[](numberOfVaults);
 
+        uint256 keroseneVaultIndex;
+        uint256 noteKeroseneAmount;
+
         for (uint256 i = 0; i < numberOfVaults; i++) {
             Vault vault = Vault(vaults[id].at(i));
             if (vaultLicenser.isLicensed(address(vault))) {
-                uint256 value = vault.getUsdValue(id);
-                vaultValues[i] = value;
                 if (vaultLicenser.isKerosene(address(vault))) {
-                    keroValue += value;
+                    noteKeroseneAmount = vault.id2asset(id);
+                    keroseneVaultIndex = i;
+                    continue;
                 } else {
+                    uint256 value = vault.getUsdValue(id);
+                    vaultValues[i] = value;
                     exoValue += value;
                 }
             }
         }
 
-        mintedDyad = dyad.mintedDyad(id);
+        uint256 tvl;
+
+        address[] memory exoVaults = keroseneManager.getVaults();
+
+        uint256 numberOfExoVaults = exoVaults.length;
+        for (uint256 i = 0; i < numberOfExoVaults; i++) {
+            Vault vault = Vault(exoVaults[i]);
+            ERC20 asset = vault.asset();
+            tvl += asset.balanceOf(address(vault)) * vault.assetPrice() * 1e18 / (10 ** asset.decimals())
+                / (10 ** vault.oracle().decimals());
+        }
+
+        Dyad dyadCache = dyad;
+
+        keroValue = (noteKeroseneAmount * keroseneValuer.deterministicValue(tvl, dyadCache.totalSupply())) / 1e8;
+        vaultValues[keroseneVaultIndex] = keroValue;
+
+        mintedDyad = dyadCache.mintedDyad(id);
         uint256 totalValue = exoValue + keroValue;
         cr = _collatRatio(mintedDyad, totalValue);
 
