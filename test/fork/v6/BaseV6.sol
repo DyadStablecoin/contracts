@@ -59,7 +59,8 @@ contract BaseTestV6 is Test, Modifiers, Parameters {
         VaultManagerV6 impl = new VaultManagerV6();
         vm.prank(MAINNET_FEE_RECIPIENT);
         VaultManagerV6(MAINNET_V2_VAULT_MANAGER).upgradeToAndCall(
-            address(impl), abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer))
+            address(impl),
+            abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer), MAINNET_V2_KEROSENE_MANAGER)
         );
 
         weth = ERC20(MAINNET_WETH);
