@@ -386,8 +386,10 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
         Dyad dyadCache = dyad;
 
-        keroValue = (noteKeroseneAmount * keroseneValuer.deterministicValue(tvl, dyadCache.totalSupply())) / 1e8;
-        vaultValues[keroseneVaultIndex] = keroValue;
+        if (noteKeroseneAmount > 0) {
+            keroValue = (noteKeroseneAmount * keroseneValuer.deterministicValue(tvl, dyadCache.totalSupply())) / 1e8;
+            vaultValues[keroseneVaultIndex] = keroValue;
+        }
 
         mintedDyad = dyadCache.mintedDyad(id);
         uint256 totalValue = exoValue + keroValue;
