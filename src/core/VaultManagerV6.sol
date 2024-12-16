@@ -220,6 +220,9 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             uint256 amountRemaining = totalLiquidationReward - amountMoved;
             uint256 keroDeposited = Vault(KEROSENE_VAULT).id2asset(id);
             uint256 keroToMove = keroDeposited.mulWadDown(amountRemaining).divWadDown(keroValue);
+            if (keroToMove > keroDeposited) {
+                keroToMove = keroDeposited;
+            }
             vaultAmounts[keroIndex] = keroToMove;
             dyadXP.beforeKeroseneWithdrawn(id, keroToMove);
             Vault(KEROSENE_VAULT).move(id, to, keroToMove);
