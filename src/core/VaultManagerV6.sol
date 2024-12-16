@@ -50,7 +50,6 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
     KeroseneValuer public keroseneValuer;
-    KerosineManager public keroseneManager;
 
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
@@ -62,9 +61,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         _disableInitializers();
     }
 
-    function initialize(address _keroseneValuer, address _keroseneManager) public reinitializer(6) {
+    function initialize(address _keroseneValuer) public reinitializer(6) {
         keroseneValuer = KeroseneValuer(_keroseneValuer);
-        keroseneManager = KerosineManager(_keroseneManager);
     }
 
     function setKeroseneValuer(address _newKeroseneValuer) external onlyOwner {
@@ -372,26 +370,12 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             }
         }
 
-        uint256 tvl;
-
-        address[] memory exoVaults = keroseneManager.getVaults();
-
-        uint256 numberOfExoVaults = exoVaults.length;
-        for (uint256 i = 0; i < numberOfExoVaults; i++) {
-            Vault vault = Vault(exoVaults[i]);
-            ERC20 asset = vault.asset();
-            tvl += asset.balanceOf(address(vault)) * vault.assetPrice() * 1e18 / (10 ** asset.decimals())
-                / (10 ** vault.oracle().decimals());
-        }
-
-        Dyad dyadCache = dyad;
-
         if (noteKeroseneAmount > 0) {
-            keroValue = (noteKeroseneAmount * keroseneValuer.deterministicValue(tvl, dyadCache.totalSupply())) / 1e8;
+            keroValue = (noteKeroseneAmount * keroseneValuer.deterministicValue()) / 1e8;
             vaultValues[keroseneVaultIndex] = keroValue;
         }
 
-        mintedDyad = dyadCache.mintedDyad(id);
+        mintedDyad = dyad.mintedDyad(id);
         uint256 totalValue = exoValue + keroValue;
         cr = _collatRatio(mintedDyad, totalValue);
 

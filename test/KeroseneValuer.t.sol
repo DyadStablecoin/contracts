@@ -4,18 +4,84 @@ pragma solidity ^0.8.19;
 import {Test} from "forge-std/Test.sol";
 import {KeroseneValuer} from "../src/staking/KeroseneValuer.sol";
 import {Kerosine} from "../src/staking/Kerosine.sol";
+import {KerosineManager} from "../src/core/KerosineManager.sol";
+import {Dyad} from "../src/core/Dyad.sol";
+
+import {OracleMock} from "./OracleMock.sol";
+import {ERC20Mock} from "./ERC20Mock.sol";
+
+contract TokenMock is ERC20Mock {
+    constructor(string memory _name, string memory _symbol) ERC20Mock(_name, _symbol) {}
+
+    function setBalance(address _target, uint256 _amount) external {
+        _burn(_target, balanceOf[_target]);
+        _mint(_target, _amount);
+    }
+}
+
+contract VaultMock {
+    OracleMock public oracle = new OracleMock(1e8);
+    TokenMock public asset = new TokenMock("TokenMock", "mToken");
+
+    function assetPrice() public view returns (uint256) {
+        (, uint256 answer,,,) = oracle.latestRoundData();
+        return answer;
+    }
+
+    function setAssetBalance(uint256 _balance) external {
+        asset.setBalance(address(this), _balance);
+    }
+
+    function getTvl() external view returns (uint256) {
+        return
+            asset.balanceOf(address(this)) * assetPrice() * 1e18 / (10 ** asset.decimals()) / (10 ** oracle.decimals());
+    }
+}
+
+contract VaultManagerMock {
+    address[] _vaults;
+
+    function addVault(VaultMock _vault) external {
+        _vaults.push(address(_vault));
+    }
+
+    function getVaults() external view returns (address[] memory) {
+        return _vaults;
+    }
+
+    function getTvl() external view returns (uint256) {
+        uint256 tvl;
+        uint256 numberOfVaults = _vaults.length;
+        for (uint256 i = 0; i < numberOfVaults; i++) {
+            VaultMock vault = VaultMock(_vaults[i]);
+            tvl += vault.getTvl();
+        }
+
+        return tvl;
+    }
+}
 
 contract KeroseneValuerTest is Test {
     address OWNER;
     address ALICE = makeAddr("ALICE");
 
     KeroseneValuer valuer;
-    Kerosine kerosene;
+    TokenMock kerosene;
+    TokenMock dyad;
+    VaultManagerMock keroseneManager;
+    VaultMock vault;
 
     function setUp() external {
-        kerosene = new Kerosine();
+        kerosene = new TokenMock("Kerosene Mock", "Kerosene");
+        dyad = new TokenMock("Dyad Mock", "Dyad");
+        keroseneManager = new VaultManagerMock();
+        vault = new VaultMock();
 
-        valuer = new KeroseneValuer(kerosene);
+        keroseneManager.addVault(vault);
+
+        valuer = new KeroseneValuer(
+            Kerosine(address(kerosene)), KerosineManager(address(keroseneManager)), Dyad(address(dyad))
+        );
 
         OWNER = valuer.owner();
     }
@@ -105,7 +171,12 @@ contract KeroseneValuerTest is Test {
         uint64 multiplier = 1.25e12;
         vm.prank(OWNER);
         valuer.setTargetDyadMultiplier(multiplier, 0);
+
         uint256 dyadSupply = 100_000_000e18;
+        dyad.mint(address(this), dyadSupply);
+
+        uint256 keroseneSupply = 1_000_000_000e18;
+        kerosene.mint(address(this), keroseneSupply);
 
         uint96[25] memory systemTvls = [
             1_000_000_000e18,
@@ -166,9 +237,32 @@ contract KeroseneValuerTest is Test {
         for (uint256 i; i < systemTvls.length; i++) {
             uint256 expectedPrice = expectedPrices[i];
 
-            uint256 deterministicValue = valuer.deterministicValue(systemTvls[i], dyadSupply);
+            vault.setAssetBalance(systemTvls[i]);
+
+            uint256 deterministicValue = valuer.deterministicValue();
 
             assertEq(deterministicValue, expectedPrice);
         }
+    }
+
+    function test_kerosine_deterministic_value_is_zero() external {
+        uint64 multiplier = 1.25e12;
+        vm.prank(OWNER);
+        valuer.setTargetDyadMultiplier(multiplier, 0);
+
+        uint256 dyadSupply = 100_000_000e18;
+        dyad.mint(address(this), dyadSupply);
+
+        uint256 keroseneSupply = dyadSupply;
+        kerosene.mint(address(this), keroseneSupply);
+
+        // kerosene supply < multiplier * dyadSupply
+        assertEq(valuer.deterministicValue(), 0);
+
+        keroseneSupply = (multiplier * dyadSupply) / 1e12;
+        kerosene.mint(address(this), keroseneSupply);
+
+        // kerosene supply == multiplier * dyadSupply
+        assertEq(valuer.deterministicValue(), 0);
     }
 }

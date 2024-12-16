@@ -3,18 +3,22 @@ pragma solidity ^0.8.19;
 
 import {Owned} from "@solmate/src/auth/Owned.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
-import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import {FixedPointMathLib} from "solady/utils/FixedPointMathLib.sol";
 import {Parameters} from "../params/Parameters.sol";
 import {Kerosine} from "../staking/Kerosine.sol";
 import {Dyad} from "../core/Dyad.sol";
 import {Vault} from "../core/Vault.sol";
+import {KerosineManager} from "../core/KerosineManager.sol";
+import {Dyad} from "../core/Dyad.sol";
 
 contract KeroseneValuer is Owned {
     using EnumerableSet for EnumerableSet.AddressSet;
     using FixedPointMathLib for uint256;
 
-    Kerosine public immutable KEROSINE;
+    Kerosine public immutable KEROSENE;
+    KerosineManager public immutable KEROSENE_MANAGER;
+    Dyad public immutable DYAD;
 
     uint64 public dyadMultiplierSnapshot = 1e12;
     uint64 public targetDyadMultiplier = 1e12;
@@ -28,8 +32,12 @@ contract KeroseneValuer is Owned {
 
     error TargetMultiplierTooSmall();
 
-    constructor(Kerosine _kerosine) Owned(0xDeD796De6a14E255487191963dEe436c45995813) {
-        KEROSINE = _kerosine;
+    constructor(Kerosine _kerosine, KerosineManager _keroseneManager, Dyad _dyad)
+        Owned(0xDeD796De6a14E255487191963dEe436c45995813)
+    {
+        KEROSENE = _kerosine;
+        KEROSENE_MANAGER = _keroseneManager;
+        DYAD = _dyad;
         _excludedAddresses.add(0xDeD796De6a14E255487191963dEe436c45995813); // Team Multisig
         _excludedAddresses.add(0x3962f6585946823440d274aD7C719B02b49DE51E); // Sablier Linear Lockup
     }
@@ -71,22 +79,34 @@ contract KeroseneValuer is Owned {
         return _excludedAddresses.values();
     }
 
-    function deterministicValue(uint256 _tvl, uint256 _dyadTotalSupply) external view returns (uint256) {
+    function deterministicValue() external view returns (uint256) {
         uint256 dyadMultiplier = _getDyadSupplyMultiplier();
 
-        uint256 normalizedSupply = _dyadTotalSupply.mulDiv(dyadMultiplier, 1e12);
+        uint256 normalizedSupply = DYAD.totalSupply().mulDiv(dyadMultiplier, 1e12);
 
-        if (normalizedSupply >= _tvl) {
+        uint256 tvl;
+
+        address[] memory exoVaults = KEROSENE_MANAGER.getVaults();
+
+        uint256 numberOfExoVaults = exoVaults.length;
+        for (uint256 i = 0; i < numberOfExoVaults; i++) {
+            Vault vault = Vault(exoVaults[i]);
+            ERC20 asset = vault.asset();
+            tvl += asset.balanceOf(address(vault)) * vault.assetPrice() * 1e18 / (10 ** asset.decimals())
+                / (10 ** vault.oracle().decimals());
+        }
+
+        if (normalizedSupply >= tvl) {
             return 0;
         }
 
-        uint256 adjustedKerosineSupply = KEROSINE.totalSupply();
+        uint256 adjustedKerosineSupply = KEROSENE.totalSupply();
         uint256 excludedAddressLength = _excludedAddresses.length();
         for (uint256 i = 0; i < excludedAddressLength; ++i) {
-            adjustedKerosineSupply -= KEROSINE.balanceOf(_excludedAddresses.at(i));
+            adjustedKerosineSupply -= KEROSENE.balanceOf(_excludedAddresses.at(i));
         }
 
-        return (_tvl - normalizedSupply).mulDiv(1e8, adjustedKerosineSupply);
+        return (tvl - normalizedSupply).mulDiv(1e8, adjustedKerosineSupply);
     }
 
     function _getDyadSupplyMultiplier() internal view returns (uint64) {

@@ -11,6 +11,7 @@ import {IVault} from "../../../src/interfaces/IVault.sol";
 import {VaultManagerV6} from "../../../src/core/VaultManagerV6.sol";
 import {KeroseneValuer} from "../../../src/staking/KeroseneValuer.sol";
 import {Kerosine} from "../../../src/staking/Kerosine.sol";
+import {KerosineManager} from "../../../src/core/KerosineManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -54,13 +55,14 @@ contract BaseTestV6 is Test, Modifiers, Parameters {
     function setUp() public {
         vm.createSelectFork(vm.envString("RPC_URL"), 21_086_097);
 
-        KeroseneValuer keroseneValuer = new KeroseneValuer(Kerosine(MAINNET_KEROSENE));
+        KeroseneValuer keroseneValuer = new KeroseneValuer(
+            Kerosine(MAINNET_KEROSENE), KerosineManager(MAINNET_V2_KEROSENE_MANAGER), Dyad(MAINNET_V2_DYAD)
+        );
 
         VaultManagerV6 impl = new VaultManagerV6();
         vm.prank(MAINNET_FEE_RECIPIENT);
         VaultManagerV6(MAINNET_V2_VAULT_MANAGER).upgradeToAndCall(
-            address(impl),
-            abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer), MAINNET_V2_KEROSENE_MANAGER)
+            address(impl), abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer))
         );
 
         weth = ERC20(MAINNET_WETH);
