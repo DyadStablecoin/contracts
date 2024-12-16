@@ -9,6 +9,8 @@ import {DyadXP} from "../staking/DyadXP.sol";
 import {IVaultManagerV5} from "../interfaces/IVaultManagerV5.sol";
 import {DyadHooks} from "./DyadHooks.sol";
 import "../interfaces/IExtension.sol";
+import {KeroseneValuer} from "../staking/KeroseneValuer.sol";
+import {KerosineManager} from "../core/KerosineManager.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -47,6 +49,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     /// @notice Extensions authorized by a user for use on their notes
     mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
+    KeroseneValuer public keroseneValuer;
+
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
         _;
@@ -57,8 +61,12 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         _disableInitializers();
     }
 
-    function initialize() public reinitializer(6) {
-        // Nothing to initialize right now
+    function initialize(address _keroseneValuer) public reinitializer(6) {
+        keroseneValuer = KeroseneValuer(_keroseneValuer);
+    }
+
+    function setKeroseneValuer(address _newKeroseneValuer) external onlyOwner {
+        keroseneValuer = KeroseneValuer(_newKeroseneValuer);
     }
 
     /// @inheritdoc IVaultManagerV5
@@ -344,17 +352,27 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         uint256 numberOfVaults = vaults[id].length();
         vaultValues = new uint256[](numberOfVaults);
 
+        uint256 keroseneVaultIndex;
+        uint256 noteKeroseneAmount;
+
         for (uint256 i = 0; i < numberOfVaults; i++) {
             Vault vault = Vault(vaults[id].at(i));
             if (vaultLicenser.isLicensed(address(vault))) {
-                uint256 value = vault.getUsdValue(id);
-                vaultValues[i] = value;
                 if (vaultLicenser.isKerosene(address(vault))) {
-                    keroValue += value;
+                    noteKeroseneAmount = vault.id2asset(id);
+                    keroseneVaultIndex = i;
+                    continue;
                 } else {
+                    uint256 value = vault.getUsdValue(id);
+                    vaultValues[i] = value;
                     exoValue += value;
                 }
             }
+        }
+
+        if (noteKeroseneAmount > 0) {
+            keroValue = (noteKeroseneAmount * keroseneValuer.deterministicValue()) / 1e8;
+            vaultValues[keroseneVaultIndex] = keroValue;
         }
 
         mintedDyad = dyad.mintedDyad(id);
