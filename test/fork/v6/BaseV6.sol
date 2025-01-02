@@ -12,6 +12,7 @@ import {VaultManagerV6} from "../../../src/core/VaultManagerV6.sol";
 import {KeroseneValuer} from "../../../src/staking/KeroseneValuer.sol";
 import {Kerosine} from "../../../src/staking/Kerosine.sol";
 import {KerosineManager} from "../../../src/core/KerosineManager.sol";
+import {InterestVault} from "../../../src/core/InterestVault.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -30,6 +31,7 @@ struct Contracts {
     VaultWstEth wstEth;
     KeroseneVault keroseneVault;
     KeroseneValuer keroseneValuer;
+    InterestVault interestVault;
 }
 
 contract BaseTestV6 is Test, Modifiers, Parameters {
@@ -49,20 +51,27 @@ contract BaseTestV6 is Test, Modifiers, Parameters {
     uint256 bob0;
     uint256 bob1;
 
+    address owner;
     address alice;
     address bob = address(0x42);
 
-    function setUp() public {
-        vm.createSelectFork(vm.envString("RPC_URL"), 21_086_097);
+    function setUp() public virtual {
+        vm.createSelectFork(vm.envString("RPC_URL"), 21_431_383);
+
+        owner = VaultManagerV6(MAINNET_V2_VAULT_MANAGER).owner();
 
         KeroseneValuer keroseneValuer = new KeroseneValuer(
             Kerosine(MAINNET_KEROSENE), KerosineManager(MAINNET_V2_KEROSENE_MANAGER), Dyad(MAINNET_V2_DYAD)
         );
 
+        InterestVault interestVault = new InterestVault(owner, MAINNET_V2_DYAD, MAINNET_V2_VAULT_MANAGER);
+
         VaultManagerV6 impl = new VaultManagerV6();
-        vm.prank(MAINNET_FEE_RECIPIENT);
+
+        vm.prank(owner);
         VaultManagerV6(MAINNET_V2_VAULT_MANAGER).upgradeToAndCall(
-            address(impl), abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer))
+            address(impl),
+            abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer), address(interestVault))
         );
 
         weth = ERC20(MAINNET_WETH);
@@ -75,7 +84,8 @@ contract BaseTestV6 is Test, Modifiers, Parameters {
             ethVault: Vault(MAINNET_V2_WETH_VAULT),
             wstEth: VaultWstEth(MAINNET_V2_WSTETH_VAULT),
             keroseneVault: KeroseneVault(MAINNET_V2_KEROSENE_V2_VAULT),
-            keroseneValuer: keroseneValuer
+            keroseneValuer: keroseneValuer,
+            interestVault: interestVault
         });
 
         ETH_TO_USD = contracts.ethVault.assetPrice();
@@ -104,13 +114,13 @@ contract BaseTestV6 is Test, Modifiers, Parameters {
         _;
     }
 
-    function mintDNft(address owner) public returns (uint256 id) {
+    function mintDNft(address _owner) public returns (uint256 id) {
         uint256 startPrice = contracts.dNft.START_PRICE();
         uint256 priceIncrease = contracts.dNft.PRICE_INCREASE();
         uint256 publicMints = contracts.dNft.publicMints();
         uint256 price = startPrice + (priceIncrease * publicMints);
         vm.deal(address(this), price);
-        id = contracts.dNft.mintNft{value: price}(owner);
+        id = contracts.dNft.mintNft{value: price}(_owner);
     }
 
     // -- helpers --
@@ -149,11 +159,11 @@ contract BaseTestV6 is Test, Modifiers, Parameters {
     }
 
     modifier deposit(uint256 id, IVault vault, uint256 amount) {
-        address owner = contracts.dNft.ownerOf(id);
-        vm.startPrank(owner);
+        address _owner = contracts.dNft.ownerOf(id);
+        vm.startPrank(_owner);
 
         ERC20 asset = vault.asset();
-        deal(address(asset), owner, amount);
+        deal(address(asset), _owner, amount);
         asset.approve(address(contracts.vaultManager), amount);
         contracts.vaultManager.deposit(id, address(vault), amount);
 
