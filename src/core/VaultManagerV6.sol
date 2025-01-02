@@ -23,9 +23,6 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-// TODO: REMOVE
-import {console} from "forge-std/console.sol";
-
 /// @custom:oz-upgrades-from src/core/VaultManagerV4.sol:VaultManagerV4
 contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable {
     using EnumerableSet for EnumerableSet.AddressSet;
@@ -58,14 +55,14 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     KeroseneValuer public keroseneValuer;
     IInterestVault public interestVault;
 
+    mapping(uint256 noteId => uint256 activeInterestIndex) public noteInterestIndex;
     uint256 public interestRate;
-    uint256 public globalActiveInterestIndex;
-    uint256 public lastActiveIndexUpdate;
-    uint256 public totalActiveDebt;
+    uint256 public lastInterestIndexUpdate;
     uint256 public claimableInterest;
 
-    mapping(uint256 noteId => uint256 activeInterestIndex) public activeInterestIndex;
-    mapping(uint256 noteId => uint256 debt) noteDebt;
+    mapping(uint256 noteId => uint256 debt) internal _noteDebtSnapshot;
+    uint256 internal _lastInterestIndex;
+    uint256 internal _activeDebtSnapshot;
 
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
@@ -82,22 +79,22 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         keroseneValuer = KeroseneValuer(_keroseneValuer);
 
         uint256 interestIndex = INTEREST_PRECISION;
-        globalActiveInterestIndex = interestIndex;
-        lastActiveIndexUpdate = block.timestamp;
+        _lastInterestIndex = interestIndex;
+        lastInterestIndexUpdate = block.timestamp;
 
         uint256 totalNotes = dNft.totalSupply();
         Dyad dyadCached = dyad;
 
         for (uint256 i; i < totalNotes; i++) {
-            activeInterestIndex[i] = interestIndex;
+            noteInterestIndex[i] = interestIndex;
 
             uint256 mintedDyad = dyadCached.mintedDyad(i);
             if (mintedDyad > 0) {
-                noteDebt[i] += mintedDyad;
+                _noteDebtSnapshot[i] += mintedDyad;
             }
         }
 
-        totalActiveDebt = dyadCached.totalSupply();
+        _activeDebtSnapshot = dyadCached.totalSupply();
     }
 
     function setKeroseneValuer(address _newKeroseneValuer) external onlyOwner {
@@ -117,7 +114,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         }
     }
 
-    function claimInterest() external onlyOwner {
+    function claimInterest() external onlyOwner returns (uint256) {
         _accrueGlobalActiveInterest();
 
         uint256 interestToClaim = claimableInterest;
@@ -126,6 +123,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             claimableInterest = 0;
             interestVault.mintInterest(interestToClaim);
         }
+
+        return interestToClaim;
     }
 
     /// @inheritdoc IVaultManagerV5
@@ -186,8 +185,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
         uint256 currentNoteDebt = _accrueNoteInterest(id);
 
-        totalActiveDebt += amount;
-        noteDebt[id] = currentNoteDebt + amount;
+        _activeDebtSnapshot += amount;
+        _noteDebtSnapshot[id] = currentNoteDebt + amount;
 
         if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_MINT)) {
             IAfterMintHook(msg.sender).afterMint(id, amount, to);
@@ -213,10 +212,10 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     function burnDyad(uint256 id, uint256 amount) public isValidDNft(id) {
         dyad.burn(id, msg.sender, amount);
         uint256 currentNoteDebt = _accrueNoteInterest(id);
-        totalActiveDebt -= amount;
-        noteDebt[id] = currentNoteDebt - amount;
+        _activeDebtSnapshot -= amount;
+        _noteDebtSnapshot[id] = currentNoteDebt - amount;
         if (currentNoteDebt == amount) {
-            activeInterestIndex[id] = 0;
+            noteInterestIndex[id] = 0;
         }
         emit BurnDyad(id, amount, msg.sender);
     }
@@ -243,11 +242,11 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
         dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
         if (currentNoteDebt == amount) {
-            activeInterestIndex[id] = 0;
+            noteInterestIndex[id] = 0;
         }
 
-        noteDebt[id] = currentNoteDebt - amount;
-        totalActiveDebt -= amount;
+        _noteDebtSnapshot[id] = currentNoteDebt - amount;
+        _activeDebtSnapshot -= amount;
 
         lastDeposit[to] = block.number; // `move` acts like a deposit
 
@@ -462,7 +461,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             vaultValues[keroseneVaultIndex] = keroValue;
         }
 
-        mintedDyad = noteDebt[id];
+        mintedDyad = _noteDebtSnapshot[id];
         uint256 totalValue = exoValue + keroValue;
         cr = _collatRatio(mintedDyad, totalValue);
 
@@ -471,12 +470,12 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
     function getNoteDebt(uint256 _noteID) external view returns (uint256) {
         (uint256 globalInterestIndex,) = _calculateInterestIndex();
-        uint256 noteInterestIndex = activeInterestIndex[_noteID];
+        uint256 interestIndex = noteInterestIndex[_noteID];
 
-        uint256 debt = noteDebt[_noteID];
+        uint256 debt = _noteDebtSnapshot[_noteID];
 
-        if (noteInterestIndex > 0 && noteInterestIndex < globalInterestIndex) {
-            debt = debt.mulDivUp(globalInterestIndex, noteInterestIndex);
+        if (interestIndex > 0 && interestIndex < globalInterestIndex) {
+            debt = debt.mulDivUp(globalInterestIndex, interestIndex);
         }
 
         return debt;
@@ -485,28 +484,34 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     function getTotalDebt() external view returns (uint256) {
         (, uint256 interestFactor) = _calculateInterestIndex();
 
-        uint256 debt = totalActiveDebt;
+        uint256 debt = _activeDebtSnapshot;
 
         return debt + debt.mulDivUp(interestFactor, INTEREST_PRECISION);
     }
 
+    function activeInterestIndex() external view returns (uint256) {
+        (uint256 interestIndex,) = _calculateInterestIndex();
+
+        return interestIndex;
+    }
+
     function _accrueNoteInterest(uint256 _noteID) internal returns (uint256) {
-        uint256 noteInterestIndex = activeInterestIndex[_noteID];
+        uint256 interestIndex = noteInterestIndex[_noteID];
         uint256 currentInterestIndex = _accrueGlobalActiveInterest();
 
-        uint256 debt = noteDebt[_noteID];
+        uint256 debt = _noteDebtSnapshot[_noteID];
 
-        if (noteInterestIndex == 0) {
-            activeInterestIndex[_noteID] = currentInterestIndex;
+        if (interestIndex == 0) {
+            noteInterestIndex[_noteID] = currentInterestIndex;
 
             return debt;
         }
 
-        if (noteInterestIndex < currentInterestIndex) {
-            debt = debt.mulDivUp(currentInterestIndex, noteInterestIndex);
-            activeInterestIndex[_noteID] = currentInterestIndex;
+        if (interestIndex < currentInterestIndex) {
+            debt = debt.mulDivUp(currentInterestIndex, interestIndex);
+            noteInterestIndex[_noteID] = currentInterestIndex;
 
-            noteDebt[_noteID] = debt;
+            _noteDebtSnapshot[_noteID] = debt;
         }
 
         return debt;
@@ -516,31 +521,31 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         (uint256 currentGlobalActiveInterestIndex, uint256 interestFactor) = _calculateInterestIndex();
 
         if (interestFactor > 0) {
-            uint256 currentDebt = totalActiveDebt;
+            uint256 currentDebt = _activeDebtSnapshot;
 
             uint256 activeInterests = currentDebt.mulDivUp(interestFactor, INTEREST_PRECISION);
 
-            totalActiveDebt = currentDebt + activeInterests;
+            _activeDebtSnapshot = currentDebt + activeInterests;
 
             claimableInterest += activeInterests;
 
-            globalActiveInterestIndex = currentGlobalActiveInterestIndex;
+            _lastInterestIndex = currentGlobalActiveInterestIndex;
 
-            lastActiveIndexUpdate = block.timestamp;
+            lastInterestIndexUpdate = block.timestamp;
         }
 
         return currentGlobalActiveInterestIndex;
     }
 
     function _calculateInterestIndex() internal view returns (uint256 currentInterestIndex, uint256 interestFactor) {
-        uint256 lastIndexUpdateCached = lastActiveIndexUpdate;
+        uint256 lastIndexUpdateCached = lastInterestIndexUpdate;
         if (lastIndexUpdateCached == block.timestamp) {
-            return (globalActiveInterestIndex, 0);
+            return (_lastInterestIndex, 0);
         }
 
         uint256 currentInterestRate = interestRate;
 
-        currentInterestIndex = globalActiveInterestIndex;
+        currentInterestIndex = _lastInterestIndex;
 
         if (currentInterestRate > 0) {
             uint256 timeDelta = block.timestamp - lastIndexUpdateCached;
