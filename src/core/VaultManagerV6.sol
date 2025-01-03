@@ -62,7 +62,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     mapping(uint256 noteId => uint256 debt) internal _noteDebtSnapshot;
     uint256 internal _interestIndexSnapshot;
     uint256 internal _activeDebtSnapshot;
-    uint256 internal _claimableInterest;
+    uint256 internal _claimableInterestSnapshot;
 
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
@@ -117,10 +117,10 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     function claimInterest() external onlyOwner returns (uint256) {
         _accrueGlobalActiveInterest();
 
-        uint256 interestToClaim = _claimableInterest;
+        uint256 interestToClaim = _claimableInterestSnapshot;
 
         if (interestToClaim > 0) {
-            _claimableInterest = 0;
+            _claimableInterestSnapshot = 0;
             interestVault.mintInterest(interestToClaim);
         }
 
@@ -502,7 +502,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
         uint256 earnedInterest = activeDebtSnapshot.mulDivUp(interestFactor, INTEREST_PRECISION);
 
-        return _claimableInterest + earnedInterest;
+        return _claimableInterestSnapshot + earnedInterest;
     }
 
     function _accrueNoteInterest(uint256 _noteID) internal returns (uint256) {
@@ -537,7 +537,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
             _activeDebtSnapshot = activeDebtSnapshot + earnedInterest;
 
-            _claimableInterest += earnedInterest;
+            _claimableInterestSnapshot += earnedInterest;
 
             _interestIndexSnapshot = currentGlobalActiveInterestIndex;
 
