@@ -33,7 +33,6 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     uint256 public constant MIN_COLLAT_RATIO = 1.5e18; // 150% // Collaterization
     uint256 public constant LIQUIDATION_REWARD = 0.2e18; //  20%
     uint256 public constant INTEREST_PRECISION = 1e27;
-    uint256 public constant MAX_INTEREST_RATE_IN_BPS = 400; // 4%
 
     address public constant KEROSENE_VAULT = 0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43;
 
@@ -55,6 +54,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     KeroseneValuer public keroseneValuer;
     IInterestVault public interestVault;
 
+    uint256 public maxInterestRateInBps;
+
     mapping(uint256 noteId => uint256 activeInterestIndex) public noteInterestIndex;
     uint256 public interestRate;
     uint256 public lastInterestIndexUpdate;
@@ -63,6 +64,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     uint256 internal _interestIndexSnapshot;
     uint256 internal _activeDebtSnapshot;
     uint256 internal _claimableInterestSnapshot;
+
+    error InterestRateTooHigh();
 
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
@@ -95,16 +98,26 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         }
 
         _activeDebtSnapshot = dyadCached.totalSupply();
+        maxInterestRateInBps = 500; // 5%
     }
 
     function setKeroseneValuer(address _newKeroseneValuer) external onlyOwner {
         keroseneValuer = KeroseneValuer(_newKeroseneValuer);
     }
 
-    function setInterestRate(uint256 _newInterestRateBps) external onlyOwner {
-        if (_newInterestRateBps > MAX_INTEREST_RATE_IN_BPS) {
-            revert("Interest rate too high");
+    function setMaxInterestRate(uint256 _newMaxInterestRateBps) external onlyOwner {
+        uint256 newInterestRate = _newMaxInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
+
+        if (newInterestRate < interestRate) {
+            interestRate = newInterestRate;
         }
+    }
+
+    function setInterestRate(uint256 _newInterestRateBps) external onlyOwner {
+        if (_newInterestRateBps > maxInterestRateInBps) {
+            revert InterestRateTooHigh();
+        }
+
         uint256 newInterestRate = _newInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
 
         if (newInterestRate != interestRate) {

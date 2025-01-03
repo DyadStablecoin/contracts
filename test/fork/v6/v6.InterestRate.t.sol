@@ -56,6 +56,21 @@ contract InterestRateTest is Test, Parameters {
         aliceNoteID = _mintNote(alice);
     }
 
+    function testInterestRateCanBeUpdated() external {
+        uint256 currentInterestRate = manager.interestRate();
+
+        vm.prank(MAINNET_FEE_RECIPIENT);
+        manager.setInterestRate(400);
+
+        assertGt(manager.interestRate(), currentInterestRate);
+    }
+
+    function testInterestRateCantGoAboveMax() external {
+        vm.expectRevert(VaultManagerV6.InterestRateTooHigh.selector);
+        vm.prank(MAINNET_FEE_RECIPIENT);
+        manager.setInterestRate(5000);
+    }
+
     function testInterestIndexIsUpdated() external {
         uint256 globalActiveInterestIndexSnapshot = manager.activeInterestIndex();
         uint256 aliceInterestIndexSnapshot = manager.noteInterestIndex(aliceNoteID);
