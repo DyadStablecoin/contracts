@@ -58,11 +58,11 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     mapping(uint256 noteId => uint256 activeInterestIndex) public noteInterestIndex;
     uint256 public interestRate;
     uint256 public lastInterestIndexUpdate;
-    uint256 public claimableInterest;
 
     mapping(uint256 noteId => uint256 debt) internal _noteDebtSnapshot;
-    uint256 internal _lastInterestIndex;
+    uint256 internal _interestIndexSnapshot;
     uint256 internal _activeDebtSnapshot;
+    uint256 internal _claimableInterest;
 
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
@@ -79,7 +79,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         keroseneValuer = KeroseneValuer(_keroseneValuer);
 
         uint256 interestIndex = INTEREST_PRECISION;
-        _lastInterestIndex = interestIndex;
+        _interestIndexSnapshot = interestIndex;
         lastInterestIndexUpdate = block.timestamp;
 
         uint256 totalNotes = dNft.totalSupply();
@@ -117,10 +117,10 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     function claimInterest() external onlyOwner returns (uint256) {
         _accrueGlobalActiveInterest();
 
-        uint256 interestToClaim = claimableInterest;
+        uint256 interestToClaim = _claimableInterest;
 
         if (interestToClaim > 0) {
-            claimableInterest = 0;
+            _claimableInterest = 0;
             interestVault.mintInterest(interestToClaim);
         }
 
@@ -495,6 +495,16 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         return interestIndex;
     }
 
+    function claimableInterest() external view returns (uint256) {
+        (, uint256 interestFactor) = _calculateInterestIndex();
+
+        uint256 activeDebtSnapshot = _activeDebtSnapshot;
+
+        uint256 earnedInterest = activeDebtSnapshot.mulDivUp(interestFactor, INTEREST_PRECISION);
+
+        return _claimableInterest + earnedInterest;
+    }
+
     function _accrueNoteInterest(uint256 _noteID) internal returns (uint256) {
         uint256 interestIndex = noteInterestIndex[_noteID];
         uint256 currentInterestIndex = _accrueGlobalActiveInterest();
@@ -521,15 +531,15 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         (uint256 currentGlobalActiveInterestIndex, uint256 interestFactor) = _calculateInterestIndex();
 
         if (interestFactor > 0) {
-            uint256 currentDebt = _activeDebtSnapshot;
+            uint256 activeDebtSnapshot = _activeDebtSnapshot;
 
-            uint256 activeInterests = currentDebt.mulDivUp(interestFactor, INTEREST_PRECISION);
+            uint256 earnedInterest = activeDebtSnapshot.mulDivUp(interestFactor, INTEREST_PRECISION);
 
-            _activeDebtSnapshot = currentDebt + activeInterests;
+            _activeDebtSnapshot = activeDebtSnapshot + earnedInterest;
 
-            claimableInterest += activeInterests;
+            _claimableInterest += earnedInterest;
 
-            _lastInterestIndex = currentGlobalActiveInterestIndex;
+            _interestIndexSnapshot = currentGlobalActiveInterestIndex;
 
             lastInterestIndexUpdate = block.timestamp;
         }
@@ -540,12 +550,12 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     function _calculateInterestIndex() internal view returns (uint256 currentInterestIndex, uint256 interestFactor) {
         uint256 lastIndexUpdateCached = lastInterestIndexUpdate;
         if (lastIndexUpdateCached == block.timestamp) {
-            return (_lastInterestIndex, 0);
+            return (_interestIndexSnapshot, 0);
         }
 
         uint256 currentInterestRate = interestRate;
 
-        currentInterestIndex = _lastInterestIndex;
+        currentInterestIndex = _interestIndexSnapshot;
 
         if (currentInterestRate > 0) {
             uint256 timeDelta = block.timestamp - lastIndexUpdateCached;

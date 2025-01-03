@@ -107,13 +107,14 @@ contract InterestRateTest is Test, Parameters {
 
         vm.warp(vm.getBlockTimestamp() + 365 days);
 
-        // Action to accrue claimable interest
-        _depositToVault(aliceNoteID, 1e18);
-
         uint256 claimableInterest = manager.claimableInterest();
+
         vm.prank(MAINNET_FEE_RECIPIENT);
         uint256 claimedInterest = manager.claimInterest();
+
         assertEq(claimedInterest, claimableInterest);
+
+        assertEq(manager.claimableInterest(), 0);
     }
 
     function _mintNote(address _to) internal returns (uint256) {
