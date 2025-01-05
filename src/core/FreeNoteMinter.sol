@@ -9,6 +9,8 @@ import {DNft} from "./DNft.sol";
 contract FreeNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
     DNft public immutable dnft;
 
+    event FreeNoteMinted(address indexed receiver, uint256 indexed noteID);
+
     error NotEnoughBalance();
 
     constructor(address _dnftAddress) Owned(msg.sender) {
@@ -49,6 +51,8 @@ contract FreeNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
         dnft.drain(address(this));
 
         dnft.safeTransferFrom(address(this), _receiver, nftID);
+
+        emit FreeNoteMinted(_receiver, nftID);
 
         return nftID;
     }
