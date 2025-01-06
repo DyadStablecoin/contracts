@@ -16,7 +16,7 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
     uint256 public price = 1e18;
 
     event PriceUpdated(uint256 oldPrice, uint256 newPrice);
-    event KeroNoteMinted(address indexed owner);
+    event KeroNoteMinted(address indexed receiver, uint256 indexed noteID);
 
     error NotEnoughBalance();
 
@@ -67,6 +67,8 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
         NOTES.drain(address(this));
 
         NOTES.transferFrom(address(this), _receiver, noteID);
+
+        emit KeroNoteMinted(_receiver, noteID);
 
         return noteID;
     }
