@@ -51,6 +51,10 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
         payable(msg.sender).transfer(address(this).balance);
     }
 
+    function transferDnftOwnership(address _newOwner) external onlyOwner {
+        NOTES.transferOwnership(_newOwner);
+    }
+
     function _mint(address _receiver) internal returns (uint256) {
         if (price > 0) {
             KERO.transferFrom(msg.sender, BURN_ADDRESS, price);
