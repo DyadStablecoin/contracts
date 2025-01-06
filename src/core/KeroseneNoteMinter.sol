@@ -12,6 +12,8 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
     address public constant BURN_ADDRESS = 0x000000000000000000000000000000000000dEaD;
     ERC20 public immutable KERO;
     DNft public immutable NOTES;
+    uint256 public immutable BASE_NOTE_PRICE;
+    uint256 public immutable NOTE_PRICE_INCREASE;
 
     uint256 public price = 1e18;
 
@@ -23,6 +25,9 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
     constructor(address _keroAddress, address _dnftAddress) Owned(msg.sender) {
         KERO = ERC20(_keroAddress);
         NOTES = DNft(_dnftAddress);
+
+        BASE_NOTE_PRICE = NOTES.START_PRICE();
+        NOTE_PRICE_INCREASE = NOTES.PRICE_INCREASE();
     }
 
     receive() external payable {}
@@ -51,7 +56,7 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
         payable(msg.sender).transfer(address(this).balance);
     }
 
-    function transferDnftOwnership(address _newOwner) external onlyOwner {
+    function transferDNftOwnership(address _newOwner) external onlyOwner {
         NOTES.transferOwnership(_newOwner);
     }
 
@@ -70,7 +75,7 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
 
         NOTES.drain(address(this));
 
-        NOTES.transferFrom(address(this), _receiver, noteID);
+        NOTES.safeTransferFrom(address(this), _receiver, noteID);
 
         emit KeroNoteMinted(_receiver, noteID);
 
@@ -79,9 +84,7 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
 
     function _calculateMintPrice() internal view returns (uint256) {
         uint256 numberOfMints = NOTES.publicMints();
-        uint256 baseMintPrice = NOTES.START_PRICE();
-        uint256 mintPriceIncrease = NOTES.PRICE_INCREASE();
 
-        return baseMintPrice + (mintPriceIncrease * numberOfMints);
+        return BASE_NOTE_PRICE + (NOTE_PRICE_INCREASE * numberOfMints);
     }
 }
