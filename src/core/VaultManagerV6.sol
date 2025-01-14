@@ -111,6 +111,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         if (newInterestRate < interestRate) {
             interestRate = newInterestRate;
         }
+
+        maxInterestRateInBps = _newMaxInterestRateBps;
     }
 
     function setInterestRate(uint256 _newInterestRateBps) external onlyOwner {

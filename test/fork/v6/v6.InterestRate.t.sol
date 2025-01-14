@@ -71,6 +71,17 @@ contract InterestRateTest is Test, Parameters {
         manager.setInterestRate(5000);
     }
 
+    function testSetMaxInterestRate() external {
+        vm.prank(MAINNET_FEE_RECIPIENT);
+        manager.setMaxInterestRate(100);
+
+        assertEq(manager.maxInterestRateInBps(), 100);
+
+        vm.expectRevert(VaultManagerV6.InterestRateTooHigh.selector);
+        vm.prank(MAINNET_FEE_RECIPIENT);
+        manager.setInterestRate(101);
+    }
+
     function testInterestIndexIsUpdated() external {
         uint256 globalActiveInterestIndexSnapshot = manager.activeInterestIndex();
         uint256 aliceInterestIndexSnapshot = manager.noteInterestIndex(aliceNoteID);
