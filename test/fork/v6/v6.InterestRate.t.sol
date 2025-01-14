@@ -23,6 +23,8 @@ contract InterestRateTest is Test, Parameters {
 
     address alice = makeAddr("ALICE");
     uint256 aliceNoteID;
+    address bob = makeAddr("BOB");
+    uint256 bobNoteID;
 
     function setUp() external {
         vm.createSelectFork(vm.envString("RPC_URL"), 21_431_383);
@@ -42,6 +44,14 @@ contract InterestRateTest is Test, Parameters {
 
         dyad.licenser().add(address(interestVault));
         VaultLicenser(MAINNET_V2_VAULT_LICENSER).add(address(mockVault), false);
+
+        vm.stopPrank();
+
+        bobNoteID = _mintNote(bob);
+        _depositToVault(bobNoteID, 1_000_000e18);
+        _mintDyad(bobNoteID, 1_000e18);
+
+        vm.startPrank(MAINNET_FEE_RECIPIENT);
 
         VaultManagerV6 impl = new VaultManagerV6();
         VaultManagerV6(MAINNET_V2_VAULT_MANAGER).upgradeToAndCall(
@@ -143,6 +153,154 @@ contract InterestRateTest is Test, Parameters {
         assertEq(manager.claimableInterest(), 0);
     }
 
+    function testRepayDebt() external {
+        uint256 dyadToMint = 10e18;
+
+        _depositToVault(aliceNoteID, 1_000e18);
+        assertEq(manager.noteInterestIndex(aliceNoteID), manager.activeInterestIndex());
+
+        _mintDyad(aliceNoteID, dyadToMint);
+
+        _repayDebt(aliceNoteID, dyadToMint);
+
+        assertEq(manager.getNoteDebt(aliceNoteID), 0);
+        assertEq(dyad.mintedDyad(aliceNoteID), 0);
+        assertEq(manager.noteInterestIndex(aliceNoteID), 0);
+    }
+
+    function testRepayDebtWithInterests() external {
+        uint256 dyadToMint = 10e18;
+
+        _depositToVault(aliceNoteID, 1_000e18);
+        assertEq(manager.noteInterestIndex(aliceNoteID), manager.activeInterestIndex());
+
+        _mintDyad(aliceNoteID, dyadToMint);
+
+        vm.warp(vm.getBlockTimestamp() + 1 days);
+
+        uint256 noteDebt = manager.getNoteDebt(aliceNoteID);
+
+        // interests accrued
+        assertGt(noteDebt, dyadToMint);
+
+        // bob gives some dyad to alice
+        vm.prank(bob);
+        dyad.transfer(alice, dyadToMint);
+
+        // alice pays the whole debt
+        _repayDebt(aliceNoteID, noteDebt);
+
+        assertEq(manager.getNoteDebt(aliceNoteID), 0);
+        assertEq(dyad.mintedDyad(aliceNoteID), 0);
+        assertEq(manager.noteInterestIndex(aliceNoteID), 0);
+    }
+
+    function testRepayWholeDebtWithInterests() external {
+        uint256 dyadToMint = 10e18;
+
+        _depositToVault(aliceNoteID, 1_000e18);
+        _mintDyad(aliceNoteID, dyadToMint);
+
+        vm.warp(vm.getBlockTimestamp() + 1 days);
+
+        uint256 noteDebt = manager.getNoteDebt(aliceNoteID);
+
+        // interests accrued
+        assertGt(noteDebt, dyadToMint);
+
+        // bob gives some dyad to alice
+        vm.prank(bob);
+        dyad.transfer(alice, dyadToMint);
+
+        // alice pays the whole debt
+        _repayDebt(aliceNoteID, type(uint256).max);
+
+        assertEq(manager.getNoteDebt(aliceNoteID), 0);
+        assertEq(dyad.mintedDyad(aliceNoteID), 0);
+        assertEq(manager.noteInterestIndex(aliceNoteID), 0);
+    }
+
+    function testRepayOldUserDebt() external {
+        _repayDebt(bobNoteID, 1_000e18);
+
+        assertEq(manager.getNoteDebt(bobNoteID), 0);
+        assertEq(dyad.mintedDyad(bobNoteID), 0);
+        assertEq(manager.noteInterestIndex(bobNoteID), 0);
+    }
+
+    function testRepayOldUserDebtWithInterest() external {
+        uint256 mintedDyad = dyad.mintedDyad(bobNoteID);
+        uint256 noteDebt = manager.getNoteDebt(bobNoteID);
+
+        // interest have not accrued yet
+        assertEq(noteDebt, mintedDyad);
+
+        vm.warp(vm.getBlockTimestamp() + 1 days);
+
+        noteDebt = manager.getNoteDebt(bobNoteID);
+
+        _depositToVault(aliceNoteID, 1_000_000e18);
+        _mintDyad(aliceNoteID, mintedDyad);
+
+        // alice sends some dyad to bob to repay the debt
+        vm.prank(alice);
+        dyad.transfer(bob, mintedDyad);
+
+        // interest have accrued
+        assertGt(noteDebt, mintedDyad);
+
+        _repayDebt(bobNoteID, noteDebt);
+
+        assertEq(manager.getNoteDebt(bobNoteID), 0);
+        assertEq(dyad.mintedDyad(bobNoteID), 0);
+        assertEq(manager.noteInterestIndex(bobNoteID), 0);
+    }
+
+    function testInterestAccruesForOldUserWithNoInteraction() external {
+        uint256 initialDebt = dyad.mintedDyad(bobNoteID);
+
+        assertEq(manager.getNoteDebt(bobNoteID), initialDebt);
+
+        vm.warp(vm.getBlockTimestamp() + 1 hours);
+        assertGt(manager.getNoteDebt(bobNoteID), initialDebt);
+    }
+
+    function testNoteInterestIndexUpdates() external {
+        uint256 initialDebt = 10e18;
+
+        _depositToVault(aliceNoteID, 1_000_000e18);
+        _mintDyad(aliceNoteID, initialDebt);
+
+        assertEq(manager.noteInterestIndex(aliceNoteID), manager.activeInterestIndex());
+
+        _repayDebt(aliceNoteID, initialDebt);
+
+        assertEq(manager.noteInterestIndex(aliceNoteID), 0);
+
+        vm.warp(vm.getBlockTimestamp() + 1 days);
+
+        _mintDyad(aliceNoteID, initialDebt);
+
+        assertEq(manager.noteInterestIndex(aliceNoteID), manager.activeInterestIndex());
+
+        vm.warp(vm.getBlockTimestamp() + 1 days);
+
+        _repayDebt(bob, aliceNoteID, manager.getNoteDebt(aliceNoteID));
+
+        assertEq(manager.noteInterestIndex(aliceNoteID), 0);
+    }
+
+    function testStateIsUpdatedForOldUsers() external {
+        // for old users that have not interacted with the protocol after interest rates were added
+        // the interest index and note debt should be 0
+        assertEq(manager.noteInterestIndex(bobNoteID), 0);
+
+        _depositToVault(bobNoteID, 1);
+
+        // after an interaction the note interest index should be set to the initial interest index
+        assertEq(manager.noteInterestIndex(bobNoteID), manager.INTEREST_PRECISION());
+    }
+
     function _mintNote(address _to) internal returns (uint256) {
         deal(_to, 10 ether);
 
@@ -181,6 +339,20 @@ contract InterestRateTest is Test, Parameters {
         vm.startPrank(owner);
 
         manager.withdraw(_noteID, address(mockVault), _amount, owner);
+
+        vm.stopPrank();
+    }
+
+    function _repayDebt(uint256 _noteID, uint256 _amount) internal {
+        address owner = DNft(MAINNET_DNFT).ownerOf(_noteID);
+
+        _repayDebt(owner, _noteID, _amount);
+    }
+
+    function _repayDebt(address _from, uint256 _noteID, uint256 _amount) internal {
+        vm.startPrank(_from);
+
+        manager.burnDyad(_noteID, _amount);
 
         vm.stopPrank();
     }

@@ -65,7 +65,10 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     uint256 internal _activeDebtSnapshot;
     uint256 internal _claimableInterestSnapshot;
 
+    event MaxInterestRateUpdated(uint256 oldInterestRateBps, uint256 newInterestRateBps);
+
     error InterestRateTooHigh();
+    error NotEnoughBalance();
 
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
@@ -81,23 +84,10 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         interestVault = IInterestVault(_interestVault);
         keroseneValuer = KeroseneValuer(_keroseneValuer);
 
-        uint256 interestIndex = INTEREST_PRECISION;
-        _interestIndexSnapshot = interestIndex;
+        _interestIndexSnapshot = INTEREST_PRECISION;
         lastInterestIndexUpdate = block.timestamp;
 
-        uint256 totalNotes = dNft.totalSupply();
-        Dyad dyadCached = dyad;
-
-        for (uint256 i; i < totalNotes; i++) {
-            noteInterestIndex[i] = interestIndex;
-
-            uint256 mintedDyad = dyadCached.mintedDyad(i);
-            if (mintedDyad > 0) {
-                _noteDebtSnapshot[i] += mintedDyad;
-            }
-        }
-
-        _activeDebtSnapshot = dyadCached.totalSupply();
+        _activeDebtSnapshot = dyad.totalSupply();
         maxInterestRateInBps = 500; // 5%
     }
 
@@ -113,6 +103,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         }
 
         maxInterestRateInBps = _newMaxInterestRateBps;
+
+        emit MaxInterestRateUpdated(maxInterestRateInBps, _newInterestRateBps);
     }
 
     function setInterestRate(uint256 _newInterestRateBps) external onlyOwner {
@@ -197,11 +189,12 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     //// @inheritdoc IVaultManagerV5
     function mintDyad(uint256 id, uint256 amount, address to) external {
         uint256 extensionFlags = _authorizeCall(id);
-        dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
         uint256 currentNoteDebt = _accrueNoteInterest(id);
 
         _activeDebtSnapshot += amount;
         _noteDebtSnapshot[id] = currentNoteDebt + amount;
+
+        dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
 
         if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_MINT)) {
             IAfterMintHook(msg.sender).afterMint(id, amount, to);
@@ -225,14 +218,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
     /// @inheritdoc IVaultManagerV5
     function burnDyad(uint256 id, uint256 amount) public isValidDNft(id) {
-        dyad.burn(id, msg.sender, amount);
-        uint256 currentNoteDebt = _accrueNoteInterest(id);
-        _activeDebtSnapshot -= amount;
-        _noteDebtSnapshot[id] = currentNoteDebt - amount;
-        if (currentNoteDebt == amount) {
-            noteInterestIndex[id] = 0;
-        }
-        emit BurnDyad(id, amount, msg.sender);
+        uint256 noteDebt = _accrueNoteInterest(id);
+        _repayDebt(msg.sender, id, amount, noteDebt);
     }
 
     /// @notice Liquidates the specified note, transferring collateral to the specified note.
@@ -245,23 +232,18 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         isValidDNft(to)
         returns (address[] memory, uint256[] memory)
     {
-        uint256 currentNoteDebt = _accrueNoteInterest(id);
+        _accrueNoteInterest(id);
         _accrueNoteInterest(to);
 
-        (uint256[] memory vaultsValues, uint256 exoValue, uint256 keroValue, uint256 cr, uint256 debt) =
+        (uint256[] memory vaultsValues, uint256 exoValue, uint256 keroValue, uint256 cr, uint256 noteDebt) =
             _totalVaultValuesAndCr(id);
+
+        // is equal to amount if amount < noteDebt or is equal to noteDebt if amount > noteDebt
+        uint256 debtToPay = _repayDebt(msg.sender, id, amount, noteDebt);
 
         if (cr >= MIN_COLLAT_RATIO) {
             revert CrTooHigh();
         }
-
-        dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
-        if (currentNoteDebt == amount) {
-            noteInterestIndex[id] = 0;
-        }
-
-        _noteDebtSnapshot[id] = currentNoteDebt - amount;
-        _activeDebtSnapshot -= amount;
 
         lastDeposit[to] = block.number; // `move` acts like a deposit
 
@@ -275,14 +257,14 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         }
 
         uint256 totalLiquidationReward;
-        if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
+        if (cr < LIQUIDATION_REWARD + 1e18 && noteDebt != debtToPay) {
             uint256 cappedCr = cr < 1e18 ? 1e18 : cr;
             uint256 liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
             uint256 liquidationAssetShare = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
             uint256 allAsset = totalValue.mulWadUp(liquidationAssetShare);
-            totalLiquidationReward = allAsset.mulWadDown(amount).divWadDown(debt);
+            totalLiquidationReward = allAsset.mulWadDown(debtToPay).divWadDown(noteDebt);
         } else {
-            totalLiquidationReward = amount + amount.mulWadDown(LIQUIDATION_REWARD);
+            totalLiquidationReward = debtToPay + debtToPay.mulWadDown(LIQUIDATION_REWARD);
             if (totalLiquidationReward < totalValue) {
                 totalLiquidationReward = totalValue;
             }
@@ -327,7 +309,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             dyadXP.afterKeroseneDeposited(to, keroToMove);
         }
 
-        emit Liquidate(id, msg.sender, to, amount);
+        emit Liquidate(id, msg.sender, to, debtToPay);
 
         return (vaultAddresses, vaultAmounts);
     }
@@ -489,6 +471,13 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
         uint256 debt = _noteDebtSnapshot[_noteID];
 
+        uint256 mintedDyad = dyad.mintedDyad(_noteID);
+
+        if (mintedDyad > 0 && interestIndex == 0) {
+            interestIndex = INTEREST_PRECISION;
+            debt = mintedDyad;
+        }
+
         if (interestIndex > 0 && interestIndex < globalInterestIndex) {
             debt = debt.mulDivUp(globalInterestIndex, interestIndex);
         }
@@ -525,6 +514,22 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         uint256 currentInterestIndex = _accrueGlobalActiveInterest();
 
         uint256 debt = _noteDebtSnapshot[_noteID];
+
+        uint256 mintedDyad = dyad.mintedDyad(_noteID);
+
+        // if minted dyad > 0 and interest index == 0 it means that the note interacted with the
+        // protocol before interests were added. If thats the case the note interest state is
+        // initialized here
+        if (mintedDyad > 0 && interestIndex == 0) {
+            interestIndex = INTEREST_PRECISION;
+
+            debt = mintedDyad.mulDivUp(currentInterestIndex, interestIndex);
+
+            noteInterestIndex[_noteID] = currentInterestIndex;
+            _noteDebtSnapshot[_noteID] = debt;
+
+            return debt;
+        }
 
         if (interestIndex == 0) {
             noteInterestIndex[_noteID] = currentInterestIndex;
@@ -579,6 +584,40 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
             currentInterestIndex += currentInterestIndex.mulDivUp(interestFactor, INTEREST_PRECISION);
         }
+    }
+
+    function _repayDebt(address _from, uint256 _noteID, uint256 _amount, uint256 _currentNoteDebt)
+        internal
+        returns (uint256)
+    {
+        if (_amount >= _currentNoteDebt) {
+            _amount = _currentNoteDebt;
+            noteInterestIndex[_noteID] = 0;
+        }
+
+        Dyad dyadCached = dyad;
+
+        if (_amount > dyadCached.balanceOf(_from)) {
+            revert NotEnoughBalance();
+        }
+
+        uint256 mintedDyad = dyadCached.mintedDyad(_noteID);
+
+        // since the dyad contract doesn't track interests we need to mint what was accrued to
+        // prevent an underflow error
+        if (_amount > mintedDyad) {
+            uint256 diff = _amount - mintedDyad;
+            dyadCached.mint(_noteID, _from, diff);
+        }
+
+        dyadCached.burn(_noteID, _from, _amount);
+
+        _activeDebtSnapshot -= _amount;
+        _noteDebtSnapshot[_noteID] = _currentNoteDebt - _amount;
+
+        emit BurnDyad(_noteID, _amount, msg.sender);
+
+        return _amount;
     }
 
     // ----------------- UPGRADABILITY ----------------- //
