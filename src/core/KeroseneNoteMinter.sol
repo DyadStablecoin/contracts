@@ -21,6 +21,7 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
     event KeroNoteMinted(address indexed receiver, uint256 indexed noteID);
 
     error NotEnoughBalance();
+    error WithdrawFailed();
 
     constructor(address _keroAddress, address _dnftAddress) Owned(msg.sender) {
         KERO = ERC20(_keroAddress);
@@ -37,11 +38,9 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
     }
 
     function setPrice(uint256 _newPrice) external onlyOwner {
-        uint256 oldPrice = price;
+        emit PriceUpdated(price, _newPrice);
 
         price = _newPrice;
-
-        emit PriceUpdated(oldPrice, _newPrice);
     }
 
     function mint() external nonReentrant returns (uint256) {
@@ -53,7 +52,8 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
     }
 
     function drain() external onlyOwner {
-        payable(msg.sender).transfer(address(this).balance);
+        (bool success,) = payable(msg.sender).call{value: address(this).balance}("");
+        if (!success) revert WithdrawFailed();
     }
 
     function transferDNftOwnership(address _newOwner) external onlyOwner {
@@ -75,7 +75,7 @@ contract KeroseneNoteMinter is Owned, ReentrancyGuard, IERC721Receiver {
 
         NOTES.drain(address(this));
 
-        NOTES.safeTransferFrom(address(this), _receiver, noteID);
+        NOTES.transferFrom(address(this), _receiver, noteID);
 
         emit KeroNoteMinted(_receiver, noteID);
 
