@@ -11,6 +11,7 @@ import {DyadHooks} from "./DyadHooks.sol";
 import "../interfaces/IExtension.sol";
 import {KeroseneValuer} from "../staking/KeroseneValuer.sol";
 import {KerosineManager} from "../core/KerosineManager.sol";
+import {IInterestVault} from "../interfaces/IInterestVault.sol";
 
 import {FixedPointMathLib} from "@solmate/src/utils/FixedPointMathLib.sol";
 import {ERC20} from "@solmate/src/tokens/ERC20.sol";
@@ -31,6 +32,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     uint256 public constant MAX_VAULTS = 6;
     uint256 public constant MIN_COLLAT_RATIO = 1.5e18; // 150% // Collaterization
     uint256 public constant LIQUIDATION_REWARD = 0.2e18; //  20%
+    uint256 public constant INTEREST_PRECISION = 1e27;
 
     address public constant KEROSENE_VAULT = 0x4808e4CC6a2Ba764778A0351E1Be198494aF0b43;
 
@@ -50,6 +52,23 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     mapping(address user => EnumerableSet.AddressSet) private _authorizedExtensions;
 
     KeroseneValuer public keroseneValuer;
+    IInterestVault public interestVault;
+
+    uint256 public maxInterestRateInBps;
+
+    mapping(uint256 noteId => uint256 activeInterestIndex) public noteInterestIndex;
+    uint256 public interestRate;
+    uint256 public lastInterestIndexUpdate;
+
+    mapping(uint256 noteId => uint256 debt) internal _noteDebtSnapshot;
+    uint256 internal _interestIndexSnapshot;
+    uint256 internal _activeDebtSnapshot;
+    uint256 internal _claimableInterestSnapshot;
+
+    event MaxInterestRateUpdated(uint256 oldInterestRateBps, uint256 newInterestRateBps);
+
+    error InterestRateTooHigh();
+    error NotEnoughBalance();
 
     modifier isValidDNft(uint256 id) {
         if (dNft.ownerOf(id) == address(0)) revert InvalidDNft();
@@ -61,17 +80,64 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         _disableInitializers();
     }
 
-    function initialize(address _keroseneValuer) public reinitializer(6) {
+    function initialize(address _keroseneValuer, address _interestVault) public reinitializer(6) {
+        interestVault = IInterestVault(_interestVault);
         keroseneValuer = KeroseneValuer(_keroseneValuer);
+
+        _interestIndexSnapshot = INTEREST_PRECISION;
+        lastInterestIndexUpdate = block.timestamp;
+
+        _activeDebtSnapshot = dyad.totalSupply();
+        maxInterestRateInBps = 500; // 5%
     }
 
     function setKeroseneValuer(address _newKeroseneValuer) external onlyOwner {
         keroseneValuer = KeroseneValuer(_newKeroseneValuer);
     }
 
+    function setMaxInterestRate(uint256 _newMaxInterestRateBps) external onlyOwner {
+        uint256 newInterestRate = _newMaxInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
+
+        if (newInterestRate < interestRate) {
+            interestRate = newInterestRate;
+        }
+
+        maxInterestRateInBps = _newMaxInterestRateBps;
+
+        emit MaxInterestRateUpdated(maxInterestRateInBps, _newMaxInterestRateBps);
+    }
+
+    function setInterestRate(uint256 _newInterestRateBps) external onlyOwner {
+        if (_newInterestRateBps > maxInterestRateInBps) {
+            revert InterestRateTooHigh();
+        }
+
+        uint256 newInterestRate = _newInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
+
+        if (newInterestRate != interestRate) {
+            _accrueGlobalActiveInterest();
+
+            interestRate = newInterestRate;
+        }
+    }
+
+    function claimInterest() external onlyOwner returns (uint256) {
+        _accrueGlobalActiveInterest();
+
+        uint256 interestToClaim = _claimableInterestSnapshot;
+
+        if (interestToClaim > 0) {
+            _claimableInterestSnapshot = 0;
+            interestVault.mintInterest(interestToClaim);
+        }
+
+        return interestToClaim;
+    }
+
     /// @inheritdoc IVaultManagerV5
     function add(uint256 id, address vault) external {
         _authorizeCall(id);
+        _accrueNoteInterest(id);
         if (!vaultLicenser.isLicensed(vault)) revert VaultNotLicensed();
         if (vaults[id].length() >= MAX_VAULTS) revert TooManyVaults();
         if (vaults[id].add(vault)) {
@@ -82,6 +148,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     /// @inheritdoc IVaultManagerV5
     function remove(uint256 id, address vault) external {
         _authorizeCall(id);
+        _accrueNoteInterest(id);
         if (vaults[id].remove(vault)) {
             if (Vault(vault).id2asset(id) > 0) {
                 if (vaultLicenser.isLicensed(vault)) {
@@ -95,6 +162,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     /// @inheritdoc IVaultManagerV5
     function deposit(uint256 id, address vault, uint256 amount) external isValidDNft(id) {
         _authorizeCall(id);
+        _accrueNoteInterest(id);
         lastDeposit[id] = block.number;
         Vault _vault = Vault(vault);
         _vault.asset().safeTransferFrom(msg.sender, vault, amount);
@@ -108,6 +176,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     /// @inheritdoc IVaultManagerV5
     function withdraw(uint256 id, address vault, uint256 amount, address to) public {
         uint256 extensionFlags = _authorizeCall(id);
+        _accrueNoteInterest(id);
         if (lastDeposit[id] == block.number) revert CanNotWithdrawInSameBlock();
         if (vault == KEROSENE_VAULT) dyadXP.beforeKeroseneWithdrawn(id, amount);
         Vault(vault).withdraw(id, to, amount); // changes `exo` or `kero` value and `cr`
@@ -120,7 +189,13 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     //// @inheritdoc IVaultManagerV5
     function mintDyad(uint256 id, uint256 amount, address to) external {
         uint256 extensionFlags = _authorizeCall(id);
+        uint256 currentNoteDebt = _accrueNoteInterest(id);
+
+        _activeDebtSnapshot += amount;
+        _noteDebtSnapshot[id] = currentNoteDebt + amount;
+
         dyad.mint(id, to, amount); // changes `mintedDyad` and `cr`
+
         if (DyadHooks.hookEnabled(extensionFlags, DyadHooks.AFTER_MINT)) {
             IAfterMintHook(msg.sender).afterMint(id, amount, to);
         }
@@ -143,8 +218,8 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
     /// @inheritdoc IVaultManagerV5
     function burnDyad(uint256 id, uint256 amount) public isValidDNft(id) {
-        dyad.burn(id, msg.sender, amount);
-        emit BurnDyad(id, amount, msg.sender);
+        uint256 noteDebt = _accrueNoteInterest(id);
+        _repayDebt(msg.sender, id, amount, noteDebt);
     }
 
     /// @notice Liquidates the specified note, transferring collateral to the specified note.
@@ -157,13 +232,18 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         isValidDNft(to)
         returns (address[] memory, uint256[] memory)
     {
-        (uint256[] memory vaultsValues, uint256 exoValue, uint256 keroValue, uint256 cr, uint256 debt) =
+        _accrueNoteInterest(id);
+        _accrueNoteInterest(to);
+
+        (uint256[] memory vaultsValues, uint256 exoValue, uint256 keroValue, uint256 cr, uint256 noteDebt) =
             _totalVaultValuesAndCr(id);
+
+        // is equal to amount if amount < noteDebt or is equal to noteDebt if amount > noteDebt
+        uint256 debtToPay = _repayDebt(msg.sender, id, amount, noteDebt);
 
         if (cr >= MIN_COLLAT_RATIO) {
             revert CrTooHigh();
         }
-        dyad.burn(id, msg.sender, amount); // changes `debt` and `cr`
 
         lastDeposit[to] = block.number; // `move` acts like a deposit
 
@@ -177,14 +257,14 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         }
 
         uint256 totalLiquidationReward;
-        if (cr < LIQUIDATION_REWARD + 1e18 && debt != amount) {
+        if (cr < LIQUIDATION_REWARD + 1e18 && noteDebt != debtToPay) {
             uint256 cappedCr = cr < 1e18 ? 1e18 : cr;
             uint256 liquidationEquityShare = (cappedCr - 1e18).mulWadDown(LIQUIDATION_REWARD);
             uint256 liquidationAssetShare = (liquidationEquityShare + 1e18).divWadDown(cappedCr);
             uint256 allAsset = totalValue.mulWadUp(liquidationAssetShare);
-            totalLiquidationReward = allAsset.mulWadDown(amount).divWadDown(debt);
+            totalLiquidationReward = allAsset.mulWadDown(debtToPay).divWadDown(noteDebt);
         } else {
-            totalLiquidationReward = amount + amount.mulWadDown(LIQUIDATION_REWARD);
+            totalLiquidationReward = debtToPay + debtToPay.mulWadDown(LIQUIDATION_REWARD);
             if (totalLiquidationReward < totalValue) {
                 totalLiquidationReward = totalValue;
             }
@@ -229,7 +309,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             dyadXP.afterKeroseneDeposited(to, keroToMove);
         }
 
-        emit Liquidate(id, msg.sender, to, amount);
+        emit Liquidate(id, msg.sender, to, debtToPay);
 
         return (vaultAddresses, vaultAmounts);
     }
@@ -378,11 +458,166 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             vaultValues[keroseneVaultIndex] = keroValue;
         }
 
-        mintedDyad = dyad.mintedDyad(id);
+        mintedDyad = _noteDebtSnapshot[id];
         uint256 totalValue = exoValue + keroValue;
         cr = _collatRatio(mintedDyad, totalValue);
 
         return (vaultValues, exoValue, keroValue, cr, mintedDyad);
+    }
+
+    function getNoteDebt(uint256 _noteID) external view returns (uint256) {
+        (uint256 globalInterestIndex,) = _calculateInterestIndex();
+        uint256 interestIndex = noteInterestIndex[_noteID];
+
+        uint256 debt = _noteDebtSnapshot[_noteID];
+
+        uint256 mintedDyad = dyad.mintedDyad(_noteID);
+
+        if (mintedDyad > 0 && interestIndex == 0) {
+            interestIndex = INTEREST_PRECISION;
+            debt = mintedDyad;
+        }
+
+        if (interestIndex > 0 && interestIndex < globalInterestIndex) {
+            debt = debt.mulDivUp(globalInterestIndex, interestIndex);
+        }
+
+        return debt;
+    }
+
+    function getTotalDebt() external view returns (uint256) {
+        (, uint256 interestFactor) = _calculateInterestIndex();
+
+        uint256 debt = _activeDebtSnapshot;
+
+        return debt + debt.mulDivUp(interestFactor, INTEREST_PRECISION);
+    }
+
+    function activeInterestIndex() external view returns (uint256) {
+        (uint256 interestIndex,) = _calculateInterestIndex();
+
+        return interestIndex;
+    }
+
+    function claimableInterest() external view returns (uint256) {
+        (, uint256 interestFactor) = _calculateInterestIndex();
+
+        uint256 activeDebtSnapshot = _activeDebtSnapshot;
+
+        uint256 earnedInterest = activeDebtSnapshot.mulDivUp(interestFactor, INTEREST_PRECISION);
+
+        return _claimableInterestSnapshot + earnedInterest;
+    }
+
+    function _accrueNoteInterest(uint256 _noteID) internal returns (uint256) {
+        uint256 interestIndex = noteInterestIndex[_noteID];
+        uint256 currentInterestIndex = _accrueGlobalActiveInterest();
+
+        uint256 debt = _noteDebtSnapshot[_noteID];
+
+        uint256 mintedDyad = dyad.mintedDyad(_noteID);
+
+        // if minted dyad > 0 and interest index == 0 it means that the note interacted with the
+        // protocol before interests were added. If thats the case the note interest state is
+        // initialized here
+        if (mintedDyad > 0 && interestIndex == 0) {
+            interestIndex = INTEREST_PRECISION;
+
+            debt = mintedDyad.mulDivUp(currentInterestIndex, interestIndex);
+
+            noteInterestIndex[_noteID] = currentInterestIndex;
+            _noteDebtSnapshot[_noteID] = debt;
+
+            return debt;
+        }
+
+        if (interestIndex == 0) {
+            noteInterestIndex[_noteID] = currentInterestIndex;
+
+            return debt;
+        }
+
+        if (interestIndex < currentInterestIndex) {
+            debt = debt.mulDivUp(currentInterestIndex, interestIndex);
+            noteInterestIndex[_noteID] = currentInterestIndex;
+
+            _noteDebtSnapshot[_noteID] = debt;
+        }
+
+        return debt;
+    }
+
+    function _accrueGlobalActiveInterest() internal returns (uint256) {
+        (uint256 currentGlobalActiveInterestIndex, uint256 interestFactor) = _calculateInterestIndex();
+
+        if (interestFactor > 0) {
+            uint256 activeDebtSnapshot = _activeDebtSnapshot;
+
+            uint256 earnedInterest = activeDebtSnapshot.mulDivUp(interestFactor, INTEREST_PRECISION);
+
+            _activeDebtSnapshot = activeDebtSnapshot + earnedInterest;
+
+            _claimableInterestSnapshot += earnedInterest;
+
+            _interestIndexSnapshot = currentGlobalActiveInterestIndex;
+
+            lastInterestIndexUpdate = block.timestamp;
+        }
+
+        return currentGlobalActiveInterestIndex;
+    }
+
+    function _calculateInterestIndex() internal view returns (uint256 currentInterestIndex, uint256 interestFactor) {
+        uint256 lastIndexUpdateCached = lastInterestIndexUpdate;
+        if (lastIndexUpdateCached == block.timestamp) {
+            return (_interestIndexSnapshot, 0);
+        }
+
+        uint256 currentInterestRate = interestRate;
+
+        currentInterestIndex = _interestIndexSnapshot;
+
+        if (currentInterestRate > 0) {
+            uint256 timeDelta = block.timestamp - lastIndexUpdateCached;
+
+            interestFactor = timeDelta * currentInterestRate;
+
+            currentInterestIndex += currentInterestIndex.mulDivUp(interestFactor, INTEREST_PRECISION);
+        }
+    }
+
+    function _repayDebt(address _from, uint256 _noteID, uint256 _amount, uint256 _currentNoteDebt)
+        internal
+        returns (uint256)
+    {
+        if (_amount >= _currentNoteDebt) {
+            _amount = _currentNoteDebt;
+            noteInterestIndex[_noteID] = 0;
+        }
+
+        Dyad dyadCached = dyad;
+
+        if (_amount > dyadCached.balanceOf(_from)) {
+            revert NotEnoughBalance();
+        }
+
+        uint256 mintedDyad = dyadCached.mintedDyad(_noteID);
+
+        // since the dyad contract doesn't track interests we need to mint what was accrued to
+        // prevent an underflow error
+        if (_amount > mintedDyad) {
+            uint256 diff = _amount - mintedDyad;
+            dyadCached.mint(_noteID, _from, diff);
+        }
+
+        dyadCached.burn(_noteID, _from, _amount);
+
+        _activeDebtSnapshot -= _amount;
+        _noteDebtSnapshot[_noteID] = _currentNoteDebt - _amount;
+
+        emit BurnDyad(_noteID, _amount, msg.sender);
+
+        return _amount;
     }
 
     // ----------------- UPGRADABILITY ----------------- //
