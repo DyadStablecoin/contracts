@@ -96,6 +96,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     }
 
     function setMaxInterestRate(uint256 _newMaxInterestRateBps) external onlyOwner {
+        _accrueGlobalActiveInterest();
         uint256 newInterestRate = _newMaxInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
 
         if (newInterestRate < interestRate) {
@@ -112,11 +113,11 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             revert InterestRateTooHigh();
         }
 
+        _accrueGlobalActiveInterest();
+
         uint256 newInterestRate = _newInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
 
         if (newInterestRate != interestRate) {
-            _accrueGlobalActiveInterest();
-
             interestRate = newInterestRate;
         }
     }
