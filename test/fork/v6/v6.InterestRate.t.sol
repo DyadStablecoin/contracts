@@ -20,6 +20,7 @@ contract InterestRateTest is Test, Parameters {
     VaultManagerV6 manager;
     VaultGCoin mockVault;
     Dyad dyad;
+    InterestVault interestVault;
 
     address alice = makeAddr("ALICE");
     uint256 aliceNoteID;
@@ -38,7 +39,7 @@ contract InterestRateTest is Test, Parameters {
             Kerosine(MAINNET_KEROSENE), KerosineManager(MAINNET_V2_KEROSENE_MANAGER), Dyad(MAINNET_V2_DYAD)
         );
 
-        InterestVault interestVault = new InterestVault(address(this), MAINNET_V2_DYAD, MAINNET_V2_VAULT_MANAGER);
+        interestVault = new InterestVault(address(this), MAINNET_V2_DYAD, MAINNET_V2_VAULT_MANAGER);
 
         vm.startPrank(MAINNET_FEE_RECIPIENT);
 
@@ -161,11 +162,15 @@ contract InterestRateTest is Test, Parameters {
 
         _mintDyad(aliceNoteID, dyadToMint);
 
+        uint256 dyadSnapshot = dyad.balanceOf(alice);
+
         _repayDebt(aliceNoteID, dyadToMint);
 
         assertEq(manager.getNoteDebt(aliceNoteID), 0);
         assertEq(dyad.mintedDyad(aliceNoteID), 0);
         assertEq(manager.noteInterestIndex(aliceNoteID), 0);
+        assertEq(dyad.balanceOf(address(manager)), 0);
+        assertEq(dyad.balanceOf(alice), dyadSnapshot - dyadToMint);
     }
 
     function testRepayDebtWithInterests() external {
@@ -187,12 +192,17 @@ contract InterestRateTest is Test, Parameters {
         vm.prank(bob);
         dyad.transfer(alice, dyadToMint);
 
+        uint256 dyadSnapshot = dyad.balanceOf(alice);
+
         // alice pays the whole debt
         _repayDebt(aliceNoteID, noteDebt);
 
         assertEq(manager.getNoteDebt(aliceNoteID), 0);
         assertEq(dyad.mintedDyad(aliceNoteID), 0);
         assertEq(manager.noteInterestIndex(aliceNoteID), 0);
+        assertEq(dyad.balanceOf(address(manager)), 0);
+        assertEq(dyad.balanceOf(alice), dyadSnapshot - noteDebt);
+        assertEq(dyad.balanceOf(address(interestVault)), noteDebt - dyadToMint);
     }
 
     function testRepayWholeDebtWithInterests() external {
@@ -212,20 +222,29 @@ contract InterestRateTest is Test, Parameters {
         vm.prank(bob);
         dyad.transfer(alice, dyadToMint);
 
+        uint256 dyadSnapshot = dyad.balanceOf(alice);
+
         // alice pays the whole debt
         _repayDebt(aliceNoteID, type(uint256).max);
 
         assertEq(manager.getNoteDebt(aliceNoteID), 0);
         assertEq(dyad.mintedDyad(aliceNoteID), 0);
         assertEq(manager.noteInterestIndex(aliceNoteID), 0);
+        assertEq(dyad.balanceOf(address(manager)), 0);
+        assertEq(dyad.balanceOf(alice), dyadSnapshot - noteDebt);
+        assertEq(dyad.balanceOf(address(interestVault)), noteDebt - dyadToMint);
     }
 
     function testRepayOldUserDebt() external {
+        uint256 dyadSnapshot = dyad.balanceOf(bob);
+
         _repayDebt(bobNoteID, 1_000e18);
 
         assertEq(manager.getNoteDebt(bobNoteID), 0);
         assertEq(dyad.mintedDyad(bobNoteID), 0);
         assertEq(manager.noteInterestIndex(bobNoteID), 0);
+        assertEq(dyad.balanceOf(address(manager)), 0);
+        assertEq(dyad.balanceOf(bob), dyadSnapshot - 1_000e18);
     }
 
     function testRepayOldUserDebtWithInterest() external {
@@ -249,11 +268,16 @@ contract InterestRateTest is Test, Parameters {
         // interest have accrued
         assertGt(noteDebt, mintedDyad);
 
+        uint256 dyadSnapshot = dyad.balanceOf(bob);
+
         _repayDebt(bobNoteID, noteDebt);
 
         assertEq(manager.getNoteDebt(bobNoteID), 0);
         assertEq(dyad.mintedDyad(bobNoteID), 0);
         assertEq(manager.noteInterestIndex(bobNoteID), 0);
+        assertEq(dyad.balanceOf(address(manager)), 0);
+        assertEq(dyad.balanceOf(bob), dyadSnapshot - noteDebt);
+        assertEq(dyad.balanceOf(address(interestVault)), noteDebt - 1_000e18);
     }
 
     function testInterestAccruesForOldUserWithNoInteraction() external {
@@ -352,6 +376,7 @@ contract InterestRateTest is Test, Parameters {
     function _repayDebt(address _from, uint256 _noteID, uint256 _amount) internal {
         vm.startPrank(_from);
 
+        dyad.approve(address(manager), _amount);
         manager.burnDyad(_noteID, _amount);
 
         vm.stopPrank();

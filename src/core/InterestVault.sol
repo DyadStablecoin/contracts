@@ -10,6 +10,8 @@ contract InterestVault is Owned {
     address public immutable VAULT_MANAGER;
     Dyad public immutable DYAD;
 
+    uint256 _burnableInterest;
+
     error OnlyVaultManager();
 
     constructor(address _owner, address _dyadAddress, address _vaultManager) Owned(_owner) {
@@ -17,10 +19,22 @@ contract InterestVault is Owned {
         VAULT_MANAGER = _vaultManager;
     }
 
-    function mintInterest(uint256 _amount) external {
+    function mintInterest(address _to, uint256 _amount) external {
         _onlyVaultManager();
 
-        DYAD.mint(NOTE_ID, address(this), _amount);
+        DYAD.mint(NOTE_ID, _to, _amount);
+
+        uint256 interestToBurn = _burnableInterest;
+        if (interestToBurn > 0) {
+            DYAD.burn(NOTE_ID, address(this), interestToBurn);
+            _burnableInterest = 0;
+        }
+    }
+
+    function notifyBurnableInterest(uint256 _amount) external {
+        _onlyVaultManager();
+
+        _burnableInterest += _amount;
     }
 
     function _onlyVaultManager() internal view {

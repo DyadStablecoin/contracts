@@ -128,7 +128,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
         if (interestToClaim > 0) {
             _claimableInterestSnapshot = 0;
-            interestVault.mintInterest(interestToClaim);
+            interestVault.mintInterest(msg.sender, interestToClaim);
         }
 
         return interestToClaim;
@@ -601,16 +601,20 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             revert NotEnoughBalance();
         }
 
+        dyadCached.transferFrom(_from, address(this), _amount);
+
         uint256 mintedDyad = dyadCached.mintedDyad(_noteID);
 
         // since the dyad contract doesn't track interests we need to mint what was accrued to
         // prevent an underflow error
+        uint256 diff;
         if (_amount > mintedDyad) {
-            uint256 diff = _amount - mintedDyad;
-            dyadCached.mint(_noteID, _from, diff);
+            diff = _amount - mintedDyad;
+            dyadCached.transfer(address(interestVault), diff);
+            interestVault.notifyBurnableInterest(diff);
         }
 
-        dyadCached.burn(_noteID, _from, _amount);
+        dyadCached.burn(_noteID, address(this), _amount - diff);
 
         _activeDebtSnapshot -= _amount;
         _noteDebtSnapshot[_noteID] = _currentNoteDebt - _amount;
