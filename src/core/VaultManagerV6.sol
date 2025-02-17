@@ -23,7 +23,7 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-/// @custom:oz-upgrades-from src/core/VaultManagerV4.sol:VaultManagerV4
+/// @custom:oz-upgrades-from src/core/VaultManagerV5.sol:VaultManagerV5
 contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable {
     using EnumerableSet for EnumerableSet.AddressSet;
     using FixedPointMathLib for uint256;
@@ -96,6 +96,10 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     }
 
     function setMaxInterestRate(uint256 _newMaxInterestRateBps) external onlyOwner {
+        if (_newMaxInterestRateBps > 10_000) {
+            revert InterestRateTooHigh();
+        }
+
         _accrueGlobalActiveInterest();
         uint256 newInterestRate = _newMaxInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
 
