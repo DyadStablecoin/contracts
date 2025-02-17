@@ -266,7 +266,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             totalLiquidationReward = allAsset.mulWadDown(debtToPay).divWadDown(noteDebt);
         } else {
             totalLiquidationReward = debtToPay + debtToPay.mulWadDown(LIQUIDATION_REWARD);
-            if (totalLiquidationReward < totalValue) {
+            if (totalValue < totalLiquidationReward) {
                 totalLiquidationReward = totalValue;
             }
         }
