@@ -23,7 +23,7 @@ import {ERC1967Proxy} from "@openzeppelin/contracts/proxy/ERC1967/ERC1967Proxy.s
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 
-/// @custom:oz-upgrades-from src/core/VaultManagerV4.sol:VaultManagerV4
+/// @custom:oz-upgrades-from src/core/VaultManagerV5.sol:VaultManagerV5
 contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable {
     using EnumerableSet for EnumerableSet.AddressSet;
     using FixedPointMathLib for uint256;
@@ -96,15 +96,20 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
     }
 
     function setMaxInterestRate(uint256 _newMaxInterestRateBps) external onlyOwner {
+        if (_newMaxInterestRateBps > 10_000) {
+            revert InterestRateTooHigh();
+        }
+
+        _accrueGlobalActiveInterest();
         uint256 newInterestRate = _newMaxInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
 
         if (newInterestRate < interestRate) {
             interestRate = newInterestRate;
         }
 
-        maxInterestRateInBps = _newMaxInterestRateBps;
-
         emit MaxInterestRateUpdated(maxInterestRateInBps, _newMaxInterestRateBps);
+
+        maxInterestRateInBps = _newMaxInterestRateBps;
     }
 
     function setInterestRate(uint256 _newInterestRateBps) external onlyOwner {
@@ -112,11 +117,11 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             revert InterestRateTooHigh();
         }
 
+        _accrueGlobalActiveInterest();
+
         uint256 newInterestRate = _newInterestRateBps.mulDivUp(INTEREST_PRECISION, 10000 * 365 days);
 
         if (newInterestRate != interestRate) {
-            _accrueGlobalActiveInterest();
-
             interestRate = newInterestRate;
         }
     }
@@ -128,7 +133,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
 
         if (interestToClaim > 0) {
             _claimableInterestSnapshot = 0;
-            interestVault.mintInterest(interestToClaim);
+            interestVault.mintInterest(msg.sender, interestToClaim);
         }
 
         return interestToClaim;
@@ -265,7 +270,7 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             totalLiquidationReward = allAsset.mulWadDown(debtToPay).divWadDown(noteDebt);
         } else {
             totalLiquidationReward = debtToPay + debtToPay.mulWadDown(LIQUIDATION_REWARD);
-            if (totalLiquidationReward < totalValue) {
+            if (totalValue < totalLiquidationReward) {
                 totalLiquidationReward = totalValue;
             }
         }
@@ -601,16 +606,20 @@ contract VaultManagerV6 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             revert NotEnoughBalance();
         }
 
+        dyadCached.transferFrom(_from, address(this), _amount);
+
         uint256 mintedDyad = dyadCached.mintedDyad(_noteID);
 
         // since the dyad contract doesn't track interests we need to mint what was accrued to
         // prevent an underflow error
+        uint256 diff;
         if (_amount > mintedDyad) {
-            uint256 diff = _amount - mintedDyad;
-            dyadCached.mint(_noteID, _from, diff);
+            diff = _amount - mintedDyad;
+            dyadCached.transfer(address(interestVault), diff);
+            interestVault.notifyBurnableInterest(diff);
         }
 
-        dyadCached.burn(_noteID, _from, _amount);
+        dyadCached.burn(_noteID, address(this), _amount - diff);
 
         _activeDebtSnapshot -= _amount;
         _noteDebtSnapshot[_noteID] = _currentNoteDebt - _amount;
