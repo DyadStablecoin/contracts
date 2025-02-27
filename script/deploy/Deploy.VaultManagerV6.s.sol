@@ -25,15 +25,18 @@ contract DeployVaultManagerV6 is Script, Parameters {
 
         InterestVault interestVault = new InterestVault(address(this), MAINNET_V2_DYAD, MAINNET_V2_VAULT_MANAGER);
 
-        VaultManagerV6(MAINNET_V2_VAULT_MANAGER).upgradeToAndCall(
-            address(impl),
-            abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer), address(interestVault))
-        );
-
         // After deployment these things need to happen
+
+        // Upgrade vault manager to V6
+        // VaultManagerV6(MAINNET_V2_VAULT_MANAGER).upgradeToAndCall(
+        //     address(impl),
+        //     abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer), address(interestVault))
+        // );
 
         // Dyad dyad = Dyad(MAINNET_V2_DYAD);
         // VaultManagerV6 manager = VaultManagerV6(MAINNET_V2_VAULT_MANAGER);
+
+        // add the interest vault to the dyad licenser
         // dyad.licenser().add(address(interestVault));
 
         vm.stopBroadcast(); // ----------------------------
