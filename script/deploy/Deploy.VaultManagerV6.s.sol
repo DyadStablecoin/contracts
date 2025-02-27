@@ -39,6 +39,9 @@ contract DeployVaultManagerV6 is Script, Parameters {
         // add the interest vault to the dyad licenser
         // dyad.licenser().add(address(interestVault));
 
+        // set dyad multiplier to increase to 1.25
+        // keroseneValuer.setTargetDyadMultiplier(1.25e12, 12 hours);
+
         vm.stopBroadcast(); // ----------------------------
     }
 }
