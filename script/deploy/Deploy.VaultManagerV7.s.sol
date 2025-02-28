@@ -16,7 +16,7 @@ contract DeployVaultManagerV7 is Script, Parameters {
         // Upgrade vault manager to V7
         // VaultManagerV7(MAINNET_V2_VAULT_MANAGER).upgradeToAndCall(
         //     address(impl),
-        //     abi.encodeWithSelector(impl.initialize.selector, address(keroseneValuer), address(interestVault))
+        //     abi.encodeWithSelector(impl.initialize.selector)
         // );
 
         vm.stopBroadcast(); // ----------------------------
