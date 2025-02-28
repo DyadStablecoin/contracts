@@ -475,8 +475,6 @@ contract VaultManagerV7 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             vaultValues[keroseneVaultIndex] = keroValue;
         }
 
-        _interestIndexSnapshot
-
         mintedDyad = _noteDebtSnapshot[id];
         uint256 totalValue = exoValue + keroValue;
         cr = _collatRatio(mintedDyad, totalValue);
