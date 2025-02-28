@@ -80,9 +80,7 @@ contract VaultManagerV7 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         _disableInitializers();
     }
 
-    function initialize(address _keroseneValuer, address _interestVault) public reinitializer(6) {
-        interestVault = IInterestVault(_interestVault);
-        keroseneValuer = KeroseneValuer(_keroseneValuer);
+    function initialize() public reinitializer(7) {
 
         uint256 interestIndex = INTEREST_PRECISION;
         _interestIndexSnapshot = interestIndex;
@@ -92,6 +90,9 @@ contract VaultManagerV7 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
         Dyad dyadCached = dyad;
 
         for (uint256 i; i < totalNotes; i++) {
+            if (noteInterestIndex[i] > 0) {
+                continue;
+            }
             noteInterestIndex[i] = interestIndex;
 
             uint256 mintedDyad = dyadCached.mintedDyad(i);
@@ -100,7 +101,6 @@ contract VaultManagerV7 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             }
         }
         _activeDebtSnapshot = dyadCached.totalSupply();
-        maxInterestRateInBps = 500; // 5%
     }
 
     function setKeroseneValuer(address _newKeroseneValuer) external onlyOwner {
@@ -474,6 +474,8 @@ contract VaultManagerV7 is IVaultManagerV5, UUPSUpgradeable, OwnableUpgradeable 
             keroValue = (noteKeroseneAmount * keroseneValuer.deterministicValue()) / 1e8;
             vaultValues[keroseneVaultIndex] = keroValue;
         }
+
+        _interestIndexSnapshot
 
         mintedDyad = _noteDebtSnapshot[id];
         uint256 totalValue = exoValue + keroValue;
